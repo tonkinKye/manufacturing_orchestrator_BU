@@ -97,36 +97,6 @@ export async function fishbowlQuery(sql) {
 }
 
 /**
- * Execute unsafe SQL query (deprecated)
- */
-export async function fishbowlUnsafeQuery(sql) {
-  const serverUrl = getServerUrl();
-
-  if (!sessionToken) {
-    throw new Error('Not logged in. Please login first.');
-  }
-
-  const response = await fetch('/api/unsafe/deprecated/data-query', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      serverUrl: serverUrl,
-      token: sessionToken,
-      sql: sql
-    })
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  if (!data) return [];
-  return Array.isArray(data) ? data : [data];
-}
-
-/**
  * Detect database name
  */
 export async function detectDatabaseName() {

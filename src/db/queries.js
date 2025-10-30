@@ -157,11 +157,50 @@ async function queueWorkOrder(connection, params) {
   ]);
 }
 
+/**
+ * Batch queue work orders
+ * @param {Connection} connection - MySQL connection
+ * @param {Array<Object>} items - Array of work order items
+ * @returns {Promise<number>} Number of inserted records
+ */
+async function batchQueueWorkOrders(connection, items) {
+  if (!items || items.length === 0) {
+    return 0;
+  }
+
+  const insertSQL = `
+    INSERT INTO mo_queue
+    (datetime, mo_number, barcode, serial_numbers, fg_location, raw_goods_part_id, bom_num, bom_id, location_group_id, status, wo_number, error_message, retry_count)
+    VALUES ?
+  `;
+
+  // Build values array - each item is an array of values
+  const values = items.map(item => [
+    new Date(), // datetime
+    null, // mo_number
+    item.barcode,
+    item.serialNumbers, // Already JSON string
+    item.fgLocation,
+    item.rawGoodsPartId,
+    item.bomNum,
+    item.bomId,
+    item.locationGroupId,
+    'Pending', // status
+    null, // wo_number
+    null, // error_message
+    0 // retry_count
+  ]);
+
+  const [result] = await connection.query(insertSQL, [values]);
+  return result.affectedRows;
+}
+
 module.exports = {
   createMOQueueTable,
   getMOQueueCount,
   getPendingItems,
   getPendingCount,
   deletePendingBarcodes,
-  queueWorkOrder
+  queueWorkOrder,
+  batchQueueWorkOrders
 };
