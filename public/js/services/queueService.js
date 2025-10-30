@@ -126,8 +126,12 @@ export async function processQueue() {
     // Grey out and disable configuration steps
     document.getElementById('step1').style.opacity = '0.6';
     document.getElementById('step1').style.pointerEvents = 'none';
+    document.getElementById('step1_5').style.opacity = '0.6';
+    document.getElementById('step1_5').style.pointerEvents = 'none';
     document.getElementById('step2').style.opacity = '0.6';
     document.getElementById('step2').style.pointerEvents = 'none';
+    document.getElementById('step2b').style.opacity = '0.6';
+    document.getElementById('step2b').style.pointerEvents = 'none';
     document.getElementById('step3').style.opacity = '0.6';
     document.getElementById('step3').style.pointerEvents = 'none';
 
@@ -139,7 +143,9 @@ export async function processQueue() {
 
     // Collapse other steps
     $('#collapseStep1').collapse('hide');
+    $('#collapseStep1_5').collapse('hide');
     $('#collapseStep2').collapse('hide');
+    $('#collapseStep2b').collapse('hide');
     $('#collapseStep3').collapse('hide');
 
     // === END UI STATE CHANGES ===
@@ -327,6 +333,9 @@ export async function pollQueueStatus() {
           document.getElementById('timeRemaining').textContent = '0s';
         }
       }
+
+      // DEBUG: Log all status checks
+      console.log('[DEBUG] Polling status:', status.status, 'Stop requested:', status.stopRequested);
 
       if (status.status === 'stopped') {
         clearInterval(pollInterval);
@@ -600,8 +609,12 @@ export async function checkAndResumeJob() {
       // Grey out and disable all configuration steps - job is already running
       document.getElementById('step1').style.opacity = '0.6';
       document.getElementById('step1').style.pointerEvents = 'none';
+      document.getElementById('step1_5').style.opacity = '0.6';
+      document.getElementById('step1_5').style.pointerEvents = 'none';
       document.getElementById('step2').style.opacity = '0.6';
       document.getElementById('step2').style.pointerEvents = 'none';
+      document.getElementById('step2b').style.opacity = '0.6';
+      document.getElementById('step2b').style.pointerEvents = 'none';
       document.getElementById('step3').style.opacity = '0.6';
       document.getElementById('step3').style.pointerEvents = 'none';
 
@@ -620,7 +633,9 @@ export async function checkAndResumeJob() {
 
       // Collapse other steps
       $('#collapseStep1').collapse('hide');
+      $('#collapseStep1_5').collapse('hide');
       $('#collapseStep2').collapse('hide');
+      $('#collapseStep2b').collapse('hide');
       $('#collapseStep3').collapse('hide');
 
       // Show the progress UI
