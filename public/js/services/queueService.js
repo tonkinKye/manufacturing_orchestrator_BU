@@ -139,6 +139,7 @@ export async function processQueue() {
 
     // Collapse other steps
     $('#collapseStep1').collapse('hide');
+    $('#collapseStep1_5').collapse('hide');
     $('#collapseStep2').collapse('hide');
     $('#collapseStep3').collapse('hide');
 
@@ -623,6 +624,7 @@ export async function checkAndResumeJob() {
 
       // Collapse other steps
       $('#collapseStep1').collapse('hide');
+      $('#collapseStep1_5').collapse('hide');
       $('#collapseStep2').collapse('hide');
       $('#collapseStep3').collapse('hide');
 
