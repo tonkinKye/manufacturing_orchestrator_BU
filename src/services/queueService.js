@@ -581,24 +581,55 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
     logger.info(`BACKGROUND PROCESSOR - Starting from sequence ${startingSequence}`);
 
-    // Group into batches of 100
-    const batches = [];
-    for (let i = 0; i < pendingItems.length; i += 100) {
-      batches.push(pendingItems.slice(i, i + 100));
+    // Separate items into those with existing MO numbers (partial MOs from stopped jobs)
+    // and those without (new items to process)
+    const itemsWithMO = pendingItems.filter(item => item.mo_number);
+    const itemsWithoutMO = pendingItems.filter(item => !item.mo_number);
+
+    // Group items with existing MOs by their MO number
+    const partialMOGroups = new Map();
+    for (const item of itemsWithMO) {
+      if (!partialMOGroups.has(item.mo_number)) {
+        partialMOGroups.set(item.mo_number, []);
+      }
+      partialMOGroups.get(item.mo_number).push(item);
     }
 
-    currentJob.totalBatches = batches.length;
-    logger.info(`BACKGROUND PROCESSOR - ${batches.length} batches to process`);
+    if (partialMOGroups.size > 0) {
+      logger.info(`BACKGROUND PROCESSOR - Found ${partialMOGroups.size} partial MO(s) from previous stopped job, will continue processing them`);
+    }
+
+    // Group new items into batches of 100
+    const newBatches = [];
+    for (let i = 0; i < itemsWithoutMO.length; i += 100) {
+      newBatches.push(itemsWithoutMO.slice(i, i + 100));
+    }
+
+    // Combine partial MOs and new batches for processing
+    const allBatches = [];
+
+    // Add partial MOs first (to complete them before creating new ones)
+    for (const [moNum, items] of partialMOGroups) {
+      allBatches.push({ batch: items, moNum: moNum, isPartial: true });
+    }
+
+    // Add new batches
+    for (let i = 0; i < newBatches.length; i++) {
+      const moNum = `${bom}|${dateStr}|${startingSequence + i}`;
+      allBatches.push({ batch: newBatches[i], moNum: moNum, isPartial: false });
+    }
+
+    currentJob.totalBatches = allBatches.length;
+    logger.info(`BACKGROUND PROCESSOR - ${allBatches.length} batch(es) to process (${partialMOGroups.size} partial, ${newBatches.length} new)`);
 
     // Process each batch
-    for (let batchIdx = 0; batchIdx < batches.length; batchIdx++) {
-      const batch = batches[batchIdx];
-      const moNum = `${bom}|${dateStr}|${startingSequence + batchIdx}`;
+    for (let batchIdx = 0; batchIdx < allBatches.length; batchIdx++) {
+      const { batch, moNum, isPartial } = allBatches[batchIdx];
 
       currentJob.currentBatch = batchIdx + 1;
       currentJob.currentMO = moNum;
 
-      logger.info(`BACKGROUND PROCESSOR - Batch ${batchIdx + 1}/${batches.length}: MO ${moNum}`);
+      logger.info(`BACKGROUND PROCESSOR - Batch ${batchIdx + 1}/${allBatches.length}: MO ${moNum}${isPartial ? ' (RESUMING PARTIAL)' : ''}`);
 
       // Check if this is a disassembly batch
       const isDisassembly = batch[0].operation_type === 'disassemble';
@@ -611,40 +642,45 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
       }
 
       try {
-        // Update MO numbers in database
-        const batchIds = batch.map(item => item.id).join(',');
-        await connection.query(
-          `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
-          [moNum]
-        );
+        if (!isPartial) {
+          // Only update MO numbers and create MO for NEW batches
+          // Partial MOs already have their MO number and the MO is already created
+          const batchIds = batch.map(item => item.id).join(',');
+          await connection.query(
+            `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
+            [moNum]
+          );
 
-        // Create MO
-        const configurations = batch.map((item, idx) => ({
-          bom: { id: parseInt(bomId) },
-          quantity: 1,
-          sortId: idx + 1,
-          dateScheduled: new Date().toISOString()
-        }));
+          // Create MO
+          const configurations = batch.map((item, idx) => ({
+            bom: { id: parseInt(bomId) },
+            quantity: 1,
+            sortId: idx + 1,
+            dateScheduled: new Date().toISOString()
+          }));
 
-        const moPayload = {
-          locationGroup: { id: parseInt(locationGroup) },
-          dateScheduled: new Date().toISOString(),
-          number: moNum,
-          configurations: configurations
-        };
+          const moPayload = {
+            locationGroup: { id: parseInt(locationGroup) },
+            dateScheduled: new Date().toISOString(),
+            number: moNum,
+            configurations: configurations
+          };
 
-        const moResult = await callFishbowlREST(serverUrl, token, 'manufacture-orders', 'POST', moPayload);
+          const moResult = await callFishbowlREST(serverUrl, token, 'manufacture-orders', 'POST', moPayload);
 
-        if (!moResult || !moResult.id) {
-          throw new Error('Failed to create MO: ' + JSON.stringify(moResult).substring(0, 200));
+          if (!moResult || !moResult.id) {
+            throw new Error('Failed to create MO: ' + JSON.stringify(moResult).substring(0, 200));
+          }
+
+          const moId = moResult.id;
+          logger.info(`BACKGROUND PROCESSOR - MO created: ${moNum} (ID: ${moId})`);
+
+          // Issue MO
+          await callFishbowlREST(serverUrl, token, `manufacture-orders/${moId}/issue`, 'POST');
+          logger.info(`BACKGROUND PROCESSOR - MO issued`);
+        } else {
+          logger.info(`BACKGROUND PROCESSOR - Resuming partial MO ${moNum} (already created and issued)`);
         }
-
-        const moId = moResult.id;
-        logger.info(`BACKGROUND PROCESSOR - MO created: ${moNum} (ID: ${moId})`);
-
-        // Issue MO
-        await callFishbowlREST(serverUrl, token, `manufacture-orders/${moId}/issue`, 'POST');
-        logger.info(`BACKGROUND PROCESSOR - MO issued`);
 
         // Get WO numbers from Fishbowl API
         const woSql = `
