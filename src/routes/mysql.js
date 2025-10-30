@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createConnection } = require('../db/connection');
-const { createMOQueueTable, getMOQueueCount, deletePendingBarcodes, queueWorkOrder } = require('../db/queries');
+const { createMOQueueTable, getMOQueueCount, deletePendingBarcodes, queueWorkOrder, batchQueueWorkOrders } = require('../db/queries');
 
 /**
  * MySQL Routes
@@ -161,6 +161,47 @@ function setupMySQLRoutes(logger) {
 
     } catch (error) {
       logger.error('QUEUE WORK ORDER - Error', { error: error.message, barcode });
+      res.status(500).json({ error: error.message });
+    } finally {
+      if (connection) {
+        await connection.end();
+      }
+    }
+  });
+
+  // Batch queue work orders
+  router.post('/mysql/batch-queue-work-orders', async (req, res) => {
+    const { database, items } = req.body;
+
+    if (!database) {
+      return res.status(400).json({ error: 'Database name is required' });
+    }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Items array is required' });
+    }
+
+    logger.info('MYSQL - Batch queueing work orders...', {
+      database,
+      count: items.length
+    });
+
+    let connection;
+
+    try {
+      connection = await createConnection(database);
+
+      const insertedCount = await batchQueueWorkOrders(connection, items);
+
+      logger.info(`MYSQL - Successfully queued ${insertedCount} work order(s)`);
+
+      res.json({
+        success: true,
+        insertedCount: insertedCount
+      });
+
+    } catch (error) {
+      logger.error('MYSQL - Error batch queueing work orders', { error: error.message });
       res.status(500).json({ error: error.message });
     } finally {
       if (connection) {

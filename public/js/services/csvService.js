@@ -5,7 +5,7 @@
 
 import { log, kv, populateSelect, setHTML } from '../utils/helpers.js';
 import { state, sessionToken, sessionCredentials, getServerUrl } from '../utils/state.js';
-import { fishbowlQuery, fishbowlUnsafeQuery } from '../api/fishbowlApi.js';
+import { fishbowlQuery } from '../api/fishbowlApi.js';
 
 /**
  * Load CSV file from file input
@@ -423,19 +423,34 @@ export async function saveToQueue() {
     // Now insert the new records
     log(`Saving ${results.valid.size} barcode(s) to queue...\n`);
 
-    const values = [];
+    const items = [];
     for (const [barcode, serials] of results.valid) {
       const serialsJson = JSON.stringify(serials);
-      values.push(`(NOW(), NULL, '${barcode.replace(/'/g, "''")}', '${serialsJson.replace(/'/g, "''")}', '${results.fgLocation.replace(/'/g, "''")}', ${results.rawGoodPartId}, '${state.bom.replace(/'/g, "''")}', ${state.bomId}, ${state.locationGroup}, 'Pending', NULL, NULL, 0)`);
+      items.push({
+        barcode: barcode,
+        serialNumbers: serialsJson,
+        fgLocation: results.fgLocation,
+        rawGoodsPartId: results.rawGoodPartId,
+        bomNum: state.bom,
+        bomId: state.bomId,
+        locationGroupId: state.locationGroup
+      });
     }
 
-    const insertSQL = `
-      INSERT INTO mo_queue
-      (datetime, mo_number, barcode, serial_numbers, fg_location, raw_goods_part_id, bom_num, bom_id, location_group_id, status, wo_number, error_message, retry_count)
-      VALUES ${values.join(', ')}
-    `;
+    const insertResponse = await fetch('/api/mysql/batch-queue-work-orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        database: config.database,
+        items: items
+      })
+    });
 
-    await fishbowlUnsafeQuery(insertSQL);
+    if (!insertResponse.ok) {
+      throw new Error('Failed to insert records');
+    }
+
+    const insertResult = await insertResponse.json();
 
     log(`[OK] Saved ${results.valid.size} item(s) to queue\n`);
 
