@@ -76,6 +76,7 @@ server = app.listen(PORT, async () => {
   logger.info('='.repeat(60));
   logger.info(`Server running on http://localhost:${PORT}`);
   logger.info(`Web interface: http://localhost:${PORT}/manufacturing-orchestrator.html`);
+  logger.info(`Log level: ${logger.getLevel()}`);
   logger.info('CORS enabled - Fishbowl API calls will be proxied');
   logger.info('SSL certificate validation disabled (development mode)');
   logger.info('='.repeat(60));

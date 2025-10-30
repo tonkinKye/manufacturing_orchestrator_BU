@@ -1,6 +1,6 @@
 const express = require('express');
 const Logger = require('./utils/logger');
-const { LOG_FILE } = require('./config');
+const { LOG_FILE, LOG_LEVEL } = require('./config');
 const setupMiddleware = require('./middleware');
 const setupRoutes = require('./routes');
 
@@ -9,7 +9,7 @@ const setupRoutes = require('./routes');
  */
 
 // Create logger instance
-const logger = new Logger(LOG_FILE);
+const logger = new Logger(LOG_FILE, LOG_LEVEL);
 
 // Create Express app
 const app = express();

@@ -5,10 +5,45 @@ const LOG_MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 const LOG_MAX_AGE_DAYS = 7; // Keep logs for 7 days
 const LOG_BACKUP_COUNT = 3; // Keep 3 backup files
 
+// Logging levels
+const LOG_LEVELS = {
+  ERROR: 0,
+  WARN: 1,
+  INFO: 2,
+  DEBUG: 3
+};
+
 class Logger {
-  constructor(logFile) {
+  constructor(logFile, level = 'INFO') {
     this.logFile = logFile;
+    this.setLevel(level);
     this.initializeLog();
+  }
+
+  /**
+   * Set logging level
+   * @param {string} level - ERROR, WARN, INFO, or DEBUG
+   */
+  setLevel(level) {
+    const upperLevel = level?.toUpperCase() || 'INFO';
+    if (LOG_LEVELS.hasOwnProperty(upperLevel)) {
+      this.level = LOG_LEVELS[upperLevel];
+      this.levelName = upperLevel;
+    } else {
+      console.warn(`Invalid log level: ${level}, defaulting to INFO`);
+      this.level = LOG_LEVELS.INFO;
+      this.levelName = 'INFO';
+    }
+  }
+
+  /**
+   * Check if a log level should be logged
+   * @param {string} level - The level to check
+   * @returns {boolean}
+   */
+  shouldLog(level) {
+    const levelValue = LOG_LEVELS[level] ?? LOG_LEVELS.INFO;
+    return levelValue <= this.level;
   }
 
   initializeLog() {
@@ -67,6 +102,11 @@ class Logger {
   }
 
   async log(level, message, data = null) {
+    // Check if this level should be logged
+    if (!this.shouldLog(level)) {
+      return;
+    }
+
     const timestamp = this.getTimestamp();
     let logMessage = `[${timestamp}] [${level}] ${message}`;
 
@@ -96,8 +136,20 @@ class Logger {
     return this.log('ERROR', message, data);
   }
 
+  debug(message, data) {
+    return this.log('DEBUG', message, data);
+  }
+
   api(message, data) {
     return this.log('API', message, data);
+  }
+
+  /**
+   * Get current log level name
+   * @returns {string}
+   */
+  getLevel() {
+    return this.levelName;
   }
 }
 

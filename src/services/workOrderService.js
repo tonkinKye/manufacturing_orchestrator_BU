@@ -23,26 +23,36 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   const dateScheduled = new Date().toISOString().slice(0, 19);
 
   // Check if WO is already completed (from previous run before job was stopped)
+  logger.debug(`WO ${woNum} - Checking if WO is already completed`);
   const getWOCheckPayload = { GetWorkOrderRq: { WorkOrderNumber: woNum } };
   const getWOCheckResult = await callFishbowlLegacy(serverUrl, token, 'GetWorkOrderRq', getWOCheckPayload);
 
   if (!getWOCheckResult.FbiJson?.FbiMsgsRs?.ErrorRs) {
     const woCheck = getWOCheckResult.FbiJson.FbiMsgsRs.GetWorkOrderRs.WO;
+    logger.debug(`WO ${woNum} - Current WO Status: ${woCheck.StatusID}`);
     if (woCheck.StatusID >= 50) {
       logger.info(`WO ${woNum} - Already completed (Status: ${woCheck.StatusID}), skipping processing`);
       return; // WO already complete, nothing to do
     }
+  } else {
+    logger.debug(`WO ${woNum} - WO check returned error, will proceed with normal processing`);
   }
 
   // STEP 1: GetPickRq via legacy API
+  logger.debug(`WO ${woNum} - Fetching pick from Fishbowl`);
   const getPickPayload = { GetPickRq: { WoNum: woNum } };
   const pickResult = await callFishbowlLegacy(serverUrl, token, 'GetPickRq', getPickPayload);
 
   if (pickResult.FbiJson?.FbiMsgsRs?.GetPickRs?.statusCode !== 1000) {
+    logger.error(`WO ${woNum} - Failed to get pick`, {
+      statusCode: pickResult.FbiJson?.FbiMsgsRs?.GetPickRs?.statusCode,
+      statusMessage: pickResult.FbiJson?.FbiMsgsRs?.GetPickRs?.statusMessage
+    });
     throw new Error('Failed to get pick');
   }
 
   const pick = pickResult.FbiJson.FbiMsgsRs.GetPickRs.Pick;
+  logger.debug(`WO ${woNum} - Pick retrieved, Status: ${pick.Status}, Num: ${pick.Num}`);
 
   // STEP 2: Open Pick (if not already open)
   // Status: 10 = Not Started, 40 = In Progress, 50 = Complete
@@ -51,18 +61,25 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   if (pick.Status >= 40) {
     // Pick is already open or completed (from previous run before job was stopped)
     logger.info(`WO ${woNum} - Pick already open/completed (Status: ${pick.Status}), skipping open step`);
+    logger.debug(`WO ${woNum} - Using existing pick without modification`);
     savedPick = pick;
   } else {
     // Pick needs to be opened
+    logger.debug(`WO ${woNum} - Opening pick (current status: ${pick.Status})`);
     pick.DateScheduled = pick.DateStarted = dateScheduled;
     const savePickResult1 = await callFishbowlLegacy(serverUrl, token, 'SavePickRq', { SavePickRq: { Pick: pick } });
 
     if (savePickResult1.FbiJson?.FbiMsgsRs?.SavePickRs?.statusCode !== 1000) {
+      logger.error(`WO ${woNum} - Failed to open pick`, {
+        statusCode: savePickResult1.FbiJson?.FbiMsgsRs?.SavePickRs?.statusCode,
+        statusMessage: savePickResult1.FbiJson?.FbiMsgsRs?.SavePickRs?.statusMessage
+      });
       throw new Error('Failed to open pick');
     }
 
     savedPick = savePickResult1.FbiJson.FbiMsgsRs.SavePickRs.Pick;
     logger.info(`WO ${woNum} - Pick opened successfully`);
+    logger.debug(`WO ${woNum} - New pick status: ${savedPick.Status}`);
   }
 
   // STEP 3: Query serial locations from Fishbowl API - FILTERED BY SELECTED RAW GOODS PART
@@ -142,10 +159,18 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   // Check if pick is already split and finished (has tracking with serials)
   const alreadyProcessed = pick.Status >= 40 && firstItem.Tracking?.TrackingItem;
 
+  logger.debug(`WO ${woNum} - Checking if pick needs splitting`, {
+    pickStatus: pick.Status,
+    hasTracking: !!firstItem.Tracking?.TrackingItem,
+    alreadyProcessed
+  });
+
   if (alreadyProcessed) {
     logger.info(`WO ${woNum} - Pick already split and processed in previous run, skipping split step`);
+    logger.debug(`WO ${woNum} - Existing pick items count: ${pickItemArray.length}`);
   } else {
     logger.info(`WO ${woNum} - Splitting pick by location`);
+    logger.debug(`WO ${woNum} - Locations to split across: ${locationGroups.size}`);
 
     const partTracking = firstItem.Part.PartTrackingList.PartTracking;
     const trackingArray = Array.isArray(partTracking) ? partTracking : [partTracking];
@@ -207,13 +232,19 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
 
     savedPick.PickItems.PickItem = newPickItems;
 
+    logger.debug(`WO ${woNum} - Saving split pick with ${newPickItems.length} pick items`);
     const savePickResult2 = await callFishbowlLegacy(serverUrl, token, 'SavePickRq', { SavePickRq: { Pick: savedPick } });
 
     if (savePickResult2.FbiJson?.FbiMsgsRs?.SavePickRs?.statusCode !== 1000) {
+      logger.error(`WO ${woNum} - Failed to finish pick`, {
+        statusCode: savePickResult2.FbiJson?.FbiMsgsRs?.SavePickRs?.statusCode,
+        statusMessage: savePickResult2.FbiJson?.FbiMsgsRs?.SavePickRs?.statusMessage
+      });
       throw new Error('Failed to finish pick');
     }
 
     logger.info(`WO ${woNum} - Pick split and saved successfully`);
+    logger.debug(`WO ${woNum} - Final pick status: ${savePickResult2.FbiJson.FbiMsgsRs.SavePickRs.Pick.Status}`);
   }
 
   // STEP 5: Get WO and complete it
