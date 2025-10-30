@@ -130,6 +130,8 @@ export async function processQueue() {
     document.getElementById('step1_5').style.pointerEvents = 'none';
     document.getElementById('step2').style.opacity = '0.6';
     document.getElementById('step2').style.pointerEvents = 'none';
+    document.getElementById('step2b').style.opacity = '0.6';
+    document.getElementById('step2b').style.pointerEvents = 'none';
     document.getElementById('step3').style.opacity = '0.6';
     document.getElementById('step3').style.pointerEvents = 'none';
 
@@ -143,6 +145,7 @@ export async function processQueue() {
     $('#collapseStep1').collapse('hide');
     $('#collapseStep1_5').collapse('hide');
     $('#collapseStep2').collapse('hide');
+    $('#collapseStep2b').collapse('hide');
     $('#collapseStep3').collapse('hide');
 
     // === END UI STATE CHANGES ===
@@ -610,6 +613,8 @@ export async function checkAndResumeJob() {
       document.getElementById('step1_5').style.pointerEvents = 'none';
       document.getElementById('step2').style.opacity = '0.6';
       document.getElementById('step2').style.pointerEvents = 'none';
+      document.getElementById('step2b').style.opacity = '0.6';
+      document.getElementById('step2b').style.pointerEvents = 'none';
       document.getElementById('step3').style.opacity = '0.6';
       document.getElementById('step3').style.pointerEvents = 'none';
 
@@ -630,6 +635,7 @@ export async function checkAndResumeJob() {
       $('#collapseStep1').collapse('hide');
       $('#collapseStep1_5').collapse('hide');
       $('#collapseStep2').collapse('hide');
+      $('#collapseStep2b').collapse('hide');
       $('#collapseStep3').collapse('hide');
 
       // Show the progress UI
