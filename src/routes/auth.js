@@ -1,0 +1,64 @@
+const express = require('express');
+const router = express.Router();
+const authService = require('../services/authService');
+const { loadTokens } = require('../db/tokenStore');
+
+/**
+ * Authentication Routes
+ */
+
+function setupAuthRoutes(logger) {
+  // Login
+  router.post('/login', async (req, res) => {
+    const { serverUrl, ...loginData } = req.body;
+
+    try {
+      const data = await authService.login(serverUrl, loginData, logger);
+      res.json(data);
+    } catch (error) {
+      logger.error('LOGIN ERROR', { error: error.message, stack: error.stack });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Logout
+  router.post('/logout', async (req, res) => {
+    const { serverUrl, token, ...logoutData } = req.body;
+
+    try {
+      const result = await authService.logout(serverUrl, token, logoutData, logger);
+      res.json(result);
+    } catch (error) {
+      logger.error('LOGOUT ERROR', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Manual token cleanup
+  router.post('/cleanup-tokens', async (req, res) => {
+    logger.info('TOKEN CLEANUP - Manual cleanup requested');
+
+    try {
+      const result = await authService.logoutAllTokens(logger);
+      res.json(result);
+    } catch (error) {
+      logger.error('TOKEN CLEANUP - Error', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get token status
+  router.get('/token-status', async (req, res) => {
+    try {
+      const status = await authService.getTokenStatus();
+      res.json(status);
+    } catch (error) {
+      logger.error('TOKEN STATUS - Error', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  return router;
+}
+
+module.exports = setupAuthRoutes;
