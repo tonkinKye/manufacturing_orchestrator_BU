@@ -287,8 +287,11 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
       if (currentJob.stopRequested) {
         logger.info('DISASSEMBLY - Stop requested, pausing job after completing current WO');
         logger.info(`DISASSEMBLY - Last completed WO: ${woNum}`);
+        logger.info(`DISASSEMBLY - Setting job status to 'stopped'`);
         currentJob.status = 'stopped';
+        currentJob.endTime = new Date().toISOString();
         currentJob.stopRequested = false;
+        logger.info(`DISASSEMBLY - Job status is now: ${currentJob.status}`);
         return;
       }
     }
@@ -941,8 +944,11 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
           if (currentJob.stopRequested) {
             logger.info('BACKGROUND PROCESSOR - Stop requested, pausing job after completing current WO');
             logger.info(`BACKGROUND PROCESSOR - Last completed WO: ${woNum}`);
+            logger.info(`BACKGROUND PROCESSOR - Setting job status to 'stopped'`);
             currentJob.status = 'stopped';
+            currentJob.endTime = new Date().toISOString();
             currentJob.stopRequested = false;
+            logger.info(`BACKGROUND PROCESSOR - Job status is now: ${currentJob.status}`);
             return;
           }
         }

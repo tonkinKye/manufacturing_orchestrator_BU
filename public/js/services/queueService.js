@@ -328,6 +328,9 @@ export async function pollQueueStatus() {
         }
       }
 
+      // DEBUG: Log all status checks
+      console.log('[DEBUG] Polling status:', status.status, 'Stop requested:', status.stopRequested);
+
       if (status.status === 'stopped') {
         clearInterval(pollInterval);
         document.getElementById('progressBar').classList.remove('active');
