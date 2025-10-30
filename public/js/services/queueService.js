@@ -126,6 +126,8 @@ export async function processQueue() {
     // Grey out and disable configuration steps
     document.getElementById('step1').style.opacity = '0.6';
     document.getElementById('step1').style.pointerEvents = 'none';
+    document.getElementById('step1_5').style.opacity = '0.6';
+    document.getElementById('step1_5').style.pointerEvents = 'none';
     document.getElementById('step2').style.opacity = '0.6';
     document.getElementById('step2').style.pointerEvents = 'none';
     document.getElementById('step3').style.opacity = '0.6';
@@ -604,6 +606,8 @@ export async function checkAndResumeJob() {
       // Grey out and disable all configuration steps - job is already running
       document.getElementById('step1').style.opacity = '0.6';
       document.getElementById('step1').style.pointerEvents = 'none';
+      document.getElementById('step1_5').style.opacity = '0.6';
+      document.getElementById('step1_5').style.pointerEvents = 'none';
       document.getElementById('step2').style.opacity = '0.6';
       document.getElementById('step2').style.pointerEvents = 'none';
       document.getElementById('step3').style.opacity = '0.6';
