@@ -682,7 +682,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
           logger.info(`BACKGROUND PROCESSOR - Resuming partial MO ${moNum} (already created and issued)`);
         }
 
-        // Get WO numbers from Fishbowl API
+        // Get WO numbers from Fishbowl API and assign them to queue items BEFORE processing
         const woSql = `
           SELECT wo.num, wo.id FROM wo
           JOIN moitem ON moitem.id = wo.moitemid
@@ -692,12 +692,73 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
         `;
         const woRows = await fishbowlQuery(woSql, serverUrl, token);
 
-        logger.info(`BACKGROUND PROCESSOR - Found ${woRows.length} WOs`);
+        logger.info(`BACKGROUND PROCESSOR - Found ${woRows.length} WOs for MO ${moNum}`);
 
-        // Process each WO
-        for (let i = 0; i < woRows.length && i < batch.length; i++) {
-          const woNum = woRows[i].num;
-          const queueItem = batch[i];
+        // CRITICAL: Assign WO numbers to queue items BEFORE processing
+        // This ensures that if the job is stopped and resumed, each item knows its WO number
+
+        // Check which items need WO number assignment
+        const itemsWithoutWO = batch.filter(item => !item.wo_number);
+
+        if (itemsWithoutWO.length > 0) {
+          if (isPartial) {
+            logger.info(`BACKGROUND PROCESSOR - Partial MO: ${itemsWithoutWO.length} items need WO number assignment`);
+          }
+
+          // Build a map of barcodes to their positions in the original batch for this MO
+          // We need to match queue items to WOs by their original order in the MO
+          logger.debug(`BACKGROUND PROCESSOR - Building barcode to WO mapping`);
+
+          // For partial MOs, we need to match based on which WOs are already assigned vs not
+          // Get all items for this MO (both pending and already processed) to understand the full picture
+          const [allMOItems] = await connection.query(
+            `SELECT id, barcode, wo_number FROM mo_queue WHERE mo_number = ? ORDER BY id`,
+            [moNum]
+          );
+
+          logger.debug(`BACKGROUND PROCESSOR - Total items for MO ${moNum}: ${allMOItems.length}, WOs available: ${woRows.length}`);
+
+          // Assign WO numbers to items that don't have them yet
+          let woIndex = 0;
+          for (const moItem of allMOItems) {
+            if (!moItem.wo_number && woIndex < woRows.length) {
+              const woNum = woRows[woIndex].num;
+              await connection.query(
+                `UPDATE mo_queue SET wo_number = ? WHERE id = ?`,
+                [woNum, moItem.id]
+              );
+              logger.debug(`BACKGROUND PROCESSOR - Assigned WO ${woNum} to queue item ${moItem.id} (barcode: ${moItem.barcode})`);
+
+              // Update the batch item if it's in our current batch
+              const batchItem = batch.find(item => item.id === moItem.id);
+              if (batchItem) {
+                batchItem.wo_number = woNum;
+              }
+            }
+            woIndex++;
+          }
+
+          logger.info(`BACKGROUND PROCESSOR - WO numbers assigned to all items for MO ${moNum}`);
+        } else {
+          logger.debug(`BACKGROUND PROCESSOR - All items already have WO numbers assigned`);
+        }
+
+        // Process each queue item using its assigned WO number
+        for (const queueItem of batch) {
+          // Use the wo_number from the database (already assigned above or from previous run)
+          const woNum = queueItem.wo_number;
+
+          if (!woNum) {
+            logger.error(`BACKGROUND PROCESSOR - Queue item ${queueItem.id} (barcode: ${queueItem.barcode}) has no WO number assigned, skipping`);
+            currentJob.failedItems++;
+            currentJob.processedItems++;
+            await connection.query(
+              `UPDATE mo_queue SET status = 'Failed', error_message = ? WHERE id = ?`,
+              ['No WO number assigned', queueItem.id]
+            );
+            continue;
+          }
+
           const itemId = queueItem.id;
           const barcode = queueItem.barcode;
           const serialsJson = queueItem.serial_numbers;
@@ -713,10 +774,10 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
             // Process the work order
             await processWorkOrder(serverUrl, token, database, connection, woNum, barcode, serials, fgLocation, bom, rawGoodsPartId, logger);
 
-            // Mark as success
+            // Mark as success (wo_number already set)
             await connection.query(
-              `UPDATE mo_queue SET status = 'Success', wo_number = ?, error_message = NULL WHERE id = ?`,
-              [woNum, itemId]
+              `UPDATE mo_queue SET status = 'Success', error_message = NULL WHERE id = ?`,
+              [itemId]
             );
 
             currentJob.successItems++;
@@ -740,8 +801,8 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
                 await processWorkOrder(serverUrl, token, database, connection, woNum, barcode, serials, fgLocation, bom, rawGoodsPartId, logger);
 
                 await connection.query(
-                  `UPDATE mo_queue SET status = 'Success', wo_number = ?, error_message = NULL, retry_count = ? WHERE id = ?`,
-                  [woNum, retryCount + 1, itemId]
+                  `UPDATE mo_queue SET status = 'Success', error_message = NULL, retry_count = ? WHERE id = ?`,
+                  [retryCount + 1, itemId]
                 );
 
                 currentJob.successItems++;
@@ -753,8 +814,8 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
               } catch (retryError) {
                 await connection.query(
-                  `UPDATE mo_queue SET status = 'Failed', wo_number = ?, error_message = ?, retry_count = ? WHERE id = ?`,
-                  [woNum, retryError.message, retryCount + 1, itemId]
+                  `UPDATE mo_queue SET status = 'Failed', error_message = ?, retry_count = ? WHERE id = ?`,
+                  [retryError.message, retryCount + 1, itemId]
                 );
 
                 currentJob.failedItems++;
@@ -767,8 +828,8 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
             } else {
               // Already retried
               await connection.query(
-                `UPDATE mo_queue SET status = 'Failed', wo_number = ?, error_message = ? WHERE id = ?`,
-                [woNum, error.message, itemId]
+                `UPDATE mo_queue SET status = 'Failed', error_message = ? WHERE id = ?`,
+                [error.message, itemId]
               );
 
               currentJob.failedItems++;
