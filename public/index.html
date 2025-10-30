@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manufacturing Orchestrator</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha512-Dop/vW3iOtayerlYAqCgkVr2aTr2ErwwTYOvRFUpzl2VhCMJyjQF0Q9TjUXIo6JhuM/3i0vVEt2e/7QQmnHQqw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h2><img src="images/factory.svg" class="icon" alt="Factory"> Manufacturing Orchestrator</h2>
+
+    <!-- Reconnection Banner (hidden by default) -->
+    <div id="reconnectBanner" class="reconnect-banner" style="display:none;">
+      <strong><img src="images/lightning.svg" class="icon" alt="Fast"> Reconnected to Active Job</strong><br>
+      A job was already running on the server. Displaying live progress below.
+    </div>
+
+    <!-- API Configuration -->
+    <div class="config-panel">
+      <h4><img src="images/gear.svg" class="icon" alt="Settings"> Fishbowl Login</h4>
+      <div class="row">
+        <div class="col-sm-6">
+          <label>Fishbowl Server URL:</label>
+          <input id="serverUrl" type="text" class="form-control" value="http://localhost:2480" placeholder="https://your-server:2456">
+        </div>
+        <div class="col-sm-6">
+          <label>Username:</label>
+          <input id="username" type="text" class="form-control" value="admin" placeholder="Username">
+        </div>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <div class="col-sm-6">
+          <label>Password:</label>
+          <input id="password" type="password" class="form-control" value="admin" placeholder="Password">
+        </div>
+        <div class="col-sm-6">
+          <label>Session Status:</label>
+          <div style="padding-top: 7px;">
+            <span id="sessionStatus" class="text-muted">Not logged in</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button id="btnLogin" class="btn btn-success btn-sm"><img src="images/lock.svg" class="icon" alt="Login"> Login</button>
+        <button id="btnLogout" class="btn btn-danger btn-sm" style="display:none;"><img src="images/door.svg" class="icon" alt="Logout"> Logout</button>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <!-- STEP 1: Configure Work Order(s) -->
+    <div class="panel panel-success step-panel disabled" id="step1">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep1" aria-expanded="false">
+            <span class="step-number">1</span>Configure Work Order(s)
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep1" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <label>Select Location Group:</label>
+              <select id="locationGroupSelect" class="form-control"><option value="">Loading location groups...</option></select>
+            </div>
+            <div class="col-sm-6">
+              <label>Select BOM:</label>
+              <select id="bomSelect" class="form-control" disabled><option value=""><img src="images/clipboard.svg" class="icon" alt="Clipboard"> First select a location group</option></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top: 15px;">
+            <div class="col-sm-12">
+              <button id="btnSelectBOM" class="btn btn-success btn-block" disabled>Configure Work Orders</button>
+            </div>
+          </div>
+          <div id="bomInfo" class="summary-box" style="display:none;">
+            <strong>Location Group:</strong> <span id="selectedLocationGroup"></span><br>
+            <strong>BOM:</strong> <span id="selectedBOM"></span><br>
+            <strong>Default FG Location:</strong> <span id="selectedDefaultLocation"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1.5: Choose Operation Type -->
+    <div class="panel panel-warning step-panel disabled" id="step1_5">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep1_5" aria-expanded="false">
+            <span class="step-number">1.5</span>Choose Operation Type
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep1_5" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="panel panel-success" style="cursor: pointer;" id="panelBuild">
+                <div class="panel-body text-center" style="padding: 40px;">
+                  <h3><img src="images/wrench.svg" class="icon" alt="Build"> BUILD</h3>
+                  <p>Assemble raw goods into finished goods</p>
+                  <p><small>Upload CSV with serial numbers → Create MOs → Pick & Finish</small></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="panel panel-info" style="cursor: pointer;" id="panelDisassemble">
+                <div class="panel-body text-center" style="padding: 40px;">
+                  <h3><img src="images/package.svg" class="icon" alt="Disassemble"> DISASSEMBLE</h3>
+                  <p>Break down finished goods into raw goods</p>
+                  <p><small>Select finished goods → Create disassembly MOs → Return materials</small></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Drop CSV File (BUILD path) -->
+    <div class="panel panel-primary step-panel disabled" id="step2">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep2" aria-expanded="false">
+            <span class="step-number">2</span>Upload CSV File
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep2" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <div class="form-group">
+            <label>CSV File (SerialNumber, Barcode):</label>
+            <input id="csvFile" type="file" accept=".csv" class="form-control">
+            <small class="help-block">File should contain serial numbers and finished good barcodes</small>
+          </div>
+          <div id="csvInfo" class="summary-box" style="display:none;">
+            <strong>File Loaded:</strong> <span id="csvFileName"></span><br>
+            <strong>Rows:</strong> <span id="csvRowCount"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2B: Select Finished Goods (DISASSEMBLE path) -->
+    <div class="panel panel-info step-panel disabled" id="step2b" style="display:none;">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep2b" aria-expanded="false">
+            <span class="step-number">2</span>Select Finished Goods for Disassembly
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep2b" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <p class="help-block">
+            <img src="images/info.svg" class="icon" alt="Info">
+            Select finished goods to disassemble. Only items built using the selected BOM are shown.
+          </p>
+
+          <div class="row">
+            <!-- Available FG List -->
+            <div class="col-sm-5">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <strong>Available Finished Goods (<span id="availableFGCount">0</span>)</strong>
+                  <div class="input-group input-group-sm" style="margin-top: 10px;">
+                    <span class="input-group-addon"><img src="images/search.svg" class="icon" alt="Search"></span>
+                    <input type="text" id="fgSearchBox" class="form-control" placeholder="Search by barcode, part number...">
+                  </div>
+                </div>
+                <div class="panel-body" style="padding: 0;">
+                  <div id="availableFGList" style="height: 400px; overflow-y: auto; border: 1px solid #ddd;">
+                    <div style="padding: 20px; text-align: center; color: #999;">
+                      Loading...
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transfer Buttons -->
+            <div class="col-sm-2 text-center" style="padding-top: 150px;">
+              <button id="btnAddAllFG" class="btn btn-sm btn-default btn-block" title="Add All">
+                <img src="images/chevron-right.svg" class="icon" alt="Add All"> All
+              </button>
+              <button id="btnAddSelectedFG" class="btn btn-sm btn-primary btn-block" title="Add Selected" style="margin-top: 10px;">
+                <img src="images/chevron-right.svg" class="icon" alt="Add">
+              </button>
+              <button id="btnRemoveSelectedFG" class="btn btn-sm btn-warning btn-block" title="Remove Selected" style="margin-top: 30px;">
+                <img src="images/chevron-left.svg" class="icon" alt="Remove">
+              </button>
+              <button id="btnRemoveAllFG" class="btn btn-sm btn-default btn-block" title="Remove All" style="margin-top: 10px;">
+                <img src="images/chevron-left.svg" class="icon" alt="Remove All"> All
+              </button>
+            </div>
+
+            <!-- Selected FG List -->
+            <div class="col-sm-5">
+              <div class="panel panel-success">
+                <div class="panel-heading">
+                  <strong>Selected for Disassembly (<span id="selectedFGCount">0</span>)</strong>
+                </div>
+                <div class="panel-body" style="padding: 0;">
+                  <div id="selectedFGList" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; background: #f9f9f9;">
+                    <div style="padding: 20px; text-align: center; color: #999;">
+                      No items selected
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top: 20px;">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label>Raw Goods Return Location:</label>
+                <select id="fgReturnLocation" class="form-control">
+                  <option value="">Loading locations...</option>
+                </select>
+                <small class="help-block">Where to return the raw goods after disassembly</small>
+              </div>
+            </div>
+          </div>
+
+          <button id="btnConfirmDisassembly" class="btn btn-success btn-block" disabled>
+            Confirm & Queue for Disassembly
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Map Headers & Validate (BUILD path) -->
+    <div class="panel panel-info step-panel disabled" id="step3">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep3" aria-expanded="false">
+            <span class="step-number">3</span>Map CSV Columns & Validate
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep3" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <div class="well well-sm">
+            <strong>CSV Preview (first 3 rows):</strong>
+            <div id="csvPreview" style="overflow-x: auto; max-height: 200px;"></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Serial Number Column:</label>
+                <select id="serialColumn" class="form-control"></select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Barcode Column:</label>
+                <select id="barcodeColumn" class="form-control"></select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Raw Good Part (for Serial Allocation):</label>
+                <select id="rawGoodPart" class="form-control"><option value="">Loading...</option></select>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>Finished Good Location:</label>
+                <select id="fgLocation" class="form-control"><option value="">Loading locations...</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><input type="checkbox" id="hasHeaders" checked> First row contains headers</label>
+          </div>
+          <button id="btnValidate" class="btn btn-info btn-block">Validate & Queue for Processing</button>
+
+          <div id="validationResults" style="display:none; margin-top:20px;">
+            <div id="validationSummary" class="summary-box"></div>
+            <div id="validationIssues" class="validation-issues" style="display:none;"></div>
+            <div style="margin-top:15px;">
+              <button id="btnSaveToQueue" class="btn btn-success btn-lg btn-block" style="display:none;"><img src="images/check.svg" class="icon" alt="Success"> Save Valid Items to Queue & Continue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Process Queue -->
+    <div class="panel panel-warning step-panel disabled" id="step4">
+      <div class="panel-heading" role="tab">
+        <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" href="#collapseStep4" aria-expanded="false">
+            <span class="step-number">4</span>Process Queue
+          </a>
+        </h4>
+      </div>
+      <div id="collapseStep4" class="panel-collapse collapse" role="tabpanel">
+        <div class="panel-body">
+          <div id="queueStats" class="queue-stats">
+            <strong>Current Job Status:</strong><br>
+            <div id="queueStatsContent">Loading...</div>
+          </div>
+          <div class="well well-sm" style="margin-top:15px;">
+            <strong>Processing Plan:</strong><br>
+            <img src="images/play.svg" class="icon" alt="Process"> Processes all <strong>Pending</strong> items in queue<br>
+            <img src="images/package.svg" class="icon" alt="Package"> Work Orders grouped into MOs of 100 WOs each<br>
+            <img src="images/hash.svg" class="icon" alt="Number"> MO naming: <code>BOMNum|YYMMDD|#</code> (e.g., RCH001|251023|1)<br>
+            <img src="images/save.svg" class="icon" alt="Save"> Progress saved to database (fault-tolerant)<br>
+            <img src="images/refresh.svg" class="icon" alt="Refresh"> Failed items auto-retry once<br>
+          </div>
+          <button id="btnProcess" class="btn btn-warning btn-lg btn-block"><img src="images/factory.svg" class="icon" alt="Factory"> Process Queue</button>
+          <div id="processResults" style="display:none; margin-top:20px;">
+            <div id="processResultContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <strong>Operation Log</strong>
+        <button type="button" id="btnClearLog" class="btn btn-xs btn-default pull-right">Clear</button>
+      </div>
+      <div class="panel-body" style="padding:0;">
+        <pre id="log"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha512-oBTprMeNEKCnqfuqKd6sbvFzmFQtlXS3e0C/RGFV0hD6QzhHV+ODfaQbAlmY6/q0ubbwlAM/nCJjkrgA3waLzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Application Module -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
