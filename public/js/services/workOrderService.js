@@ -6,6 +6,7 @@
 import { log, kv, populateSelect } from '../utils/helpers.js';
 import { state } from '../utils/state.js';
 import { fishbowlQuery } from '../api/fishbowlApi.js';
+import { enableStep } from '../ui/stepManager.js';
 
 // Store BOM data globally (similar to window.bomData in original)
 let bomDataCache = new Map();
@@ -128,17 +129,7 @@ export function selectBOM() {
   log(`\n[OK] Configuration Selected:\n   Location Group: ${locGroupSelect.options[locGroupSelect.selectedIndex].text}\n   BOM: ${bomSelect.options[bomSelect.selectedIndex].text} (ID: ${state.bomId})\n   Default FG Location: ${state.bomDefaultLocation || 'None'}\n`);
 
   // Enable operation type selection (Step 1.5)
-  const enableStepSync = (stepNum) => {
-    const step = document.getElementById(`step${stepNum}`);
-    step.classList.remove('disabled');
-    step.style.opacity = '1';
-    step.style.pointerEvents = 'auto';
-    // Use jQuery if available for Bootstrap collapse
-    if (typeof $ !== 'undefined') {
-      $(`#collapseStep${stepNum}`).collapse('show');
-    }
-  };
-  enableStepSync('1_5');
+  enableStep('1_5');
 }
 
 /**
@@ -158,18 +149,8 @@ export function selectOperationType(type) {
     document.getElementById('step2b').style.display = 'none';
     document.getElementById('step2').style.display = 'block';
 
-    // Enable step 2 using inline logic (to avoid circular dependency)
-    const enableStepSync = (stepNum) => {
-      const step = document.getElementById(`step${stepNum}`);
-      step.classList.remove('disabled');
-      step.style.opacity = '1';
-      step.style.pointerEvents = 'auto';
-      // Use jQuery if available for Bootstrap collapse
-      if (typeof $ !== 'undefined') {
-        $(`#collapseStep${stepNum}`).collapse('show');
-      }
-    };
-    enableStepSync(2);
+    // Enable step 2
+    enableStep(2);
 
   } else if (type === 'disassemble') {
     document.getElementById('panelDisassemble').style.border = '3px solid #5bc0de';
@@ -180,18 +161,8 @@ export function selectOperationType(type) {
     document.getElementById('step2').style.display = 'none';
     document.getElementById('step2b').style.display = 'block';
 
-    // Enable step 2b using inline logic
-    const enableStepSync = (stepNum) => {
-      const step = document.getElementById(`step${stepNum}`);
-      step.classList.remove('disabled');
-      step.style.opacity = '1';
-      step.style.pointerEvents = 'auto';
-      // Use jQuery if available for Bootstrap collapse
-      if (typeof $ !== 'undefined') {
-        $(`#collapseStep${stepNum}`).collapse('show');
-      }
-    };
-    enableStepSync('2b');
+    // Enable step 2b
+    enableStep('2b');
 
     // Load finished goods for disassembly
     loadFinishedGoodsAsync();
