@@ -736,6 +736,13 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
         logger.info(`BACKGROUND PROCESSOR - DISASSEMBLY mode detected`);
         // Handle disassembly separately
         await processDisassemblyBatch(serverUrl, token, database, connection, batch, bom, bomId, locationGroup, moNum, dateStr, isPartial, logger);
+
+        // Check if job was stopped during disassembly
+        if (currentJob.status === 'stopped') {
+          logger.info('BACKGROUND PROCESSOR - Disassembly batch stopped, exiting queue processor');
+          return;
+        }
+
         continue; // Skip normal BUILD processing
       }
 
