@@ -23,20 +23,27 @@ const { getCurrentJob } = require('./jobService');
  * @param {string} dateStr - Date string
  * @param {Object} logger - Logger instance
  */
-async function processDisassemblyBatch(serverUrl, token, database, connection, batch, bom, bomId, locationGroup, moNum, dateStr, logger) {
+async function processDisassemblyBatch(serverUrl, token, database, connection, batch, bom, bomId, locationGroup, moNum, dateStr, isPartial, logger) {
   const currentJob = getCurrentJob();
 
-  logger.info(`DISASSEMBLY - Processing ${batch.length} item(s)`);
+  logger.info(`DISASSEMBLY - Processing ${batch.length} item(s)${isPartial ? ' (RESUMING PARTIAL)' : ''}`);
 
   try {
-    // Update MO numbers in database
-    const batchIds = batch.map(item => item.id).join(',');
-    await connection.query(
-      `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
-      [moNum]
-    );
+    if (!isPartial) {
+      // Only update MO numbers and create MO for NEW batches
+      // Partial MOs already have their MO number and the MO is already created
+      const batchIds = batch.map(item => item.id).join(',');
+      await connection.query(
+        `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
+        [moNum]
+      );
+    } else {
+      logger.info(`DISASSEMBLY - Resuming partial MO ${moNum} (already created and issued)`);
+    }
 
-    // Query part details for all unique part IDs from all batch items
+    // For NEW MOs only: Query part details and create the MO
+    if (!isPartial) {
+      // Query part details for all unique part IDs from all batch items
     const allPartIds = new Set();
     batch.forEach(item => {
       if (item.original_wo_structure) {
@@ -125,11 +132,14 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
     const moId = moResult.id;
     logger.info(`DISASSEMBLY - MO created: ${moNum} (ID: ${moId})`);
 
-    // Issue MO
-    await callFishbowlREST(serverUrl, token, `manufacture-orders/${moId}/issue`, 'POST');
-    logger.info(`DISASSEMBLY - MO issued`);
+      // Issue MO
+      await callFishbowlREST(serverUrl, token, `manufacture-orders/${moId}/issue`, 'POST');
+      logger.info(`DISASSEMBLY - MO issued`);
+    } else {
+      logger.info(`DISASSEMBLY - Using existing MO ${moNum}`);
+    }
 
-    // Get WO numbers from Fishbowl API
+    // Get WO numbers from Fishbowl API and assign them to queue items BEFORE processing
     const woSql = `
       SELECT wo.num, wo.id FROM wo
       JOIN moitem ON moitem.id = wo.moitemid
@@ -139,12 +149,97 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
     `;
     const woRows = await fishbowlQuery(woSql, serverUrl, token);
 
-    logger.info(`DISASSEMBLY - Found ${woRows.length} WOs to process`);
+    logger.info(`DISASSEMBLY - Found ${woRows.length} WOs for MO ${moNum}`);
 
-    // Process each WO for disassembly
-    for (let i = 0; i < woRows.length && i < batch.length; i++) {
-      const woNum = woRows[i].num;
-      const queueItem = batch[i];
+    // Need partMap for processing - load it if we're resuming a partial MO
+    let partMap;
+    if (isPartial) {
+      // Re-build partMap for partial MO resume
+      const allPartIds = new Set();
+      batch.forEach(item => {
+        if (item.original_wo_structure) {
+          const woStructure = JSON.parse(item.original_wo_structure);
+          woStructure.forEach(woItem => {
+            allPartIds.add(woItem.partid);
+          });
+        }
+      });
+
+      const partIdsList = Array.from(allPartIds).join(',');
+      const partSql = `
+        SELECT
+          part.id AS part_id,
+          part.num AS part_num,
+          part.description AS part_description,
+          part.uomid AS uom_id
+        FROM part
+        WHERE part.id IN (${partIdsList})
+      `;
+      const partDetails = await fishbowlQuery(partSql, serverUrl, token);
+      partMap = new Map(partDetails.map(p => [p.part_id, p]));
+      logger.info(`DISASSEMBLY - Loaded details for ${partDetails.length} unique parts (partial resume)`);
+    }
+
+    // CRITICAL: Assign WO numbers to queue items BEFORE processing
+    // Check which items need WO number assignment
+    const itemsWithoutWO = batch.filter(item => !item.wo_number);
+
+    if (itemsWithoutWO.length > 0) {
+      if (isPartial) {
+        logger.info(`DISASSEMBLY - Partial MO: ${itemsWithoutWO.length} items need WO number assignment`);
+      }
+
+      logger.debug(`DISASSEMBLY - Building barcode to WO mapping`);
+
+      // Get all items for this MO to understand the full picture
+      const [allMOItems] = await connection.query(
+        `SELECT id, barcode, wo_number FROM mo_queue WHERE mo_number = ? ORDER BY id`,
+        [moNum]
+      );
+
+      logger.debug(`DISASSEMBLY - Total items for MO ${moNum}: ${allMOItems.length}, WOs available: ${woRows.length}`);
+
+      // Assign WO numbers to items that don't have them yet
+      let woIndex = 0;
+      for (const moItem of allMOItems) {
+        if (!moItem.wo_number && woIndex < woRows.length) {
+          const woNum = woRows[woIndex].num;
+          await connection.query(
+            `UPDATE mo_queue SET wo_number = ? WHERE id = ?`,
+            [woNum, moItem.id]
+          );
+          logger.debug(`DISASSEMBLY - Assigned WO ${woNum} to queue item ${moItem.id} (barcode: ${moItem.barcode})`);
+
+          // Update the batch item if it's in our current batch
+          const batchItem = batch.find(item => item.id === moItem.id);
+          if (batchItem) {
+            batchItem.wo_number = woNum;
+          }
+        }
+        woIndex++;
+      }
+
+      logger.info(`DISASSEMBLY - WO numbers assigned to all items for MO ${moNum}`);
+    } else {
+      logger.debug(`DISASSEMBLY - All items already have WO numbers assigned`);
+    }
+
+    // Process each queue item using its assigned WO number
+    for (const queueItem of batch) {
+      // Use the wo_number from the database (already assigned above or from previous run)
+      const woNum = queueItem.wo_number;
+
+      if (!woNum) {
+        logger.error(`DISASSEMBLY - Queue item ${queueItem.id} (barcode: ${queueItem.barcode}) has no WO number assigned, skipping`);
+        currentJob.failedItems++;
+        currentJob.processedItems++;
+        await connection.query(
+          `UPDATE mo_queue SET status = 'Failed', error_message = ? WHERE id = ?`,
+          ['No WO number assigned', queueItem.id]
+        );
+        continue;
+      }
+
       const itemId = queueItem.id;
       const barcode = queueItem.barcode;
       const returnLocation = queueItem.fg_location;
@@ -158,10 +253,10 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
         // Process the disassembly work order
         await processDisassemblyWorkOrder(serverUrl, token, woNum, barcode, originalWoStructure, returnLocation, partMap, logger);
 
-        // Mark as success
+        // Mark as success (wo_number already set)
         await connection.query(
-          `UPDATE mo_queue SET status = 'Success', wo_number = ?, error_message = NULL WHERE id = ?`,
-          [woNum, itemId]
+          `UPDATE mo_queue SET status = 'Success', error_message = NULL WHERE id = ?`,
+          [itemId]
         );
 
         currentJob.successItems++;
@@ -176,8 +271,8 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
 
         // Mark as failed
         await connection.query(
-          `UPDATE mo_queue SET status = 'Failed', wo_number = ?, error_message = ? WHERE id = ?`,
-          [woNum, error.message, itemId]
+          `UPDATE mo_queue SET status = 'Failed', error_message = ? WHERE id = ?`,
+          [error.message, itemId]
         );
 
         currentJob.failedItems++;
@@ -637,7 +732,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
       if (isDisassembly) {
         logger.info(`BACKGROUND PROCESSOR - DISASSEMBLY mode detected`);
         // Handle disassembly separately
-        await processDisassemblyBatch(serverUrl, token, database, connection, batch, bom, bomId, locationGroup, moNum, dateStr, logger);
+        await processDisassemblyBatch(serverUrl, token, database, connection, batch, bom, bomId, locationGroup, moNum, dateStr, isPartial, logger);
         continue; // Skip normal BUILD processing
       }
 
