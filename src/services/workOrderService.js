@@ -154,15 +154,27 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   // If pick status is already 40+ and pick items have tracking, pick was already split in previous run
   const originalPickItem = savedPick.PickItems.PickItem;
   const pickItemArray = Array.isArray(originalPickItem) ? originalPickItem : [originalPickItem];
-  const firstItem = pickItemArray[0];
+
+  // Find the serialized raw goods item that matches our rawGoodsPartId
+  const serializedItemIndex = pickItemArray.findIndex(item =>
+    item.Part?.PartID?.toString() === rawGoodsPartId.toString()
+  );
+
+  if (serializedItemIndex === -1) {
+    throw new Error(`Could not find pick item for raw goods part ID ${rawGoodsPartId}`);
+  }
+
+  const serializedItem = pickItemArray[serializedItemIndex];
 
   // Check if pick is already split and finished (has tracking with serials)
-  const alreadyProcessed = pick.Status >= 40 && firstItem.Tracking?.TrackingItem;
+  const alreadyProcessed = pick.Status >= 40 && serializedItem.Tracking?.TrackingItem;
 
   logger.debug(`WO ${woNum} - Checking if pick needs splitting`, {
     pickStatus: pick.Status,
-    hasTracking: !!firstItem.Tracking?.TrackingItem,
-    alreadyProcessed
+    hasTracking: !!serializedItem.Tracking?.TrackingItem,
+    alreadyProcessed,
+    totalPickItems: pickItemArray.length,
+    serializedItemIndex
   });
 
   if (alreadyProcessed) {
@@ -171,8 +183,9 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   } else {
     logger.info(`WO ${woNum} - Splitting pick by location`);
     logger.debug(`WO ${woNum} - Locations to split across: ${locationGroups.size}`);
+    logger.debug(`WO ${woNum} - Preserving ${pickItemArray.length - 1} non-serialized pick items`);
 
-    const partTracking = firstItem.Part.PartTrackingList.PartTracking;
+    const partTracking = serializedItem.Part.PartTrackingList.PartTracking;
     const trackingArray = Array.isArray(partTracking) ? partTracking : [partTracking];
     const serialTracking = trackingArray.find(t => t.PartTrackingID === 4 || t.Name.toLowerCase().includes('serial'));
 
@@ -180,14 +193,14 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
       throw new Error('Could not find serial tracking');
     }
 
-    const newPickItems = [];
+    const newSerializedPickItems = [];
     let isFirst = true;
 
     for (const [locId, group] of locationGroups) {
       const locInfo = group.locationInfo;
-      const pickItem = JSON.parse(JSON.stringify(firstItem));
+      const pickItem = JSON.parse(JSON.stringify(serializedItem));
 
-      pickItem.PickItemID = isFirst ? firstItem.PickItemID : 0;
+      pickItem.PickItemID = isFirst ? serializedItem.PickItemID : 0;
       isFirst = false;
 
       pickItem.Quantity = group.serials.length.toString();
@@ -227,12 +240,27 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
         pickItem.Part.PartTrackingList.PartTracking = [pickItem.Part.PartTrackingList.PartTracking];
       }
 
-      newPickItems.push(pickItem);
+      newSerializedPickItems.push(pickItem);
     }
 
-    savedPick.PickItems.PickItem = newPickItems;
+    // Preserve all other pick items (non-serialized BOM components)
+    // Set their status to 40 (picked) so they are processed
+    const otherPickItems = pickItemArray
+      .filter((_, index) => index !== serializedItemIndex)
+      .map(item => {
+        const processedItem = JSON.parse(JSON.stringify(item));
+        processedItem.Status = 40;
+        return processedItem;
+      });
 
-    logger.debug(`WO ${woNum} - Saving split pick with ${newPickItems.length} pick items`);
+    // Combine: split serialized items + all other original items
+    const allPickItems = [...newSerializedPickItems, ...otherPickItems];
+
+    savedPick.PickItems.PickItem = allPickItems;
+
+    logger.debug(`WO ${woNum} - Final pick item breakdown: ${newSerializedPickItems.length} serialized + ${otherPickItems.length} other = ${allPickItems.length} total`);
+
+    logger.debug(`WO ${woNum} - Saving split pick with ${allPickItems.length} pick items`);
     const savePickResult2 = await callFishbowlLegacy(serverUrl, token, 'SavePickRq', { SavePickRq: { Pick: savedPick } });
 
     if (savePickResult2.FbiJson?.FbiMsgsRs?.SavePickRs?.statusCode !== 1000) {

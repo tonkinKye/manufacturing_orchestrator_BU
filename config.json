@@ -1,7 +1,6 @@
 {
   "serverUrl": "http://localhost:2480",
   "username": "admin",
-  "password": "9ea280c6ca5f00649da29fe35f641918:8d9b6ca19d480a7e0ae068c2558e1f85",
-  "database": "ceres_tracking_v1",
-  "logLevel": "INFO"
+  "password": "3b65fc4333e09030ed7d67936e40084a:dd991bc71595789d9640a19095821ac7",
+  "database": "ceres_tracking_v1"
 }

@@ -135,7 +135,15 @@
         <div class="panel-body">
           <div class="form-group">
             <label>CSV File (SerialNumber, Barcode):</label>
-            <input id="csvFile" type="file" accept=".csv" class="form-control">
+            <div id="csvDropZone" class="csv-drop-zone">
+              <input id="csvFile" type="file" accept=".csv" class="form-control">
+              <div class="drop-zone-overlay">
+                <div class="drop-zone-text">
+                  <img src="images/upload.svg" class="drop-zone-icon" alt="Upload" onerror="this.style.display='none'">
+                  <div>Drop CSV file here or click to browse</div>
+                </div>
+              </div>
+            </div>
             <small class="help-block">File should contain serial numbers and finished good barcodes</small>
           </div>
           <div id="csvInfo" class="summary-box" style="display:none;">

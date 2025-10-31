@@ -15,6 +15,21 @@ export async function loadCSV() {
   const file = document.getElementById('csvFile').files[0];
   if (!file) return;
 
+  await processCSVFile(file);
+}
+
+/**
+ * Process a CSV file (used by both file input and drag & drop)
+ */
+async function processCSVFile(file) {
+  if (!file) return;
+
+  // Validate file type
+  if (!file.name.endsWith('.csv')) {
+    alert('Please select a CSV file');
+    return;
+  }
+
   try {
     log('Loading CSV file...\n');
     const text = await file.text();
@@ -40,6 +55,59 @@ export async function loadCSV() {
     log(`[ERROR] Error loading CSV: ${e.message}\n`);
     alert(`Error: ${e.message}`);
   }
+}
+
+/**
+ * Handle drag over event
+ */
+export function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropZone = document.getElementById('csvDropZone');
+  if (dropZone) {
+    dropZone.classList.add('drag-over');
+  }
+}
+
+/**
+ * Handle drag leave event
+ */
+export function handleDragLeave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const dropZone = document.getElementById('csvDropZone');
+  if (dropZone) {
+    dropZone.classList.remove('drag-over');
+  }
+}
+
+/**
+ * Handle file drop event
+ */
+export async function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const dropZone = document.getElementById('csvDropZone');
+  if (dropZone) {
+    dropZone.classList.remove('drag-over');
+  }
+
+  const files = e.dataTransfer?.files;
+  if (!files || files.length === 0) return;
+
+  const file = files[0];
+
+  // Update the file input to reflect the dropped file
+  const fileInput = document.getElementById('csvFile');
+  if (fileInput) {
+    // Create a new FileList-like object with the dropped file
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    fileInput.files = dataTransfer.files;
+  }
+
+  await processCSVFile(file);
 }
 
 /**

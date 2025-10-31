@@ -116,3 +116,65 @@ body {
   margin-right: 4px;
   display: inline-block;
 }
+
+/* CSV Drag and Drop Zone */
+.csv-drop-zone {
+  position: relative;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.csv-drop-zone:hover {
+  border-color: #5cb85c;
+  background: #f0f9f0;
+}
+
+.csv-drop-zone.drag-over {
+  border-color: #5cb85c;
+  background: #e8f5e9;
+  border-width: 3px;
+}
+
+.csv-drop-zone input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.drop-zone-overlay {
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+.drop-zone-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.drop-zone-icon {
+  height: 48px;
+  width: 48px;
+  margin: 0 auto 10px;
+  display: block;
+  opacity: 0.5;
+}
+
+.csv-drop-zone.drag-over .drop-zone-text {
+  color: #5cb85c;
+  font-weight: bold;
+}
+
+.csv-drop-zone.drag-over .drop-zone-icon {
+  opacity: 0.8;
+}

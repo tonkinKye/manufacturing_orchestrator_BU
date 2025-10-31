@@ -6,7 +6,7 @@
 import { log } from './utils/helpers.js';
 import { login, logout, loadConfig, restoreSessionIfAvailable } from './services/authService.js';
 import { loadLocationGroups, onLocationGroupChange, selectBOM, selectOperationType } from './services/workOrderService.js';
-import { loadCSV, validateAndPrepare, saveToQueue } from './services/csvService.js';
+import { loadCSV, validateAndPrepare, saveToQueue, handleDragOver, handleDragLeave, handleDrop } from './services/csvService.js';
 import {
   renderAvailableFGList,
   addSelectedFG,
@@ -90,6 +90,14 @@ function setupEventListeners() {
   document.getElementById('csvFile')?.addEventListener('change', loadCSV);
   document.getElementById('btnValidate')?.addEventListener('click', validateAndPrepare);
   document.getElementById('btnSaveToQueue')?.addEventListener('click', saveToQueue);
+
+  // Step 2: Drag and drop for CSV file
+  const csvDropZone = document.getElementById('csvDropZone');
+  if (csvDropZone) {
+    csvDropZone.addEventListener('dragover', handleDragOver);
+    csvDropZone.addEventListener('dragleave', handleDragLeave);
+    csvDropZone.addEventListener('drop', handleDrop);
+  }
 
   // Step 2B: DISASSEMBLE path (FG selection)
   document.getElementById('fgSearchBox')?.addEventListener('input', renderAvailableFGList);
