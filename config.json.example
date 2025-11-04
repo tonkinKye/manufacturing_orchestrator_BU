@@ -1,0 +1,6 @@
+{
+  "serverUrl": "https://your-fishbowl-server:28192",
+  "username": "your-username",
+  "password": "your-password",
+  "database": "your-database-name"
+}

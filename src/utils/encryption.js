@@ -1,6 +1,17 @@
 const crypto = require('crypto');
 
-const ENCRYPTION_KEY = crypto.createHash('sha256').update('manufacturing-orchestrator-secret-key-2024').digest();
+// Load encryption key from environment variable or use legacy key for backward compatibility
+const getEncryptionKey = () => {
+  if (process.env.ENCRYPTION_KEY) {
+    // Use environment variable if provided (recommended)
+    return Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+  }
+  // Fallback to legacy key for backward compatibility with existing encrypted data
+  console.warn('WARNING: Using legacy hardcoded encryption key. Set ENCRYPTION_KEY environment variable for better security.');
+  return crypto.createHash('sha256').update('manufacturing-orchestrator-secret-key-2024').digest();
+};
+
+const ENCRYPTION_KEY = getEncryptionKey();
 const IV_LENGTH = 16;
 
 function encrypt(text) {
