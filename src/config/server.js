@@ -7,6 +7,10 @@ module.exports = {
   CONFIG_FILE: path.join(__dirname, '../../config.json'),
   TOKEN_FILE: path.join(__dirname, '../../active-tokens.json'),
 
-  // Disable SSL certificate validation for self-signed certs (development only!)
-  NODE_TLS_REJECT_UNAUTHORIZED: '0'
+  // TLS certificate validation - configurable via environment variable
+  // Set NODE_TLS_REJECT_UNAUTHORIZED=false for development with self-signed certs
+  // Set NODE_TLS_REJECT_UNAUTHORIZED=true (or omit) for production
+  NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED !== undefined
+    ? process.env.NODE_TLS_REJECT_UNAUTHORIZED
+    : '0' // Default to permissive for backward compatibility
 };

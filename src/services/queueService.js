@@ -1,5 +1,6 @@
 const { createConnection } = require('../db/connection');
 const { getPendingItems } = require('../db/queries');
+const { assignWONumbersToQueueItems, batchUpdateMONumber } = require('../db/helpers');
 const { fishbowlQuery, callFishbowlREST } = require('./fishbowlApi');
 const { processWorkOrder } = require('./workOrderService');
 const { getCurrentJob } = require('./jobService');
@@ -32,11 +33,8 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
     if (!isPartial) {
       // Only update MO numbers and create MO for NEW batches
       // Partial MOs already have their MO number and the MO is already created
-      const batchIds = batch.map(item => item.id).join(',');
-      await connection.query(
-        `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
-        [moNum]
-      );
+      const batchIds = batch.map(item => item.id);
+      await batchUpdateMONumber(connection, moNum, batchIds);
     } else {
       logger.info(`DISASSEMBLY - Resuming partial MO ${moNum} (already created and issued)`);
     }
@@ -189,39 +187,8 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
         logger.info(`DISASSEMBLY - Partial MO: ${itemsWithoutWO.length} items need WO number assignment`);
       }
 
-      logger.debug(`DISASSEMBLY - Building barcode to WO mapping`);
-
-      // Get all items for this MO to understand the full picture
-      const [allMOItems] = await connection.query(
-        `SELECT id, barcode, wo_number FROM mo_queue WHERE mo_number = ? ORDER BY id`,
-        [moNum]
-      );
-
-      logger.debug(`DISASSEMBLY - Total items for MO ${moNum}: ${allMOItems.length}, WOs available: ${woRows.length}`);
-
-      // Assign WO numbers to items that don't have them yet
-      let woIndex = 0;
-      for (const moItem of allMOItems) {
-        if (!moItem.wo_number && woIndex < woRows.length) {
-          const woNum = woRows[woIndex].num;
-          await connection.query(
-            `UPDATE mo_queue SET wo_number = ? WHERE id = ?`,
-            [woNum, moItem.id]
-          );
-          logger.debug(`DISASSEMBLY - Assigned WO ${woNum} to queue item ${moItem.id} (barcode: ${moItem.barcode})`);
-
-          // Update the batch item if it's in our current batch
-          const batchItem = batch.find(item => item.id === moItem.id);
-          if (batchItem) {
-            batchItem.wo_number = woNum;
-          }
-        }
-        woIndex++;
-      }
-
-      logger.info(`DISASSEMBLY - WO numbers assigned to all items for MO ${moNum}`);
-    } else {
-      logger.debug(`DISASSEMBLY - All items already have WO numbers assigned`);
+      // Use shared helper function for WO assignment
+      await assignWONumbersToQueueItems(connection, moNum, batch, woRows, 'DISASSEMBLY', logger);
     }
 
     // Process each queue item using its assigned WO number
@@ -750,11 +717,8 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
         if (!isPartial) {
           // Only update MO numbers and create MO for NEW batches
           // Partial MOs already have their MO number and the MO is already created
-          const batchIds = batch.map(item => item.id).join(',');
-          await connection.query(
-            `UPDATE mo_queue SET mo_number = ? WHERE id IN (${batchIds})`,
-            [moNum]
-          );
+          const batchIds = batch.map(item => item.id);
+          await batchUpdateMONumber(connection, moNum, batchIds);
 
           // Create MO
           const configurations = batch.map((item, idx) => ({
@@ -810,42 +774,8 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
             logger.info(`BACKGROUND PROCESSOR - Partial MO: ${itemsWithoutWO.length} items need WO number assignment`);
           }
 
-          // Build a map of barcodes to their positions in the original batch for this MO
-          // We need to match queue items to WOs by their original order in the MO
-          logger.debug(`BACKGROUND PROCESSOR - Building barcode to WO mapping`);
-
-          // For partial MOs, we need to match based on which WOs are already assigned vs not
-          // Get all items for this MO (both pending and already processed) to understand the full picture
-          const [allMOItems] = await connection.query(
-            `SELECT id, barcode, wo_number FROM mo_queue WHERE mo_number = ? ORDER BY id`,
-            [moNum]
-          );
-
-          logger.debug(`BACKGROUND PROCESSOR - Total items for MO ${moNum}: ${allMOItems.length}, WOs available: ${woRows.length}`);
-
-          // Assign WO numbers to items that don't have them yet
-          let woIndex = 0;
-          for (const moItem of allMOItems) {
-            if (!moItem.wo_number && woIndex < woRows.length) {
-              const woNum = woRows[woIndex].num;
-              await connection.query(
-                `UPDATE mo_queue SET wo_number = ? WHERE id = ?`,
-                [woNum, moItem.id]
-              );
-              logger.debug(`BACKGROUND PROCESSOR - Assigned WO ${woNum} to queue item ${moItem.id} (barcode: ${moItem.barcode})`);
-
-              // Update the batch item if it's in our current batch
-              const batchItem = batch.find(item => item.id === moItem.id);
-              if (batchItem) {
-                batchItem.wo_number = woNum;
-              }
-            }
-            woIndex++;
-          }
-
-          logger.info(`BACKGROUND PROCESSOR - WO numbers assigned to all items for MO ${moNum}`);
-        } else {
-          logger.debug(`BACKGROUND PROCESSOR - All items already have WO numbers assigned`);
+          // Use shared helper function for WO assignment
+          await assignWONumbersToQueueItems(connection, moNum, batch, woRows, 'BACKGROUND PROCESSOR', logger);
         }
 
         // Process each queue item using its assigned WO number

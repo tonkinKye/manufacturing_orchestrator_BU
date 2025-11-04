@@ -1,4 +1,6 @@
 const { fetchWithNode } = require('../utils/helpers');
+const https = require('https');
+const http = require('http');
 
 /**
  * Fishbowl API Service
@@ -15,7 +17,7 @@ const { fetchWithNode } = require('../utils/helpers');
 async function fishbowlQuery(sql, serverUrl, token) {
   const url = new URL(`${serverUrl}/api/data-query`);
   const isHttps = url.protocol === 'https:';
-  const httpModule = isHttps ? require('https') : require('http');
+  const httpModule = isHttps ? https : http;
 
   const options = {
     hostname: url.hostname,

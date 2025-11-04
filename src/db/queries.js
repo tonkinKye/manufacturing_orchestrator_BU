@@ -51,6 +51,22 @@ async function createMOQueueTable(connection) {
       ADD COLUMN original_wo_structure LONGTEXT
     `);
   }
+
+  // Add wo_number index if it doesn't exist (improves query performance for job resumption)
+  const [indexes] = await connection.query(`
+    SELECT INDEX_NAME
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'mo_queue'
+      AND INDEX_NAME = 'idx_wo_number'
+  `);
+
+  if (indexes.length === 0) {
+    await connection.query(`
+      ALTER TABLE mo_queue
+      ADD INDEX idx_wo_number (wo_number)
+    `);
+  }
 }
 
 /**

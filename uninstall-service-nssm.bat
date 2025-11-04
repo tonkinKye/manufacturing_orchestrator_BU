@@ -1,8 +1,6 @@
 @echo off
-cd /d "%~dp0"
-
 echo ============================================================
-echo MANUFACTURING ORCHESTRATOR - UNINSTALL NSSM SERVICE
+echo UNINSTALL MANUFACTURING ORCHESTRATOR SERVICE (NSSM)
 echo ============================================================
 echo.
 
@@ -20,9 +18,10 @@ if %errorLevel% neq 0 (
 echo [OK] Running with Administrator privileges
 echo.
 
-REM Set NSSM variables
-set "NSSM_DIR=%~dp0nssm"
-set "NSSM_EXE=%NSSM_DIR%\nssm.exe"
+cd /d "%~dp0"
+
+REM Find NSSM
+set "NSSM_EXE=%~dp0nssm\nssm.exe"
 
 REM Check for nssm in PATH first
 where nssm >nul 2>&1
@@ -38,75 +37,121 @@ if exist "%NSSM_EXE%" (
     goto :nssm_ready
 )
 
-REM nssm not found
-echo ERROR: nssm.exe not found!
+echo [ERROR] nssm.exe not found!
 echo.
-echo Searched:
-echo   - System PATH
-echo   - Local directory: %NSSM_DIR%
-echo.
-echo Cannot uninstall without nssm.
-echo.
-echo Options:
-echo   1. Run install-service-nssm.bat to download nssm
-echo   2. Manually remove service via services.msc
+echo Please install nssm first or specify the path.
+echo Download from: https://nssm.cc/download
 echo.
 pause
 exit /b 1
 
 :nssm_ready
-echo [OK] Using nssm: %NSSM_EXE%
+
+echo Checking service status...
 echo.
 
-REM Check if service exists
 "%NSSM_EXE%" status ManufacturingOrchestrator >nul 2>&1
+
 if %errorLevel% neq 0 (
-    echo Service "ManufacturingOrchestrator" is not installed.
-    echo Nothing to uninstall.
+    echo [INFO] Service 'ManufacturingOrchestrator' is not installed
     echo.
-    pause
-    exit /b 0
+    echo Checking if service exists with sc...
+    sc query ManufacturingOrchestrator >nul 2>&1
+
+    if %errorLevel% equ 0 (
+        echo [WARN] Service exists but not managed by NSSM
+        echo.
+        echo Do you want to delete it with SC?
+        choice /C YN /M "Delete service with SC"
+
+        if errorlevel 2 goto :end
+
+        echo.
+        echo Stopping service...
+        net stop ManufacturingOrchestrator >nul 2>&1
+
+        echo Deleting service...
+        sc delete ManufacturingOrchestrator
+
+        if %errorLevel% equ 0 (
+            echo [OK] Service deleted
+        ) else (
+            echo [ERROR] Failed to delete service
+        )
+    ) else (
+        echo [OK] No service found to uninstall
+    )
+
+    goto :end
 )
 
-echo Found service: ManufacturingOrchestrator
+echo Service is currently installed
 echo.
-echo This will:
-echo   1. Stop the service (if running)
-echo   2. Remove the service
-echo   3. Configuration and logs will NOT be deleted
+sc query ManufacturingOrchestrator
 echo.
-pause
+
+echo This will STOP and REMOVE the ManufacturingOrchestrator service
+echo.
+choice /C YN /M "Continue with uninstall"
+
+if errorlevel 2 (
+    echo.
+    echo Cancelled by user
+    goto :end
+)
 
 echo.
-echo [1/2] Stopping service...
+echo [1/3] Stopping service...
 "%NSSM_EXE%" stop ManufacturingOrchestrator
-timeout /t 3 /nobreak >nul
 
-echo [2/2] Removing service...
+if %errorLevel% equ 0 (
+    echo [OK] Service stopped
+) else (
+    echo [WARN] Service may already be stopped
+)
+
+echo.
+echo [2/3] Waiting 5 seconds...
+timeout /t 5 /nobreak >nul
+
+echo.
+echo [3/3] Removing service...
 "%NSSM_EXE%" remove ManufacturingOrchestrator confirm
 
 if %errorLevel% equ 0 (
-    echo.
-    echo ============================================================
-    echo SERVICE UNINSTALLED SUCCESSFULLY
-    echo ============================================================
-    echo.
-    echo The service has been removed.
-    echo.
-    echo Note: Configuration files and logs were NOT deleted.
-    echo.
-    echo To reinstall:
-    echo   - Run: install-service-nssm.bat
-    echo.
+    echo [OK] Service removed successfully
 ) else (
+    echo [ERROR] Failed to remove service
     echo.
-    echo ============================================================
-    echo ERROR DURING UNINSTALL
-    echo ============================================================
-    echo.
-    echo The service may not have been removed completely.
-    echo Please check services.msc manually.
-    echo.
+    echo Trying with sc delete...
+    sc delete ManufacturingOrchestrator
 )
 
+echo.
+echo Verifying removal...
+"%NSSM_EXE%" status ManufacturingOrchestrator >nul 2>&1
+
+if %errorLevel% equ 0 (
+    echo [WARN] Service still exists!
+    echo.
+    sc query ManufacturingOrchestrator
+) else (
+    echo [OK] Service successfully uninstalled
+)
+
+echo.
+echo ============================================================
+echo UNINSTALL COMPLETE
+echo ============================================================
+echo.
+
+:end
+echo Note: This does NOT remove:
+echo   - Application files
+echo   - Log files (server.log)
+echo   - Configuration files (config.json)
+echo   - Database data (mo_queue table)
+echo.
+echo To reinstall, run: install-service-nssm.bat
+echo.
 pause
