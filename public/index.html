@@ -194,7 +194,7 @@
             <!-- Transfer Buttons -->
             <div class="col-sm-2 text-center" style="padding-top: 150px;">
               <button id="btnAddAllFG" class="btn btn-sm btn-default btn-block" title="Add All">
-                <img src="images/chevron-right.svg" class="icon" alt="Add All"> All
+                <img src="images/chevrons-right.svg" class="icon" alt="Add All"> All
               </button>
               <button id="btnAddSelectedFG" class="btn btn-sm btn-primary btn-block" title="Add Selected" style="margin-top: 10px;">
                 <img src="images/chevron-right.svg" class="icon" alt="Add">
@@ -203,7 +203,7 @@
                 <img src="images/chevron-left.svg" class="icon" alt="Remove">
               </button>
               <button id="btnRemoveAllFG" class="btn btn-sm btn-default btn-block" title="Remove All" style="margin-top: 10px;">
-                <img src="images/chevron-left.svg" class="icon" alt="Remove All"> All
+                <img src="images/chevrons-left.svg" class="icon" alt="Remove All"> All
               </button>
             </div>
 
@@ -319,12 +319,17 @@
             <strong>Processing Plan:</strong><br>
             <img src="images/play.svg" class="icon" alt="Process"> Processes all <strong>Pending</strong> items in queue<br>
             <img src="images/package.svg" class="icon" alt="Package"> Work Orders grouped into MOs of 100 WOs each<br>
-            <img src="images/hash.svg" class="icon" alt="Number"> MO naming: <code>BOMNum|YYMMDD|#</code> (e.g., RCH001|251023|1)<br>
-            <img src="images/save.svg" class="icon" alt="Save"> Progress saved to database (fault-tolerant)<br>
+            <img src="images/hash.svg" class="icon" alt="Number"> MO naming: <code>BOMNum|YYMMDD|#</code><br>
+            <img src="images/save.svg" class="icon" alt="Save"> Progress saved to database<br>
             <img src="images/refresh.svg" class="icon" alt="Refresh"> Failed items auto-retry once<br>
           </div>
           <button id="btnProcess" class="btn btn-warning btn-lg btn-block"><img src="images/factory.svg" class="icon" alt="Factory"> Process Queue</button>
           <div id="processResults" style="display:none; margin-top:20px;">
+            <!-- Reconnection Status Banner (visible during service restarts) -->
+            <div id="jobReconnectBanner" class="reconnect-banner" style="display:none; margin-bottom:15px;">
+              <strong><img src="images/warning.svg" class="icon" alt="Warning"> Connection Lost</strong><br>
+              The background service is restarting. Attempting to reconnect...
+            </div>
             <div id="processResultContent"></div>
           </div>
         </div>

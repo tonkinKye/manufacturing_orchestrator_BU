@@ -3,14 +3,15 @@
  * Handles all queue processing, job status polling, and job resumption logic
  */
 
-import { log, kv } from '../utils/helpers.js';
+import { log } from '../utils/helpers.js';
 import { state, sessionToken, sessionCredentials, getServerUrl, setPollInterval, clearPollInterval } from '../utils/state.js';
-import { fishbowlQuery } from '../api/fishbowlApi.js';
 import { getQueueStats } from '../api/queueApi.js';
 import { closeAndLogout, downloadFailedItemsCSV } from './authService.js';
 
 // Local reference to poll interval
 let pollInterval = null;
+let connectionLost = false;
+let reconnectAttempts = 0;
 
 /**
  * Update queue statistics display
@@ -58,18 +59,23 @@ export async function processQueue() {
       // Resuming an interrupted job - get BOM/location from first pending item
       log(`[RESUME] Getting BOM and location group from pending items...\n`);
 
-      const resumeSQL = 'SELECT bom_num, bom_id, location_group_id FROM mo_queue WHERE status = "Pending" LIMIT 1';
-      const resumeData = await fishbowlQuery(resumeSQL);
+      const infoResponse = await fetch('/api/get-pending-job-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ database: config.database })
+      });
 
-      if (!resumeData || resumeData.length === 0) {
-        throw new Error('No pending items found in queue');
+      if (!infoResponse.ok) {
+        const errorData = await infoResponse.json();
+        throw new Error(errorData.error || 'Failed to get pending job info');
       }
 
-      bomNum = kv(resumeData[0], 'bom_num');
-      bomId = kv(resumeData[0], 'bom_id');
-      locationGroupId = kv(resumeData[0], 'location_group_id');
+      const infoData = await infoResponse.json();
+      bomNum = infoData.bomNum;
+      bomId = infoData.bomId;
+      locationGroupId = infoData.locationGroupId;
 
-      log(`[RESUME] Retrieved from queue - BOM: ${bomNum}, Location Group: ${locationGroupId}\n`);
+      log(`[RESUME] Retrieved from queue - BOM: ${bomNum}, BOM ID: ${bomId}, Location Group: ${locationGroupId}\n`);
     }
 
     log(`[SERVER] Starting server-side processing...\n`);
@@ -303,7 +309,83 @@ export async function pollQueueStatus() {
   pollInterval = setInterval(async () => {
     try {
       const statusResponse = await fetch('/api/queue-status');
+
+      // Check if the request failed (service down)
+      if (!statusResponse.ok) {
+        throw new Error(`HTTP ${statusResponse.status}`);
+      }
+
       const status = await statusResponse.json();
+
+      // Connection successful - clear any reconnection state
+      if (connectionLost) {
+        log(`\n[RECONNECT] Connection restored! Service is back online.\n`);
+        log(`[RECONNECT] Job status: ${status.status}\n`);
+
+        // Update banner to show successful reconnection
+        const banner = document.getElementById('jobReconnectBanner');
+        if (banner) {
+          banner.innerHTML = `
+            <strong><img src="images/check.svg" class="icon" alt="Success"> Connection Restored</strong><br>
+            Service is back online. Resuming job automatically...
+          `;
+          banner.style.background = '#d4edda';
+          banner.style.borderLeft = '4px solid #28a745';
+
+          // Auto-hide success banner after 3 seconds
+          setTimeout(() => {
+            banner.style.display = 'none';
+          }, 3000);
+        }
+
+        connectionLost = false;
+        reconnectAttempts = 0;
+
+        // Check if we need to resume the job
+        // If service restarted, status will be 'idle' but there may be pending items
+        if (status.status === 'idle' && status.totalItems === 0) {
+          // Service restarted and no job is running - check for pending items
+          log(`[RECONNECT] Service restarted with no active job. Checking for pending work...\n`);
+
+          // Stop polling temporarily
+          clearInterval(pollInterval);
+
+          // Check for pending jobs and auto-resume
+          setTimeout(async () => {
+            try {
+              const configResponse = await fetch('/api/load-config');
+              const config = await configResponse.json();
+
+              if (config.database) {
+                const checkResponse = await fetch('/api/check-pending-jobs', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ database: config.database })
+                });
+
+                const result = await checkResponse.json();
+
+                if (result.hasPendingJobs) {
+                  log(`[AUTO-RESUME] Found ${result.pendingCount} pending item(s). Resuming automatically...\n`);
+
+                  // Auto-resume the job
+                  await processQueue();
+                } else {
+                  log(`[RECONNECT] No pending items found. Job completed during restart.\n`);
+                }
+              }
+            } catch (error) {
+              log(`[ERROR] Failed to check for pending jobs: ${error.message}\n`);
+              // Restart polling even if check fails
+              pollQueueStatus();
+            }
+          }, 100);
+        } else if (status.status === 'running') {
+          log(`[RECONNECT] Job is still running. Continuing to monitor...\n`);
+        } else if (status.status === 'stopped') {
+          log(`[RECONNECT] Job was stopped. Waiting for user action.\n`);
+        }
+      }
 
       document.getElementById('statusText').textContent = status.status.toUpperCase();
       document.getElementById('progressText').textContent = `${status.processedItems} / ${status.totalItems}`;
@@ -451,7 +533,38 @@ export async function pollQueueStatus() {
 
 
     } catch (e) {
-      log(`[WARN] Status poll error: ${e.message}\n`);
+      // Connection failed - service is likely restarting
+      if (!connectionLost) {
+        connectionLost = true;
+        reconnectAttempts = 0;
+
+        log(`\n[CONNECTION LOST] Cannot reach server - service may be restarting\n`);
+        log(`[INFO] Will keep trying to reconnect automatically...\n`);
+
+        // Show reconnection banner (in the job progress area where user is looking)
+        const banner = document.getElementById('jobReconnectBanner');
+        if (banner) {
+          banner.innerHTML = `
+            <strong><img src="images/warning.svg" class="icon" alt="Warning"> Connection Lost</strong><br>
+            The background service is restarting. Attempting to reconnect automatically...
+          `;
+          banner.style.background = '#fff3cd';
+          banner.style.borderLeft = '4px solid #ffc107';
+          banner.style.display = 'block';
+        }
+      }
+
+      reconnectAttempts++;
+      console.log(`[RECONNECT] Attempt ${reconnectAttempts} - waiting for service...`);
+
+      // Update banner with attempt count after a few tries
+      const banner = document.getElementById('jobReconnectBanner');
+      if (banner && reconnectAttempts > 3) {
+        banner.innerHTML = `
+          <strong><img src="images/warning.svg" class="icon" alt="Warning"> Connection Lost</strong><br>
+          The background service is restarting. Attempting to reconnect... (attempt ${reconnectAttempts})
+        `;
+      }
     }
   }, 2000);
 }

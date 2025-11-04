@@ -24,7 +24,8 @@ const svc = new Service({
   maxRetries: 5,
   abortOnError: false,
   wait: 2,
-  grow: 0.5
+  grow: 0.5,
+  stopparentfirst: true
 });
 
 svc.on('install', function() {

@@ -1,7 +1,7 @@
 ============================================================ 
 Manufacturing Orchestrator - Bootstrapper Installation 
 ============================================================ 
-Installation started: Fri 31/10/2025 15:01:31.03 
+Installation started: Tue 04/11/2025 10:14:12.02 
 Working Directory: C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator 
  
 [STEP 1/6] Checking for Node.js... 
@@ -9,7 +9,7 @@ Working Directory: C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator
 [OK] npm version: v10.9.3 
 [STEP 5/6] Installing dependencies... 
 
-added 101 packages, and audited 102 packages in 1s
+up to date, audited 102 packages in 1s
 
 18 packages are looking for funding
   run `npm fund` for details
@@ -17,7 +17,7 @@ added 101 packages, and audited 102 packages in 1s
 found 0 vulnerabilities
 [OK] Dependencies installed 
 
-up to date, audited 102 packages in 2s
+up to date, audited 102 packages in 1s
 
 18 packages are looking for funding
   run `npm fund` for details
@@ -67,7 +67,7 @@ Please wait...
       '--abortonerror',
       'n',
       '--stopparentfirst',
-      undefined,
+      true,
       '--maxretries',
       5
     ],
@@ -82,8 +82,8 @@ Please wait...
       mungeCredentialsAfterInstall: true
     },
     workingdirectory: 'C:\\Users\\kye.tonkin\\Desktop\\manufacturing_orchestrator',
-    stopparentfirst: undefined,
-    stoptimeout: 30,
+    stopparentfirst: true,
+    stoptimeout: 120,
     logmode: 'rotate',
     logging: undefined,
     allowServiceLogon: undefined

@@ -1,2316 +1,954 @@
-[2025-10-31 05:01:38] [INFO] ============================================================
-[2025-10-31 05:01:38] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
-[2025-10-31 05:01:38] [INFO] ============================================================
-[2025-10-31 05:01:38] [INFO] Server running on http://localhost:3000
-[2025-10-31 05:01:38] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
-[2025-10-31 05:01:38] [INFO] Log level: INFO
-[2025-10-31 05:01:38] [INFO] CORS enabled - Fishbowl API calls will be proxied
-[2025-10-31 05:01:38] [INFO] SSL certificate validation disabled (development mode)
-[2025-10-31 05:01:38] [INFO] ============================================================
-[2025-10-31 05:01:38] [INFO] No orphaned tokens found - starting fresh
-[2025-10-31 05:01:38] [INFO] ============================================================
-[2025-10-31 05:01:38] [INFO] Server ready - Press Ctrl+C to stop
-[2025-10-31 05:01:44] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:01:44] [INFO] CONFIG - Configuration loaded successfully
+[2025-11-04 00:34:41] [INFO] Windows platform detected - added SIGBREAK handler for service control
+[2025-11-04 00:34:41] [INFO] ============================================================
+[2025-11-04 00:34:41] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
+[2025-11-04 00:34:41] [INFO] ============================================================
+[2025-11-04 00:34:41] [INFO] Server running on http://localhost:3000
+[2025-11-04 00:34:41] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
+[2025-11-04 00:34:41] [INFO] Log level: INFO
+[2025-11-04 00:34:41] [INFO] CORS enabled - Fishbowl API calls will be proxied
+[2025-11-04 00:34:41] [INFO] SSL certificate validation disabled (development mode)
+[2025-11-04 00:34:41] [INFO] ============================================================
+[2025-11-04 00:34:41] [WARN] Found 1 orphaned token(s) from previous session(s)
+[2025-11-04 00:34:41] [WARN] STARTUP - Could not check for pending jobs
 {
-  "database": "ceres_tracking_v1"
+  "error": "Table 'ceres_tracking_v2.mo_queue' doesn't exist"
 }
-[2025-10-31 05:01:44] [INFO] STATUS - Queue status requested
-[2025-10-31 05:01:46] [API] LOGIN REQUEST
+[2025-11-04 00:34:41] [INFO] STARTUP - No pending jobs found, cleaning up orphaned tokens...
+[2025-11-04 00:34:41] [INFO] TOKEN TRACKING - Attempting to logout 1 token(s)
+[2025-11-04 00:34:41] [INFO] TOKEN TRACKING - Logging out admin@http://localhost:2480
+[2025-11-04 00:34:41] [INFO] TOKEN TRACKING - Successfully logged out admin
+[2025-11-04 00:34:41] [INFO] TOKEN TRACKING - Cleanup complete
+{
+  "loggedOut": 1,
+  "failed": 0,
+  "remaining": 0
+}
+[2025-11-04 00:34:41] [INFO] STARTUP - Successfully cleaned up 1 orphaned session(s)
+[2025-11-04 00:34:41] [INFO] ============================================================
+[2025-11-04 00:34:41] [INFO] Server ready - Press Ctrl+C to stop
+[2025-11-04 00:37:54] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:37:54] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:37:54] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:01:46] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:01:46] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:01:46] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
+  "sqlPreview": "SELECT 1 as test...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:01:46] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:01:46] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:01:46] [INFO] CONFIG - Configuration saved successfully
+[2025-11-04 00:37:54] [API] SQL QUERY RESPONSE - Status: 401, Rows: N/A
+[2025-11-04 00:37:54] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:37:54] [INFO] CONFIG - Configuration loaded successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:01:46] [INFO] MYSQL - Initializing queue table...
+[2025-11-04 00:37:54] [INFO] PENDING JOBS - Checking for pending queue items
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:01:46] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:01:46] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:01:46] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:01:46] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:01:46] [INFO] MYSQL - Table has 60 row(s)
-[2025-10-31 05:01:46] [API] SQL QUERY
+[2025-11-04 00:37:54] [ERROR] PENDING JOBS - Error checking pending jobs
+{
+  "error": "Table 'ceres_tracking_v2.mo_queue' doesn't exist"
+}
+[2025-11-04 00:37:54] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:01:46] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:01:46] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:01:46] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:01:46] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:01:46] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:01:48] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:01:48] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:02:27] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:27] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
-[2025-10-31 05:02:27] [INFO] RAW GOODS - Fetching for BOM
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:02:27] [INFO] RAW GOODS - Found 1 raw good(s)
-[2025-10-31 05:02:44] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS serial FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid J...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:44] [API] SQL QUERY RESPONSE - Status: 200, Rows: 100
-[2025-10-31 05:02:44] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS barcode FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid ...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:44] [API] SQL QUERY RESPONSE - Status: 200, Rows: 0
-[2025-10-31 05:02:46] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:02:46] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:02:46] [INFO] MYSQL - Deleting pending barcodes...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:02:46] [INFO] MYSQL - No pending records found for given barcodes
-[2025-10-31 05:02:46] [INFO] MYSQL - Batch queueing work orders...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:02:46] [INFO] MYSQL - Successfully queued 10 work order(s)
-[2025-10-31 05:02:47] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:47] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:02:47] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:47] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:02:48] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:02:48] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:02:48] [INFO] QUEUE PROCESSING - Start requested
-{
-  "database": "ceres_tracking_v1",
-  "bom": "RCH001",
-  "locationGroup": "1"
-}
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Found 4 existing MO(s) for today
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 4, starting from 5
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Starting from sequence 5
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:02:48] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|5
-[2025-10-31 05:02:49] [INFO] BACKGROUND PROCESSOR - MO created: RCH001|251031|5 (ID: 68)
-[2025-10-31 05:02:50] [INFO] BACKGROUND PROCESSOR - MO issued
-[2025-10-31 05:02:50] [INFO] BACKGROUND PROCESSOR - Found 10 WOs for MO RCH001|251031|5
-[2025-10-31 05:02:50] [INFO] BACKGROUND PROCESSOR - WO numbers assigned to all items for MO RCH001|251031|5
-[2025-10-31 05:02:50] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:001 | Barcode RCH0010241W40
-[2025-10-31 05:02:50] [INFO] STATUS - Queue status requested
-[2025-10-31 05:02:50] [INFO] WO RCH001|251031|5:001 - Pick opened successfully
-[2025-10-31 05:02:50] [INFO] WO RCH001|251031|5:001 - Splitting pick by location
-[2025-10-31 05:02:51] [INFO] WO RCH001|251031|5:001 - Pick split and saved successfully
-[2025-10-31 05:02:51] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:001 | RCH0010241W40
-[2025-10-31 05:02:51] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:002 | Barcode RCH0010242W40
-[2025-10-31 05:02:51] [INFO] WO RCH001|251031|5:002 - Pick opened successfully
-[2025-10-31 05:02:51] [INFO] WO RCH001|251031|5:002 - Splitting pick by location
-[2025-10-31 05:02:52] [INFO] WO RCH001|251031|5:002 - Pick split and saved successfully
-[2025-10-31 05:02:52] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:002 | RCH0010242W40
-[2025-10-31 05:02:52] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:003 | Barcode RCH0010243W40
-[2025-10-31 05:02:52] [INFO] WO RCH001|251031|5:003 - Pick opened successfully
-[2025-10-31 05:02:52] [INFO] WO RCH001|251031|5:003 - Splitting pick by location
-[2025-10-31 05:02:52] [INFO] STATUS - Queue status requested
-[2025-10-31 05:02:53] [INFO] WO RCH001|251031|5:003 - Pick split and saved successfully
-[2025-10-31 05:02:53] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:003 | RCH0010243W40
-[2025-10-31 05:02:53] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:004 | Barcode RCH0010244W40
-[2025-10-31 05:02:53] [INFO] WO RCH001|251031|5:004 - Pick opened successfully
-[2025-10-31 05:02:53] [INFO] WO RCH001|251031|5:004 - Splitting pick by location
-[2025-10-31 05:02:53] [INFO] WO RCH001|251031|5:004 - Pick split and saved successfully
-[2025-10-31 05:02:54] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:004 | RCH0010244W40
-[2025-10-31 05:02:54] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:005 | Barcode RCH0010245W40
-[2025-10-31 05:02:54] [INFO] WO RCH001|251031|5:005 - Pick opened successfully
-[2025-10-31 05:02:54] [INFO] WO RCH001|251031|5:005 - Splitting pick by location
-[2025-10-31 05:02:54] [INFO] WO RCH001|251031|5:005 - Pick split and saved successfully
-[2025-10-31 05:02:54] [INFO] STATUS - Queue status requested
-[2025-10-31 05:02:54] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:005 | RCH0010245W40
-[2025-10-31 05:02:54] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:006 | Barcode RCH0010246W40
-[2025-10-31 05:02:55] [INFO] WO RCH001|251031|5:006 - Pick opened successfully
-[2025-10-31 05:02:55] [INFO] WO RCH001|251031|5:006 - Splitting pick by location
-[2025-10-31 05:02:55] [INFO] WO RCH001|251031|5:006 - Pick split and saved successfully
-[2025-10-31 05:02:55] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:006 | RCH0010246W40
-[2025-10-31 05:02:55] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:007 | Barcode RCH0010247W40
-[2025-10-31 05:02:55] [INFO] WO RCH001|251031|5:007 - Pick opened successfully
-[2025-10-31 05:02:55] [INFO] WO RCH001|251031|5:007 - Splitting pick by location
-[2025-10-31 05:02:56] [INFO] WO RCH001|251031|5:007 - Pick split and saved successfully
-[2025-10-31 05:02:56] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:007 | RCH0010247W40
-[2025-10-31 05:02:56] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:008 | Barcode RCH0010248W40
-[2025-10-31 05:02:56] [INFO] WO RCH001|251031|5:008 - Pick opened successfully
-[2025-10-31 05:02:56] [INFO] WO RCH001|251031|5:008 - Splitting pick by location
-[2025-10-31 05:02:56] [INFO] WO RCH001|251031|5:008 - Pick split and saved successfully
-[2025-10-31 05:02:56] [INFO] STATUS - Queue status requested
-[2025-10-31 05:02:57] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:008 | RCH0010248W40
-[2025-10-31 05:02:57] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:009 | Barcode RCH0010249W40
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:009 - Pick opened successfully
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:009 - Splitting pick by location
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:009 - Pick split and saved successfully
-[2025-10-31 05:02:57] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:009 | RCH0010249W40
-[2025-10-31 05:02:57] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|5:010 | Barcode RCH0010250W40
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:010 - Pick opened successfully
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:010 - Splitting pick by location
-[2025-10-31 05:02:57] [INFO] WO RCH001|251031|5:010 - Pick split and saved successfully
-[2025-10-31 05:02:58] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|5:010 | RCH0010250W40
-[2025-10-31 05:02:58] [INFO] BACKGROUND PROCESSOR - Complete
-{
-  "total": 10,
-  "success": 10,
-  "failed": 0
-}
-[2025-10-31 05:02:58] [INFO] STATUS - Queue status requested
-[2025-10-31 05:02:58] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:58] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:02:58] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:02:58] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:05:43] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
+[2025-11-04 00:37:54] [API] SQL QUERY RESPONSE - Status: 401, Rows: N/A
+[2025-11-04 00:37:54] [INFO] STATUS - Queue status requested
+[2025-11-04 00:38:18] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
 {
   "serverUrl": "http://localhost:2480"
 }
-[2025-10-31 05:05:43] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:05:43] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:05:43] [API] LOGOUT - Complete
+[2025-11-04 00:38:19] [API] LOGOUT - Current session logged out successfully
+[2025-11-04 00:38:19] [INFO] TOKEN TRACKING - No active tokens to logout
+[2025-11-04 00:38:19] [API] LOGOUT - Complete
 {
   "success": true,
   "loggedOut": 0,
   "failed": 0
 }
-[2025-10-31 05:05:54] [INFO] ============================================================
-[2025-10-31 05:05:54] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
-[2025-10-31 05:05:54] [INFO] ============================================================
-[2025-10-31 05:05:54] [INFO] Server running on http://localhost:3000
-[2025-10-31 05:05:54] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
-[2025-10-31 05:05:54] [INFO] Log level: INFO
-[2025-10-31 05:05:54] [INFO] CORS enabled - Fishbowl API calls will be proxied
-[2025-10-31 05:05:54] [INFO] SSL certificate validation disabled (development mode)
-[2025-10-31 05:05:54] [INFO] ============================================================
-[2025-10-31 05:05:54] [INFO] No orphaned tokens found - starting fresh
-[2025-10-31 05:05:54] [INFO] ============================================================
-[2025-10-31 05:05:54] [INFO] Server ready - Press Ctrl+C to stop
-[2025-10-31 05:05:55] [API] LOGIN REQUEST
+[2025-11-04 00:38:22] [API] LOGIN REQUEST
 {
   "serverUrl": "http://localhost:2480",
   "username": "admin",
   "url": "http://localhost:2480/api/login"
 }
-[2025-10-31 05:05:55] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:05:55] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:05:55] [API] SQL QUERY
+[2025-11-04 00:38:22] [API] LOGIN RESPONSE - Status: 200
+[2025-11-04 00:38:22] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
+[2025-11-04 00:38:22] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT DATABASE() as current_db...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:05:55] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:05:55] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:05:55] [INFO] CONFIG - Configuration saved successfully
+[2025-11-04 00:38:22] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:22] [INFO] CONFIG - Saving configuration...
+[2025-11-04 00:38:22] [INFO] CONFIG - Configuration saved successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:05:55] [INFO] MYSQL - Initializing queue table...
+[2025-11-04 00:38:22] [INFO] MYSQL - Initializing queue table...
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:05:55] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:05:55] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:05:55] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:05:55] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:05:55] [INFO] MYSQL - Table has 70 row(s)
-[2025-10-31 05:05:55] [API] SQL QUERY
+[2025-11-04 00:38:22] [INFO] MYSQL - Connected successfully
+[2025-11-04 00:38:22] [INFO] MYSQL - Current database: ceres_tracking_v2
+[2025-11-04 00:38:22] [INFO] MYSQL - Creating mo_queue table (if not exists)...
+[2025-11-04 00:38:22] [INFO] MYSQL - Table ready (created or already exists)
+[2025-11-04 00:38:22] [INFO] MYSQL - Table has 0 row(s)
+[2025-11-04 00:38:22] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:05:55] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:05:55] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:05:55] [INFO] CONFIG - Configuration loaded successfully
+[2025-11-04 00:38:23] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:23] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:38:23] [INFO] CONFIG - Configuration loaded successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:05:55] [INFO] PENDING JOBS - Checking for pending queue items
+[2025-11-04 00:38:23] [INFO] PENDING JOBS - Checking for pending queue items
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:05:55] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:05:57] [API] SQL QUERY
+[2025-11-04 00:38:23] [INFO] PENDING JOBS - Found 0 pending item(s)
+[2025-11-04 00:38:24] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:05:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:05:59] [INFO] FINISHED GOODS - Fetching on-hand for disassembly
+[2025-11-04 00:38:24] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:30] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:30] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
+[2025-11-04 00:38:30] [INFO] RAW GOODS - Fetching for BOM
 {
   "bomNum": "RCH001"
 }
-[2025-10-31 05:05:59] [INFO] FINISHED GOODS - Found 10 on-hand finished good(s) for disassembly
-[2025-10-31 05:05:59] [INFO] LOCATIONS - Fetching for location group
+[2025-11-04 00:38:30] [INFO] RAW GOODS - Found 1 raw good(s)
+[2025-11-04 00:38:34] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS serial FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid J...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:34] [API] SQL QUERY RESPONSE - Status: 200, Rows: 100
+[2025-11-04 00:38:34] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS barcode FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid ...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:34] [API] SQL QUERY RESPONSE - Status: 200, Rows: 0
+[2025-11-04 00:38:46] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:38:46] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:38:46] [INFO] MYSQL - Deleting pending barcodes...
+{
+  "database": "ceres_tracking_v2",
+  "count": 10
+}
+[2025-11-04 00:38:46] [INFO] MYSQL - No pending records found for given barcodes
+[2025-11-04 00:38:46] [INFO] MYSQL - Batch queueing work orders...
+{
+  "database": "ceres_tracking_v2",
+  "count": 10
+}
+[2025-11-04 00:38:46] [INFO] MYSQL - Successfully queued 10 work order(s)
+[2025-11-04 00:38:47] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:47] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:47] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:47] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:48] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:38:48] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:38:48] [INFO] QUEUE PROCESSING - Start requested
+{
+  "database": "ceres_tracking_v2",
+  "bom": "RCH001",
+  "locationGroup": "1"
+}
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - Starting
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - Connected to database
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - No existing MOs for today, starting from 1
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - Starting from sequence 1
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
+[2025-11-04 00:38:48] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251104|1
+[2025-11-04 00:38:49] [INFO] BACKGROUND PROCESSOR - MO created: RCH001|251104|1 (ID: 2)
+[2025-11-04 00:38:49] [INFO] BACKGROUND PROCESSOR - MO issued
+[2025-11-04 00:38:49] [INFO] BACKGROUND PROCESSOR - Found 10 WOs for MO RCH001|251104|1
+[2025-11-04 00:38:49] [INFO] BACKGROUND PROCESSOR - WO numbers assigned to all items for MO RCH001|251104|1
+[2025-11-04 00:38:49] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:001 | Barcode RCH0010241W40
+[2025-11-04 00:38:49] [INFO] WO RCH001|251104|1:001 - Pick opened successfully
+[2025-11-04 00:38:49] [INFO] WO RCH001|251104|1:001 - Splitting pick by location
+[2025-11-04 00:38:50] [INFO] WO RCH001|251104|1:001 - Pick split and saved successfully
+[2025-11-04 00:38:50] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:001 | RCH0010241W40
+[2025-11-04 00:38:50] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:002 | Barcode RCH0010242W40
+[2025-11-04 00:38:50] [INFO] WO RCH001|251104|1:002 - Pick opened successfully
+[2025-11-04 00:38:50] [INFO] WO RCH001|251104|1:002 - Splitting pick by location
+[2025-11-04 00:38:50] [INFO] STATUS - Queue status requested
+[2025-11-04 00:38:50] [INFO] WO RCH001|251104|1:002 - Pick split and saved successfully
+[2025-11-04 00:38:51] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:002 | RCH0010242W40
+[2025-11-04 00:38:51] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:003 | Barcode RCH0010243W40
+[2025-11-04 00:38:51] [INFO] WO RCH001|251104|1:003 - Pick opened successfully
+[2025-11-04 00:38:51] [INFO] WO RCH001|251104|1:003 - Splitting pick by location
+[2025-11-04 00:38:51] [INFO] WO RCH001|251104|1:003 - Pick split and saved successfully
+[2025-11-04 00:38:51] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:003 | RCH0010243W40
+[2025-11-04 00:38:51] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:004 | Barcode RCH0010244W40
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:004 - Pick opened successfully
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:004 - Splitting pick by location
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:004 - Pick split and saved successfully
+[2025-11-04 00:38:52] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:004 | RCH0010244W40
+[2025-11-04 00:38:52] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:005 | Barcode RCH0010245W40
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:005 - Pick opened successfully
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:005 - Splitting pick by location
+[2025-11-04 00:38:52] [INFO] WO RCH001|251104|1:005 - Pick split and saved successfully
+[2025-11-04 00:38:52] [INFO] STATUS - Queue status requested
+[2025-11-04 00:38:53] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:005 | RCH0010245W40
+[2025-11-04 00:38:53] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:006 | Barcode RCH0010246W40
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:006 - Pick opened successfully
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:006 - Splitting pick by location
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:006 - Pick split and saved successfully
+[2025-11-04 00:38:53] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:006 | RCH0010246W40
+[2025-11-04 00:38:53] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:007 | Barcode RCH0010247W40
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:007 - Pick opened successfully
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:007 - Splitting pick by location
+[2025-11-04 00:38:53] [INFO] WO RCH001|251104|1:007 - Pick split and saved successfully
+[2025-11-04 00:38:54] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:007 | RCH0010247W40
+[2025-11-04 00:38:54] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:008 | Barcode RCH0010248W40
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:008 - Pick opened successfully
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:008 - Splitting pick by location
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:008 - Pick split and saved successfully
+[2025-11-04 00:38:54] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:008 | RCH0010248W40
+[2025-11-04 00:38:54] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:009 | Barcode RCH0010249W40
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:009 - Pick opened successfully
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:009 - Splitting pick by location
+[2025-11-04 00:38:54] [INFO] STATUS - Queue status requested
+[2025-11-04 00:38:54] [INFO] WO RCH001|251104|1:009 - Pick split and saved successfully
+[2025-11-04 00:38:55] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:009 | RCH0010249W40
+[2025-11-04 00:38:55] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251104|1:010 | Barcode RCH0010250W40
+[2025-11-04 00:38:55] [INFO] WO RCH001|251104|1:010 - Pick opened successfully
+[2025-11-04 00:38:55] [INFO] WO RCH001|251104|1:010 - Splitting pick by location
+[2025-11-04 00:38:55] [INFO] WO RCH001|251104|1:010 - Pick split and saved successfully
+[2025-11-04 00:38:55] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251104|1:010 | RCH0010250W40
+[2025-11-04 00:38:55] [INFO] BACKGROUND PROCESSOR - Complete
+{
+  "total": 10,
+  "success": 10,
+  "failed": 0
+}
+[2025-11-04 00:38:56] [INFO] STATUS - Queue status requested
+[2025-11-04 00:38:56] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:56] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:38:56] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:38:56] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:09] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
+{
+  "serverUrl": "http://localhost:2480"
+}
+[2025-11-04 00:39:09] [API] LOGOUT - Current session logged out successfully
+[2025-11-04 00:39:09] [INFO] TOKEN TRACKING - No active tokens to logout
+[2025-11-04 00:39:09] [API] LOGOUT - Complete
+{
+  "success": true,
+  "loggedOut": 0,
+  "failed": 0
+}
+[2025-11-04 00:39:15] [API] LOGIN REQUEST
+{
+  "serverUrl": "http://localhost:2480",
+  "username": "admin",
+  "url": "http://localhost:2480/api/login"
+}
+[2025-11-04 00:39:15] [API] LOGIN RESPONSE - Status: 200
+[2025-11-04 00:39:15] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
+[2025-11-04 00:39:15] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT DATABASE() as current_db...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:15] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:15] [INFO] CONFIG - Saving configuration...
+[2025-11-04 00:39:15] [INFO] CONFIG - Configuration saved successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:15] [INFO] MYSQL - Initializing queue table...
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:15] [INFO] MYSQL - Connected successfully
+[2025-11-04 00:39:15] [INFO] MYSQL - Current database: ceres_tracking_v2
+[2025-11-04 00:39:15] [INFO] MYSQL - Creating mo_queue table (if not exists)...
+[2025-11-04 00:39:15] [INFO] MYSQL - Table ready (created or already exists)
+[2025-11-04 00:39:15] [INFO] MYSQL - Table has 10 row(s)
+[2025-11-04 00:39:15] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:16] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:16] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:39:16] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:16] [INFO] PENDING JOBS - Checking for pending queue items
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:16] [INFO] PENDING JOBS - Found 0 pending item(s)
+[2025-11-04 00:39:29] [INFO] Windows platform detected - added SIGBREAK handler for service control
+[2025-11-04 00:39:29] [INFO] ============================================================
+[2025-11-04 00:39:29] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
+[2025-11-04 00:39:29] [INFO] ============================================================
+[2025-11-04 00:39:29] [INFO] Server running on http://localhost:3000
+[2025-11-04 00:39:29] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
+[2025-11-04 00:39:29] [INFO] Log level: INFO
+[2025-11-04 00:39:29] [INFO] CORS enabled - Fishbowl API calls will be proxied
+[2025-11-04 00:39:29] [INFO] SSL certificate validation disabled (development mode)
+[2025-11-04 00:39:29] [INFO] ============================================================
+[2025-11-04 00:39:29] [WARN] Found 1 orphaned token(s) from previous session(s)
+[2025-11-04 00:39:29] [INFO] STARTUP - No pending jobs found, cleaning up orphaned tokens...
+[2025-11-04 00:39:29] [INFO] TOKEN TRACKING - Attempting to logout 1 token(s)
+[2025-11-04 00:39:29] [INFO] TOKEN TRACKING - Logging out admin@http://localhost:2480
+[2025-11-04 00:39:29] [INFO] TOKEN TRACKING - Successfully logged out admin
+[2025-11-04 00:39:29] [INFO] TOKEN TRACKING - Cleanup complete
+{
+  "loggedOut": 1,
+  "failed": 0,
+  "remaining": 0
+}
+[2025-11-04 00:39:29] [INFO] STARTUP - Successfully cleaned up 1 orphaned session(s)
+[2025-11-04 00:39:29] [INFO] ============================================================
+[2025-11-04 00:39:29] [INFO] Server ready - Press Ctrl+C to stop
+[2025-11-04 00:39:30] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:39:30] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:30] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT 1 as test...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:30] [API] SQL QUERY RESPONSE - Status: 401, Rows: N/A
+[2025-11-04 00:39:30] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:39:30] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:30] [INFO] PENDING JOBS - Checking for pending queue items
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:30] [INFO] PENDING JOBS - Found 0 pending item(s)
+[2025-11-04 00:39:30] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:30] [API] SQL QUERY RESPONSE - Status: 401, Rows: N/A
+[2025-11-04 00:39:30] [INFO] STATUS - Queue status requested
+[2025-11-04 00:39:31] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
+{
+  "serverUrl": "http://localhost:2480"
+}
+[2025-11-04 00:39:31] [API] LOGOUT - Current session logged out successfully
+[2025-11-04 00:39:31] [INFO] TOKEN TRACKING - No active tokens to logout
+[2025-11-04 00:39:31] [API] LOGOUT - Complete
+{
+  "success": true,
+  "loggedOut": 0,
+  "failed": 0
+}
+[2025-11-04 00:39:36] [API] LOGIN REQUEST
+{
+  "serverUrl": "http://localhost:2480",
+  "username": "admin",
+  "url": "http://localhost:2480/api/login"
+}
+[2025-11-04 00:39:36] [API] LOGIN RESPONSE - Status: 200
+[2025-11-04 00:39:36] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
+[2025-11-04 00:39:36] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT DATABASE() as current_db...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:37] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:37] [INFO] CONFIG - Saving configuration...
+[2025-11-04 00:39:37] [INFO] CONFIG - Configuration saved successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:37] [INFO] MYSQL - Initializing queue table...
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:37] [INFO] MYSQL - Connected successfully
+[2025-11-04 00:39:37] [INFO] MYSQL - Current database: ceres_tracking_v2
+[2025-11-04 00:39:37] [INFO] MYSQL - Creating mo_queue table (if not exists)...
+[2025-11-04 00:39:37] [INFO] MYSQL - Table ready (created or already exists)
+[2025-11-04 00:39:37] [INFO] MYSQL - Table has 10 row(s)
+[2025-11-04 00:39:37] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:37] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:37] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:39:37] [INFO] CONFIG - Configuration loaded successfully
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:37] [INFO] PENDING JOBS - Checking for pending queue items
+{
+  "database": "ceres_tracking_v2"
+}
+[2025-11-04 00:39:37] [INFO] PENDING JOBS - Found 0 pending item(s)
+[2025-11-04 00:39:38] [API] SQL QUERY
+{
+  "serverUrl": "http://localhost:2480",
+  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
+  "url": "http://localhost:2480/api/data-query"
+}
+[2025-11-04 00:39:38] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:41] [INFO] FINISHED GOODS - Fetching on-hand for disassembly
+{
+  "bomNum": "RCH001"
+}
+[2025-11-04 00:39:41] [INFO] FINISHED GOODS - Found 10 on-hand finished good(s) for disassembly
+[2025-11-04 00:39:41] [INFO] LOCATIONS - Fetching for location group
 {
   "locationGroupId": "1"
 }
-[2025-10-31 05:05:59] [INFO] LOCATIONS - Found 4 location(s)
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:41] [INFO] LOCATIONS - Found 4 location(s)
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:001"
+  "woNumber": "RCH001|251104|1:001"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010241W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010241W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010241W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:002"
+  "woNumber": "RCH001|251104|1:002"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010242W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010242W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010242W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:003"
+  "woNumber": "RCH001|251104|1:003"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010243W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010243W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010243W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:004"
+  "woNumber": "RCH001|251104|1:004"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010244W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010244W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010244W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:005"
+  "woNumber": "RCH001|251104|1:005"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010245W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010245W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010245W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:006"
+  "woNumber": "RCH001|251104|1:006"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010246W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010246W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010246W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:007"
+  "woNumber": "RCH001|251104|1:007"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010247W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010247W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010247W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:008"
+  "woNumber": "RCH001|251104|1:008"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010248W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010248W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010248W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:009"
+  "woNumber": "RCH001|251104|1:009"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010249W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010249W40 for disassemble
-[2025-10-31 05:06:04] [API] WO STRUCTURE QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010249W40 for disassemble
+[2025-11-04 00:39:45] [API] WO STRUCTURE QUERY
 {
   "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|5:010"
+  "woNumber": "RCH001|251104|1:010"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Executing SQL
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Executing SQL
 {
   "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
 }
-[2025-10-31 05:06:04] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:06:04] [API] WO STRUCTURE RESPONSE - Items: 2
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Queueing
+[2025-11-04 00:39:45] [API] WO STRUCTURE - Fishbowl response status: 200
+[2025-11-04 00:39:45] [API] WO STRUCTURE RESPONSE - Items: 3
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Queueing
 {
   "barcode": "RCH0010250W40",
   "operationType": "disassemble"
 }
-[2025-10-31 05:06:04] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010250W40 for disassemble
-[2025-10-31 05:06:05] [API] SQL QUERY
+[2025-11-04 00:39:45] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010250W40 for disassemble
+[2025-11-04 00:39:46] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:05] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:06:05] [API] SQL QUERY
+[2025-11-04 00:39:46] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
+[2025-11-04 00:39:46] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:05] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:06] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:06:06] [INFO] CONFIG - Configuration loaded successfully
+[2025-11-04 00:39:46] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:39:58] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:39:58] [INFO] CONFIG - Configuration loaded successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:06] [INFO] QUEUE PROCESSING - Start requested
+[2025-11-04 00:39:58] [INFO] QUEUE PROCESSING - Start requested
 {
-  "database": "ceres_tracking_v1",
+  "database": "ceres_tracking_v2",
   "bom": "RCH001",
   "locationGroup": "1"
 }
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Found 5 existing MO(s) for today
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 5, starting from 6
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Starting from sequence 6
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|6
-[2025-10-31 05:06:06] [INFO] BACKGROUND PROCESSOR - DISASSEMBLY mode detected
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - Processing 10 item(s)
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - Loaded details for 2 unique parts
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010241W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010242W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010243W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010244W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010245W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010246W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010247W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010248W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010249W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - RCH0010250W40: 2 original items
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - Creating MO RCH001|251031|6
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - MO created: RCH001|251031|6 (ID: 69)
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - MO issued
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - Found 10 WOs for MO RCH001|251031|6
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - WO numbers assigned to all items for MO RCH001|251031|6
-[2025-10-31 05:06:06] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:001 | Barcode RCH0010241W40 | Return Location 4
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:001
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902587, BW3902774, BW4000220, BW4000270, BW4000271KYE, BW4000358, BW4000429, BW4000435, BW4000445, BW4000446
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:001...
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO RCH001|251031|6:001 completed successfully
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Success: RCH001|251031|6:001 | RCH0010241W40
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:002 | Barcode RCH0010242W40 | Return Location 4
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:002
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902793, BW4000217, BW4000222, BW4000264, BW4000269, BW4000272, BW4000304, BW4000431, BW4000441, BW4000452
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:002...
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO RCH001|251031|6:002 completed successfully
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Success: RCH001|251031|6:002 | RCH0010242W40
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:003 | Barcode RCH0010243W40 | Return Location 4
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:003
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902561, BW3902818, BW3902823, BW4000167, BW4000210, BW4000223, BW4000438, BW4000440, BW4000442, BW4000447
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:07] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:003...
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO RCH001|251031|6:003 completed successfully
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Success: RCH001|251031|6:003 | RCH0010243W40
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:004 | Barcode RCH0010244W40 | Return Location 4
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:004
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902574, BW3902606, BW3902770, BW3902802, BW4000218, BW4000266, BW4000298, BW4000424, BW4000450, BW4000459
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:004...
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO RCH001|251031|6:004 completed successfully
-[2025-10-31 05:06:08] [INFO] STATUS - Queue status requested
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Success: RCH001|251031|6:004 | RCH0010244W40
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:005 | Barcode RCH0010245W40 | Return Location 4
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:005
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902652, BW3902817, BW3902819, BW4000234, BW4000265, BW4000268, BW4000274, BW4000301, BW4000436, BW4000443
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:005...
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO RCH001|251031|6:005 completed successfully
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Success: RCH001|251031|6:005 | RCH0010245W40
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:006 | Barcode RCH0010246W40 | Return Location 4
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:006
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902585, BW3902648, BW3902650, BW3902771, BW3902776, BW3902801, BW4000313, BW4000432, BW4000434, BW4000465
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:08] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:006...
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO RCH001|251031|6:006 completed successfully
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Success: RCH001|251031|6:006 | RCH0010246W40
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:007 | Barcode RCH0010247W40 | Return Location 4
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:007
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902577, BW3902619, BW3902656, BW3902659, BW3902798, BW4000257, BW4000380, BW4000382, BW4000408, BW4000413
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:007...
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO RCH001|251031|6:007 completed successfully
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Success: RCH001|251031|6:007 | RCH0010247W40
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:008 | Barcode RCH0010248W40 | Return Location 4
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:008
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902552, BW3902583, BW3902611, BW3902627, BW3902629, BW3902630, BW3902662, BW3902735, BW3902867, BW4000410
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:008...
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - WO RCH001|251031|6:008 completed successfully
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Success: RCH001|251031|6:008 | RCH0010248W40
-[2025-10-31 05:06:09] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:009 | Barcode RCH0010249W40 | Return Location 4
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:009
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902567, BW3902570, BW3902625, BW3902727, BW3902728, BW3902743, BW3902866, BW3902870, BW4000412, BW4000426
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:009...
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO RCH001|251031|6:009 completed successfully
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Success: RCH001|251031|6:009 | RCH0010249W40
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Processing WO RCH001|251031|6:010 | Barcode RCH0010250W40 | Return Location 4
-[2025-10-31 05:06:10] [INFO] STATUS - Queue status requested
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|6:010
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO has 2 items total
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Found 1 FG items (produced raw goods)
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902572, BW3902578, BW3902592, BW3902615, BW3902633, BW3902664, BW3902733, BW3902789, BW4000399, BW4000411
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Saving WO RCH001|251031|6:010...
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - WO RCH001|251031|6:010 completed successfully
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Success: RCH001|251031|6:010 | RCH0010250W40
-[2025-10-31 05:06:10] [INFO] DISASSEMBLY - Completed 10 item(s)
-[2025-10-31 05:06:10] [INFO] BACKGROUND PROCESSOR - Complete
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Starting
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Connected to database
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Found 1 existing MO(s) for today
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 1, starting from 2
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Starting from sequence 2
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251104|2
+[2025-11-04 00:39:58] [INFO] BACKGROUND PROCESSOR - DISASSEMBLY mode detected
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - Processing 10 item(s)
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - Loaded details for 3 unique parts
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010241W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010242W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010243W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010244W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010245W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010246W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010247W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010248W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010249W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - RCH0010250W40: 3 original items
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - Creating MO RCH001|251104|2
+[2025-11-04 00:39:58] [INFO] DISASSEMBLY - MO created: RCH001|251104|2 (ID: 3)
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - MO issued
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Found 10 WOs for MO RCH001|251104|2
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO numbers assigned to all items for MO RCH001|251104|2
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:001 | Barcode RCH0010241W40 | Return Location 4
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:001
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902587, BW3902774, BW4000220, BW4000270, BW4000271KYE, BW4000358, BW4000429, BW4000435, BW4000445, BW4000446
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:001...
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO RCH001|251104|2:001 completed successfully
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Success: RCH001|251104|2:001 | RCH0010241W40
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:002 | Barcode RCH0010242W40 | Return Location 4
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:002
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902793, BW4000217, BW4000222, BW4000264, BW4000269, BW4000272, BW4000304, BW4000431, BW4000441, BW4000452
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:002...
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - WO RCH001|251104|2:002 completed successfully
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Success: RCH001|251104|2:002 | RCH0010242W40
+[2025-11-04 00:39:59] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:003 | Barcode RCH0010243W40 | Return Location 4
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:003
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902561, BW3902818, BW3902823, BW4000167, BW4000210, BW4000223, BW4000438, BW4000440, BW4000442, BW4000447
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:003...
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO RCH001|251104|2:003 completed successfully
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Success: RCH001|251104|2:003 | RCH0010243W40
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:004 | Barcode RCH0010244W40 | Return Location 4
+[2025-11-04 00:40:00] [INFO] STATUS - Queue status requested
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:004
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902574, BW3902606, BW3902770, BW3902802, BW4000218, BW4000266, BW4000298, BW4000424, BW4000450, BW4000459
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:004...
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO RCH001|251104|2:004 completed successfully
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Success: RCH001|251104|2:004 | RCH0010244W40
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:005 | Barcode RCH0010245W40 | Return Location 4
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:005
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902652, BW3902817, BW3902819, BW4000234, BW4000265, BW4000268, BW4000274, BW4000301, BW4000436, BW4000443
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:00] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:005...
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO RCH001|251104|2:005 completed successfully
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Success: RCH001|251104|2:005 | RCH0010245W40
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:006 | Barcode RCH0010246W40 | Return Location 4
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:006
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902585, BW3902648, BW3902650, BW3902771, BW3902776, BW3902801, BW4000313, BW4000432, BW4000434, BW4000465
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:006...
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO RCH001|251104|2:006 completed successfully
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Success: RCH001|251104|2:006 | RCH0010246W40
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:007 | Barcode RCH0010247W40 | Return Location 4
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:007
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902577, BW3902619, BW3902656, BW3902659, BW3902798, BW4000257, BW4000380, BW4000382, BW4000408, BW4000413
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:007...
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - WO RCH001|251104|2:007 completed successfully
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Success: RCH001|251104|2:007 | RCH0010247W40
+[2025-11-04 00:40:01] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:008 | Barcode RCH0010248W40 | Return Location 4
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:008
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902552, BW3902583, BW3902611, BW3902627, BW3902629, BW3902630, BW3902662, BW3902735, BW3902867, BW4000410
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:008...
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO RCH001|251104|2:008 completed successfully
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Success: RCH001|251104|2:008 | RCH0010248W40
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:009 | Barcode RCH0010249W40 | Return Location 4
+[2025-11-04 00:40:02] [INFO] STATUS - Queue status requested
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:009
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902567, BW3902570, BW3902625, BW3902727, BW3902728, BW3902743, BW3902866, BW3902870, BW4000412, BW4000426
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:009...
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO RCH001|251104|2:009 completed successfully
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Success: RCH001|251104|2:009 | RCH0010249W40
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing WO RCH001|251104|2:010 | Barcode RCH0010250W40 | Return Location 4
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251104|2:010
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - WO has 3 items total
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902572, BW3902578, BW3902592, BW3902615, BW3902633, BW3902664, BW3902733, BW3902789, BW4000399, BW4000411
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
+[2025-11-04 00:40:02] [INFO] DISASSEMBLY - Saving WO RCH001|251104|2:010...
+[2025-11-04 00:40:03] [INFO] DISASSEMBLY - WO RCH001|251104|2:010 completed successfully
+[2025-11-04 00:40:03] [INFO] DISASSEMBLY - Success: RCH001|251104|2:010 | RCH0010250W40
+[2025-11-04 00:40:03] [INFO] DISASSEMBLY - Completed 10 item(s)
+[2025-11-04 00:40:03] [INFO] BACKGROUND PROCESSOR - Complete
 {
   "total": 10,
   "success": 10,
   "failed": 0
 }
-[2025-10-31 05:06:12] [INFO] STATUS - Queue status requested
-[2025-10-31 05:06:12] [API] SQL QUERY
+[2025-11-04 00:40:04] [INFO] STATUS - Queue status requested
+[2025-11-04 00:40:04] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:12] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:12] [API] SQL QUERY
+[2025-11-04 00:40:04] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:40:04] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:12] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:32] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
+[2025-11-04 00:40:04] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:41:13] [INFO] Windows platform detected - added SIGBREAK handler for service control
+[2025-11-04 00:41:13] [INFO] ============================================================
+[2025-11-04 00:41:13] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
+[2025-11-04 00:41:13] [INFO] ============================================================
+[2025-11-04 00:41:13] [INFO] Server running on http://localhost:3000
+[2025-11-04 00:41:13] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
+[2025-11-04 00:41:13] [INFO] Log level: INFO
+[2025-11-04 00:41:13] [INFO] CORS enabled - Fishbowl API calls will be proxied
+[2025-11-04 00:41:13] [INFO] SSL certificate validation disabled (development mode)
+[2025-11-04 00:41:13] [INFO] ============================================================
+[2025-11-04 00:41:13] [WARN] Found 1 orphaned token(s) from previous session(s)
+[2025-11-04 00:41:13] [INFO] STARTUP - No pending jobs found, cleaning up orphaned tokens...
+[2025-11-04 00:41:13] [INFO] TOKEN TRACKING - Attempting to logout 1 token(s)
+[2025-11-04 00:41:13] [INFO] TOKEN TRACKING - Logging out admin@http://localhost:2480
+[2025-11-04 00:41:13] [INFO] TOKEN TRACKING - Successfully logged out admin
+[2025-11-04 00:41:13] [INFO] TOKEN TRACKING - Cleanup complete
 {
-  "serverUrl": "http://localhost:2480"
+  "loggedOut": 1,
+  "failed": 0,
+  "remaining": 0
 }
-[2025-10-31 05:06:32] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:06:32] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:06:32] [API] LOGOUT - Complete
+[2025-11-04 00:41:13] [INFO] STARTUP - Successfully cleaned up 1 orphaned session(s)
+[2025-11-04 00:41:13] [INFO] ============================================================
+[2025-11-04 00:41:13] [INFO] Server ready - Press Ctrl+C to stop
+[2025-11-04 00:41:16] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:41:16] [INFO] CONFIG - Configuration loaded successfully
 {
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:34] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:06:34] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:06:34] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:06:34] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:34] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:34] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:06:34] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:34] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:34] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:06:34] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:06:34] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:06:34] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:06:34] [INFO] MYSQL - Table has 80 row(s)
-[2025-10-31 05:06:34] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:34] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:34] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:06:34] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:34] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:34] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:06:36] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:06:36] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:06:36] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:06:36] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:06:42] [INFO] ============================================================
-[2025-10-31 05:06:42] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
-[2025-10-31 05:06:42] [INFO] ============================================================
-[2025-10-31 05:06:42] [INFO] Server running on http://localhost:3000
-[2025-10-31 05:06:42] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
-[2025-10-31 05:06:42] [INFO] Log level: INFO
-[2025-10-31 05:06:42] [INFO] CORS enabled - Fishbowl API calls will be proxied
-[2025-10-31 05:06:42] [INFO] SSL certificate validation disabled (development mode)
-[2025-10-31 05:06:42] [INFO] ============================================================
-[2025-10-31 05:06:42] [INFO] No orphaned tokens found - starting fresh
-[2025-10-31 05:06:42] [INFO] ============================================================
-[2025-10-31 05:06:42] [INFO] Server ready - Press Ctrl+C to stop
-[2025-10-31 05:06:43] [API] LOGIN REQUEST
+[2025-11-04 00:41:16] [INFO] STATUS - Queue status requested
+[2025-11-04 00:41:20] [API] LOGIN REQUEST
 {
   "serverUrl": "http://localhost:2480",
   "username": "admin",
   "url": "http://localhost:2480/api/login"
 }
-[2025-10-31 05:06:43] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:06:43] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:06:43] [API] SQL QUERY
+[2025-11-04 00:41:20] [API] LOGIN RESPONSE - Status: 200
+[2025-11-04 00:41:20] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
+[2025-11-04 00:41:20] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT DATABASE() as current_db...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:43] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:43] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:06:43] [INFO] CONFIG - Configuration saved successfully
+[2025-11-04 00:41:20] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:41:20] [INFO] CONFIG - Saving configuration...
+[2025-11-04 00:41:20] [INFO] CONFIG - Configuration saved successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:43] [INFO] MYSQL - Initializing queue table...
+[2025-11-04 00:41:20] [INFO] MYSQL - Initializing queue table...
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:43] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:06:43] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:06:43] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:06:43] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:06:43] [INFO] MYSQL - Table has 80 row(s)
-[2025-10-31 05:06:43] [API] SQL QUERY
+[2025-11-04 00:41:20] [INFO] MYSQL - Connected successfully
+[2025-11-04 00:41:20] [INFO] MYSQL - Current database: ceres_tracking_v2
+[2025-11-04 00:41:20] [INFO] MYSQL - Creating mo_queue table (if not exists)...
+[2025-11-04 00:41:20] [INFO] MYSQL - Table ready (created or already exists)
+[2025-11-04 00:41:20] [INFO] MYSQL - Table has 20 row(s)
+[2025-11-04 00:41:20] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:43] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:43] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:06:43] [INFO] CONFIG - Configuration loaded successfully
+[2025-11-04 00:41:20] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:41:20] [INFO] CONFIG - Loading configuration...
+[2025-11-04 00:41:20] [INFO] CONFIG - Configuration loaded successfully
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:43] [INFO] PENDING JOBS - Checking for pending queue items
+[2025-11-04 00:41:20] [INFO] PENDING JOBS - Checking for pending queue items
 {
-  "database": "ceres_tracking_v1"
+  "database": "ceres_tracking_v2"
 }
-[2025-10-31 05:06:43] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:06:44] [API] SQL QUERY
+[2025-11-04 00:41:20] [INFO] PENDING JOBS - Found 0 pending item(s)
+[2025-11-04 00:41:22] [API] SQL QUERY
 {
   "serverUrl": "http://localhost:2480",
   "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
   "url": "http://localhost:2480/api/data-query"
 }
-[2025-10-31 05:06:44] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:50] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:50] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
-[2025-10-31 05:06:50] [INFO] RAW GOODS - Fetching for BOM
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:06:50] [INFO] RAW GOODS - Found 1 raw good(s)
-[2025-10-31 05:06:54] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS serial FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid J...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:54] [API] SQL QUERY RESPONSE - Status: 200, Rows: 100
-[2025-10-31 05:06:54] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS barcode FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid ...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:54] [API] SQL QUERY RESPONSE - Status: 200, Rows: 0
-[2025-10-31 05:06:56] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:06:56] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:56] [INFO] MYSQL - Deleting pending barcodes...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:06:56] [INFO] MYSQL - No pending records found for given barcodes
-[2025-10-31 05:06:56] [INFO] MYSQL - Batch queueing work orders...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:06:56] [INFO] MYSQL - Successfully queued 10 work order(s)
-[2025-10-31 05:06:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:06:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:06:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:06:58] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:06:58] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:06:58] [INFO] QUEUE PROCESSING - Start requested
-{
-  "database": "ceres_tracking_v1",
-  "bom": "RCH001",
-  "locationGroup": "1"
-}
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Found 6 existing MO(s) for today
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 6, starting from 7
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Starting from sequence 7
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|7
-[2025-10-31 05:06:58] [INFO] BACKGROUND PROCESSOR - MO created: RCH001|251031|7 (ID: 70)
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - MO issued
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - Found 10 WOs for MO RCH001|251031|7
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - WO numbers assigned to all items for MO RCH001|251031|7
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:001 | Barcode RCH0010241W40
-[2025-10-31 05:06:59] [INFO] WO RCH001|251031|7:001 - Pick opened successfully
-[2025-10-31 05:06:59] [INFO] WO RCH001|251031|7:001 - Splitting pick by location
-[2025-10-31 05:06:59] [INFO] WO RCH001|251031|7:001 - Pick split and saved successfully
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:001 | RCH0010241W40
-[2025-10-31 05:06:59] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:002 | Barcode RCH0010242W40
-[2025-10-31 05:06:59] [INFO] WO RCH001|251031|7:002 - Pick opened successfully
-[2025-10-31 05:06:59] [INFO] WO RCH001|251031|7:002 - Splitting pick by location
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:002 - Pick split and saved successfully
-[2025-10-31 05:07:00] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:002 | RCH0010242W40
-[2025-10-31 05:07:00] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:003 | Barcode RCH0010243W40
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:003 - Pick opened successfully
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:003 - Splitting pick by location
-[2025-10-31 05:07:00] [INFO] STATUS - Queue status requested
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:003 - Pick split and saved successfully
-[2025-10-31 05:07:00] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:003 | RCH0010243W40
-[2025-10-31 05:07:00] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:004 | Barcode RCH0010244W40
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:004 - Pick opened successfully
-[2025-10-31 05:07:00] [INFO] WO RCH001|251031|7:004 - Splitting pick by location
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:004 - Pick split and saved successfully
-[2025-10-31 05:07:01] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:004 | RCH0010244W40
-[2025-10-31 05:07:01] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:005 | Barcode RCH0010245W40
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:005 - Pick opened successfully
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:005 - Splitting pick by location
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:005 - Pick split and saved successfully
-[2025-10-31 05:07:01] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:005 | RCH0010245W40
-[2025-10-31 05:07:01] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:006 | Barcode RCH0010246W40
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:006 - Pick opened successfully
-[2025-10-31 05:07:01] [INFO] WO RCH001|251031|7:006 - Splitting pick by location
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:006 - Pick split and saved successfully
-[2025-10-31 05:07:02] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:006 | RCH0010246W40
-[2025-10-31 05:07:02] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:007 | Barcode RCH0010247W40
-[2025-10-31 05:07:02] [INFO] STATUS - Queue status requested
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:007 - Pick opened successfully
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:007 - Splitting pick by location
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:007 - Pick split and saved successfully
-[2025-10-31 05:07:02] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:007 | RCH0010247W40
-[2025-10-31 05:07:02] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:008 | Barcode RCH0010248W40
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:008 - Pick opened successfully
-[2025-10-31 05:07:02] [INFO] WO RCH001|251031|7:008 - Splitting pick by location
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:008 - Pick split and saved successfully
-[2025-10-31 05:07:03] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:008 | RCH0010248W40
-[2025-10-31 05:07:03] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:009 | Barcode RCH0010249W40
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:009 - Pick opened successfully
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:009 - Splitting pick by location
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:009 - Pick split and saved successfully
-[2025-10-31 05:07:03] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:009 | RCH0010249W40
-[2025-10-31 05:07:03] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|7:010 | Barcode RCH0010250W40
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:010 - Pick opened successfully
-[2025-10-31 05:07:03] [INFO] WO RCH001|251031|7:010 - Splitting pick by location
-[2025-10-31 05:07:04] [INFO] WO RCH001|251031|7:010 - Pick split and saved successfully
-[2025-10-31 05:07:04] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|7:010 | RCH0010250W40
-[2025-10-31 05:07:04] [INFO] BACKGROUND PROCESSOR - Complete
-{
-  "total": 10,
-  "success": 10,
-  "failed": 0
-}
-[2025-10-31 05:07:04] [INFO] STATUS - Queue status requested
-[2025-10-31 05:07:04] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:04] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:04] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:04] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:25] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
+[2025-11-04 00:41:22] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
+[2025-11-04 00:41:24] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
 {
   "serverUrl": "http://localhost:2480"
 }
-[2025-10-31 05:07:26] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:07:26] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:07:26] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:07:27] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:07:27] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:07:27] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:07:27] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:27] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:27] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:07:27] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:27] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:27] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:07:27] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:07:27] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:07:27] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:07:27] [INFO] MYSQL - Table has 90 row(s)
-[2025-10-31 05:07:27] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:27] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:27] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:07:27] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:27] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:27] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:07:28] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:28] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:30] [INFO] FINISHED GOODS - Fetching on-hand for disassembly
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:07:30] [INFO] FINISHED GOODS - Found 10 on-hand finished good(s) for disassembly
-[2025-10-31 05:07:30] [INFO] LOCATIONS - Fetching for location group
-{
-  "locationGroupId": "1"
-}
-[2025-10-31 05:07:30] [INFO] LOCATIONS - Found 4 location(s)
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:001"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010241W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010241W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:002"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010242W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010242W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:003"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010243W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010243W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:004"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010244W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010244W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:005"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010245W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010245W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:006"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010246W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010246W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:007"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010247W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010247W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:008"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010248W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010248W40 for disassemble
-[2025-10-31 05:07:35] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:009"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:35] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:35] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:35] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010249W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:36] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010249W40 for disassemble
-[2025-10-31 05:07:36] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|7:010"
-}
-[2025-10-31 05:07:36] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:07:36] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:07:36] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:07:36] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010250W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:07:36] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010250W40 for disassemble
-[2025-10-31 05:07:36] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:36] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:07:36] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:36] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:37] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:07:37] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:37] [INFO] QUEUE PROCESSING - Start requested
-{
-  "database": "ceres_tracking_v1",
-  "bom": "RCH001",
-  "locationGroup": "1"
-}
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Found 10 pending items
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Found 7 existing MO(s) for today
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 7, starting from 8
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Starting from sequence 8
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|8
-[2025-10-31 05:07:37] [INFO] BACKGROUND PROCESSOR - DISASSEMBLY mode detected
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - Processing 10 item(s)
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - Loaded details for 3 unique parts
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010241W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010242W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010243W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010244W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010245W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010246W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010247W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010248W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010249W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - RCH0010250W40: 3 original items
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - Creating MO RCH001|251031|8
-[2025-10-31 05:07:37] [INFO] DISASSEMBLY - MO created: RCH001|251031|8 (ID: 71)
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - MO issued
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Found 10 WOs for MO RCH001|251031|8
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO numbers assigned to all items for MO RCH001|251031|8
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:001 | Barcode RCH0010241W40 | Return Location 4
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:001
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902587, BW3902774, BW4000220, BW4000270, BW4000271KYE, BW4000358, BW4000429, BW4000435, BW4000445, BW4000446
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:001...
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO RCH001|251031|8:001 completed successfully
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Success: RCH001|251031|8:001 | RCH0010241W40
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:002 | Barcode RCH0010242W40 | Return Location 4
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:002
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902793, BW4000217, BW4000222, BW4000264, BW4000269, BW4000272, BW4000304, BW4000431, BW4000441, BW4000452
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:38] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:002...
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO RCH001|251031|8:002 completed successfully
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Success: RCH001|251031|8:002 | RCH0010242W40
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:003 | Barcode RCH0010243W40 | Return Location 4
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:003
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902561, BW3902818, BW3902823, BW4000167, BW4000210, BW4000223, BW4000438, BW4000440, BW4000442, BW4000447
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:003...
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO RCH001|251031|8:003 completed successfully
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Success: RCH001|251031|8:003 | RCH0010243W40
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:004 | Barcode RCH0010244W40 | Return Location 4
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:004
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902574, BW3902606, BW3902770, BW3902802, BW4000218, BW4000266, BW4000298, BW4000424, BW4000450, BW4000459
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:004...
-[2025-10-31 05:07:39] [INFO] STATUS - Queue status requested
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - WO RCH001|251031|8:004 completed successfully
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Success: RCH001|251031|8:004 | RCH0010244W40
-[2025-10-31 05:07:39] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:005 | Barcode RCH0010245W40 | Return Location 4
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:005
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902652, BW3902817, BW3902819, BW4000234, BW4000265, BW4000268, BW4000274, BW4000301, BW4000436, BW4000443
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:005...
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO RCH001|251031|8:005 completed successfully
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Success: RCH001|251031|8:005 | RCH0010245W40
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:006 | Barcode RCH0010246W40 | Return Location 4
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:006
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902585, BW3902648, BW3902650, BW3902771, BW3902776, BW3902801, BW4000313, BW4000432, BW4000434, BW4000465
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:006...
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO RCH001|251031|8:006 completed successfully
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Success: RCH001|251031|8:006 | RCH0010246W40
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:007 | Barcode RCH0010247W40 | Return Location 4
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:007
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902577, BW3902619, BW3902656, BW3902659, BW3902798, BW4000257, BW4000380, BW4000382, BW4000408, BW4000413
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:007...
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - WO RCH001|251031|8:007 completed successfully
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Success: RCH001|251031|8:007 | RCH0010247W40
-[2025-10-31 05:07:40] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:008 | Barcode RCH0010248W40 | Return Location 4
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:008
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902552, BW3902583, BW3902611, BW3902627, BW3902629, BW3902630, BW3902662, BW3902735, BW3902867, BW4000410
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:008...
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO RCH001|251031|8:008 completed successfully
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Success: RCH001|251031|8:008 | RCH0010248W40
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:009 | Barcode RCH0010249W40 | Return Location 4
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:009
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902567, BW3902570, BW3902625, BW3902727, BW3902728, BW3902743, BW3902866, BW3902870, BW4000412, BW4000426
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:009...
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO RCH001|251031|8:009 completed successfully
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Success: RCH001|251031|8:009 | RCH0010249W40
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing WO RCH001|251031|8:010 | Barcode RCH0010250W40 | Return Location 4
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|8:010
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902572, BW3902578, BW3902592, BW3902615, BW3902633, BW3902664, BW3902733, BW3902789, BW4000399, BW4000411
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Saving WO RCH001|251031|8:010...
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - WO RCH001|251031|8:010 completed successfully
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Success: RCH001|251031|8:010 | RCH0010250W40
-[2025-10-31 05:07:41] [INFO] DISASSEMBLY - Completed 10 item(s)
-[2025-10-31 05:07:41] [INFO] BACKGROUND PROCESSOR - Complete
-{
-  "total": 10,
-  "success": 10,
-  "failed": 0
-}
-[2025-10-31 05:07:41] [INFO] STATUS - Queue status requested
-[2025-10-31 05:07:41] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:41] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:41] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:41] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:50] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:07:50] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:07:50] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:07:50] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:07:51] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:07:51] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:07:51] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:07:51] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:51] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:51] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:07:51] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:51] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:51] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:07:51] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:07:51] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:07:51] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:07:51] [INFO] MYSQL - Table has 100 row(s)
-[2025-10-31 05:07:51] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:51] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:51] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:07:51] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:51] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:07:51] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:07:53] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:53] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:07:59] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:07:59] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
-[2025-10-31 05:07:59] [INFO] RAW GOODS - Fetching for BOM
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:07:59] [INFO] RAW GOODS - Found 1 raw good(s)
-[2025-10-31 05:08:44] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:08:44] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:08:44] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:08:44] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:13:33] [INFO] ============================================================
-[2025-10-31 05:13:33] [INFO] MANUFACTURING ORCHESTRATOR PROXY SERVER
-[2025-10-31 05:13:33] [INFO] ============================================================
-[2025-10-31 05:13:33] [INFO] Server running on http://localhost:3000
-[2025-10-31 05:13:33] [INFO] Web interface: http://localhost:3000/manufacturing-orchestrator.html
-[2025-10-31 05:13:33] [INFO] Log level: INFO
-[2025-10-31 05:13:33] [INFO] CORS enabled - Fishbowl API calls will be proxied
-[2025-10-31 05:13:33] [INFO] SSL certificate validation disabled (development mode)
-[2025-10-31 05:13:33] [INFO] ============================================================
-[2025-10-31 05:13:33] [INFO] No orphaned tokens found - starting fresh
-[2025-10-31 05:13:33] [INFO] ============================================================
-[2025-10-31 05:13:33] [INFO] Server ready - Press Ctrl+C to stop
-[2025-10-31 05:13:34] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:13:34] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:34] [INFO] STATUS - Queue status requested
-[2025-10-31 05:13:35] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:13:35] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:13:35] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:13:35] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:35] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:13:35] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:13:35] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:35] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:35] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:13:35] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:13:35] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:13:35] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:13:35] [INFO] MYSQL - Table has 100 row(s)
-[2025-10-31 05:13:35] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:35] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:13:35] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:13:35] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:35] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:35] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:13:37] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:37] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:13:53] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:53] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
-[2025-10-31 05:13:53] [INFO] RAW GOODS - Fetching for BOM
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:13:53] [INFO] RAW GOODS - Found 1 raw good(s)
-[2025-10-31 05:13:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS serial FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid J...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 100
-[2025-10-31 05:13:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS barcode FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid ...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 0
-[2025-10-31 05:13:58] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:13:58] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:13:58] [INFO] MYSQL - Deleting pending barcodes...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:13:58] [INFO] MYSQL - No pending records found for given barcodes
-[2025-10-31 05:13:58] [INFO] MYSQL - Batch queueing work orders...
-{
-  "database": "ceres_tracking_v1",
-  "count": 10
-}
-[2025-10-31 05:13:58] [INFO] MYSQL - Successfully queued 10 work order(s)
-[2025-10-31 05:13:59] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:59] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:13:59] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:13:59] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:14:17] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:14:17] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:14:17] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:14:17] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:14:19] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:14:19] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:14:19] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:14:19] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:19] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:14:19] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:14:19] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:14:19] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:14:19] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:14:19] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:14:19] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:14:19] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:14:19] [INFO] MYSQL - Table has 110 row(s)
-[2025-10-31 05:14:19] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:19] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:14:19] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:14:19] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:14:19] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:14:19] [INFO] PENDING JOBS - Found 10 pending item(s)
-[2025-10-31 05:14:21] [INFO] CLOSE SHORT - Starting close short for pending jobs
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:14:21] [INFO] CLOSE SHORT - No MOs to close short
-[2025-10-31 05:14:25] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:25] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:14:35] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT CONCAT(locationgroup.name,'-',location.name) AS location_list FROM location JOIN loc...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:35] [API] SQL QUERY RESPONSE - Status: 200, Rows: 4
-[2025-10-31 05:14:35] [INFO] RAW GOODS - Fetching for BOM
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:14:35] [INFO] RAW GOODS - Found 1 raw good(s)
-[2025-10-31 05:14:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS serial FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid J...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 99
-[2025-10-31 05:14:57] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DISTINCT tisn.serialnum AS barcode FROM serialnum tisn JOIN serial s ON s.id = tisn.serialid ...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:14:57] [API] SQL QUERY RESPONSE - Status: 200, Rows: 0
-[2025-10-31 05:15:12] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:15:12] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:12] [INFO] MYSQL - Deleting pending barcodes...
-{
-  "database": "ceres_tracking_v1",
-  "count": 9
-}
-[2025-10-31 05:15:12] [INFO] MYSQL - No pending records found for given barcodes
-[2025-10-31 05:15:12] [INFO] MYSQL - Batch queueing work orders...
-{
-  "database": "ceres_tracking_v1",
-  "count": 9
-}
-[2025-10-31 05:15:12] [INFO] MYSQL - Successfully queued 9 work order(s)
-[2025-10-31 05:15:13] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:13] [API] SQL QUERY RESPONSE - Status: 200, Rows: 3
-[2025-10-31 05:15:13] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:13] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:14] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:15:14] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:14] [INFO] QUEUE PROCESSING - Start requested
-{
-  "database": "ceres_tracking_v1",
-  "bom": "RCH001",
-  "locationGroup": "1"
-}
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Found 9 pending items
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Found 8 existing MO(s) for today
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 8, starting from 9
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Starting from sequence 9
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|9
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - MO created: RCH001|251031|9 (ID: 72)
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - MO issued
-[2025-10-31 05:15:14] [INFO] BACKGROUND PROCESSOR - Found 9 WOs for MO RCH001|251031|9
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - WO numbers assigned to all items for MO RCH001|251031|9
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:001 | Barcode RCH0010242W40
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:001 - Pick opened successfully
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:001 - Splitting pick by location
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:001 - Pick split and saved successfully
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:001 | RCH0010242W40
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:002 | Barcode RCH0010243W40
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:002 - Pick opened successfully
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:002 - Splitting pick by location
-[2025-10-31 05:15:15] [INFO] WO RCH001|251031|9:002 - Pick split and saved successfully
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:002 | RCH0010243W40
-[2025-10-31 05:15:15] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:003 | Barcode RCH0010244W40
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:003 - Pick opened successfully
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:003 - Splitting pick by location
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:003 - Pick split and saved successfully
-[2025-10-31 05:15:16] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:003 | RCH0010244W40
-[2025-10-31 05:15:16] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:004 | Barcode RCH0010245W40
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:004 - Pick opened successfully
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:004 - Splitting pick by location
-[2025-10-31 05:15:16] [INFO] STATUS - Queue status requested
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:004 - Pick split and saved successfully
-[2025-10-31 05:15:16] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:004 | RCH0010245W40
-[2025-10-31 05:15:16] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:005 | Barcode RCH0010246W40
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:005 - Pick opened successfully
-[2025-10-31 05:15:16] [INFO] WO RCH001|251031|9:005 - Splitting pick by location
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:005 - Pick split and saved successfully
-[2025-10-31 05:15:17] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:005 | RCH0010246W40
-[2025-10-31 05:15:17] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:006 | Barcode RCH0010247W40
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:006 - Pick opened successfully
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:006 - Splitting pick by location
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:006 - Pick split and saved successfully
-[2025-10-31 05:15:17] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:006 | RCH0010247W40
-[2025-10-31 05:15:17] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:007 | Barcode RCH0010248W40
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:007 - Pick opened successfully
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:007 - Splitting pick by location
-[2025-10-31 05:15:17] [INFO] WO RCH001|251031|9:007 - Pick split and saved successfully
-[2025-10-31 05:15:18] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:007 | RCH0010248W40
-[2025-10-31 05:15:18] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:008 | Barcode RCH0010249W40
-[2025-10-31 05:15:18] [INFO] WO RCH001|251031|9:008 - Pick opened successfully
-[2025-10-31 05:15:18] [INFO] WO RCH001|251031|9:008 - Splitting pick by location
-[2025-10-31 05:15:18] [INFO] WO RCH001|251031|9:008 - Pick split and saved successfully
-[2025-10-31 05:15:18] [INFO] STATUS - Queue status requested
-[2025-10-31 05:15:18] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:008 | RCH0010249W40
-[2025-10-31 05:15:18] [INFO] BACKGROUND PROCESSOR - Processing WO RCH001|251031|9:009 | Barcode RCH0010250W40
-[2025-10-31 05:15:18] [INFO] WO RCH001|251031|9:009 - Pick opened successfully
-[2025-10-31 05:15:18] [INFO] WO RCH001|251031|9:009 - Splitting pick by location
-[2025-10-31 05:15:19] [INFO] WO RCH001|251031|9:009 - Pick split and saved successfully
-[2025-10-31 05:15:19] [INFO] BACKGROUND PROCESSOR - Success: RCH001|251031|9:009 | RCH0010250W40
-[2025-10-31 05:15:19] [INFO] BACKGROUND PROCESSOR - Complete
-{
-  "total": 9,
-  "success": 9,
-  "failed": 0
-}
-[2025-10-31 05:15:20] [INFO] STATUS - Queue status requested
-[2025-10-31 05:15:20] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:20] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:15:20] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:20] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:40] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:15:40] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:15:40] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:15:40] [API] LOGOUT - Complete
-{
-  "success": true,
-  "loggedOut": 0,
-  "failed": 0
-}
-[2025-10-31 05:15:41] [API] LOGIN REQUEST
-{
-  "serverUrl": "http://localhost:2480",
-  "username": "admin",
-  "url": "http://localhost:2480/api/login"
-}
-[2025-10-31 05:15:41] [API] LOGIN RESPONSE - Status: 200
-[2025-10-31 05:15:41] [INFO] LOGIN - Token tracked successfully. Total active tokens: 1
-[2025-10-31 05:15:41] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT DATABASE() as current_db...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:41] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:41] [INFO] CONFIG - Saving configuration...
-[2025-10-31 05:15:41] [INFO] CONFIG - Configuration saved successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:41] [INFO] MYSQL - Initializing queue table...
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:41] [INFO] MYSQL - Connected successfully
-[2025-10-31 05:15:41] [INFO] MYSQL - Current database: ceres_tracking_v1
-[2025-10-31 05:15:41] [INFO] MYSQL - Creating mo_queue table (if not exists)...
-[2025-10-31 05:15:41] [INFO] MYSQL - Table ready (created or already exists)
-[2025-10-31 05:15:41] [INFO] MYSQL - Table has 119 row(s)
-[2025-10-31 05:15:41] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT locationgroup.name AS locationgroupnamelistvalue, locationgroup.id AS locgid FROM locationgro...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:41] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:41] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:15:41] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:41] [INFO] PENDING JOBS - Checking for pending queue items
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:41] [INFO] PENDING JOBS - Found 0 pending item(s)
-[2025-10-31 05:15:42] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT bom.id AS bomid, bom.num, CONCAT(bom.num,' - ',bom.description) AS bom_list_value, locationgr...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:42] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:44] [INFO] FINISHED GOODS - Fetching on-hand for disassembly
-{
-  "bomNum": "RCH001"
-}
-[2025-10-31 05:15:44] [INFO] FINISHED GOODS - Found 9 on-hand finished good(s) for disassembly
-[2025-10-31 05:15:44] [INFO] LOCATIONS - Fetching for location group
-{
-  "locationGroupId": "1"
-}
-[2025-10-31 05:15:44] [INFO] LOCATIONS - Found 4 location(s)
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:001"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010242W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010242W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:002"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010243W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010243W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:003"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010244W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010244W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:004"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010245W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010245W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:005"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010246W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010246W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:006"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010247W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010247W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:007"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010248W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010248W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:008"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010249W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010249W40 for disassemble
-[2025-10-31 05:15:52] [API] WO STRUCTURE QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "woNumber": "RCH001|251031|9:009"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Executing SQL
-{
-  "sqlPreview": "\n        SELECT\n          bomitemtype.name AS woitem_type,\n          woitem.partId AS partid,\n          woitem.qtyUsed AS woitem_qty,\n          GROUP_CONCAT(DISTINCT trackinginfosn.serialNum) AS seria"
-}
-[2025-10-31 05:15:52] [API] WO STRUCTURE - Fishbowl response status: 200
-[2025-10-31 05:15:52] [API] WO STRUCTURE RESPONSE - Items: 3
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Queueing
-{
-  "barcode": "RCH0010250W40",
-  "operationType": "disassemble"
-}
-[2025-10-31 05:15:52] [INFO] QUEUE WORK ORDER - Successfully queued RCH0010250W40 for disassemble
-[2025-10-31 05:15:53] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:53] [API] SQL QUERY RESPONSE - Status: 200, Rows: 3
-[2025-10-31 05:15:53] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:53] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:15:54] [INFO] CONFIG - Loading configuration...
-[2025-10-31 05:15:54] [INFO] CONFIG - Configuration loaded successfully
-{
-  "database": "ceres_tracking_v1"
-}
-[2025-10-31 05:15:54] [INFO] QUEUE PROCESSING - Start requested
-{
-  "database": "ceres_tracking_v1",
-  "bom": "RCH001",
-  "locationGroup": "1"
-}
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Starting
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Connected to database
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Found 9 pending items
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Found 9 existing MO(s) for today
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Last MO sequence: 9, starting from 10
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Starting from sequence 10
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - 1 batch(es) to process (0 partial, 1 new)
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - Batch 1/1: MO RCH001|251031|10
-[2025-10-31 05:15:54] [INFO] BACKGROUND PROCESSOR - DISASSEMBLY mode detected
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - Processing 9 item(s)
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - Loaded details for 3 unique parts
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010242W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010243W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010244W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010245W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010246W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010247W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010248W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010249W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - RCH0010250W40: 3 original items
-[2025-10-31 05:15:54] [INFO] DISASSEMBLY - Creating MO RCH001|251031|10
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - MO created: RCH001|251031|10 (ID: 73)
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - MO issued
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Found 9 WOs for MO RCH001|251031|10
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO numbers assigned to all items for MO RCH001|251031|10
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:001 | Barcode RCH0010242W40 | Return Location 4
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:001
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902793, BW4000217, BW4000222, BW4000264, BW4000269, BW4000272, BW4000304, BW4000431, BW4000441, BW4000452
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:001...
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO RCH001|251031|10:001 completed successfully
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Success: RCH001|251031|10:001 | RCH0010242W40
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:002 | Barcode RCH0010243W40 | Return Location 4
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:002
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902561, BW3902818, BW3902823, BW4000167, BW4000210, BW4000223, BW4000438, BW4000440, BW4000442, BW4000447
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:55] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:002...
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO RCH001|251031|10:002 completed successfully
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Success: RCH001|251031|10:002 | RCH0010243W40
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:003 | Barcode RCH0010244W40 | Return Location 4
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:003
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902574, BW3902606, BW3902770, BW3902802, BW4000218, BW4000266, BW4000298, BW4000424, BW4000450, BW4000459
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:003...
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO RCH001|251031|10:003 completed successfully
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Success: RCH001|251031|10:003 | RCH0010244W40
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:004 | Barcode RCH0010245W40 | Return Location 4
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:004
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902652, BW3902817, BW3902819, BW4000234, BW4000265, BW4000268, BW4000274, BW4000301, BW4000436, BW4000443
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:004...
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO RCH001|251031|10:004 completed successfully
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Success: RCH001|251031|10:004 | RCH0010245W40
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:005 | Barcode RCH0010246W40 | Return Location 4
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:005
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902585, BW3902648, BW3902650, BW3902771, BW3902776, BW3902801, BW4000313, BW4000432, BW4000434, BW4000465
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:005...
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - WO RCH001|251031|10:005 completed successfully
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Success: RCH001|251031|10:005 | RCH0010246W40
-[2025-10-31 05:15:56] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:006 | Barcode RCH0010247W40 | Return Location 4
-[2025-10-31 05:15:56] [INFO] STATUS - Queue status requested
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:006
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902577, BW3902619, BW3902656, BW3902659, BW3902798, BW4000257, BW4000380, BW4000382, BW4000408, BW4000413
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:006...
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO RCH001|251031|10:006 completed successfully
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Success: RCH001|251031|10:006 | RCH0010247W40
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:007 | Barcode RCH0010248W40 | Return Location 4
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:007
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902552, BW3902583, BW3902611, BW3902627, BW3902629, BW3902630, BW3902662, BW3902735, BW3902867, BW4000410
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:007...
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO RCH001|251031|10:007 completed successfully
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Success: RCH001|251031|10:007 | RCH0010248W40
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:008 | Barcode RCH0010249W40 | Return Location 4
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:008
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902567, BW3902570, BW3902625, BW3902727, BW3902728, BW3902743, BW3902866, BW3902870, BW4000412, BW4000426
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:008...
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - WO RCH001|251031|10:008 completed successfully
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Success: RCH001|251031|10:008 | RCH0010249W40
-[2025-10-31 05:15:57] [INFO] DISASSEMBLY - Processing WO RCH001|251031|10:009 | Barcode RCH0010250W40 | Return Location 4
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - WO retrieved, processing items for RCH001|251031|10:009
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Return location: Main-RandoLoc (ID: 4)
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - WO has 3 items total
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Found 2 FG items (produced raw goods)
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Processing FG item 1: Unknown (ID: 1), Qty: 10
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Found 10 serial(s) from original WO for Unknown: BW3902572, BW3902578, BW3902592, BW3902615, BW3902633, BW3902664, BW3902733, BW3902789, BW4000399, BW4000411
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Applied 10 serial(s) to Unknown
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Processing FG item 2: Unknown (ID: 4), Qty: 1
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - No serial tracking in original WO for Unknown
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Set destination location for Unknown: Main-RandoLoc
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Saving WO RCH001|251031|10:009...
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - WO RCH001|251031|10:009 completed successfully
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Success: RCH001|251031|10:009 | RCH0010250W40
-[2025-10-31 05:15:58] [INFO] DISASSEMBLY - Completed 9 item(s)
-[2025-10-31 05:15:58] [INFO] BACKGROUND PROCESSOR - Complete
-{
-  "total": 9,
-  "success": 9,
-  "failed": 0
-}
-[2025-10-31 05:15:58] [INFO] STATUS - Queue status requested
-[2025-10-31 05:15:58] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "\n      SELECT\n        status,\n        COUNT(*) as count,\n        COUNT(DISTINCT mo_number) as mo_cou...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:59] [API] SQL QUERY RESPONSE - Status: 200, Rows: 2
-[2025-10-31 05:15:59] [API] SQL QUERY
-{
-  "serverUrl": "http://localhost:2480",
-  "sqlPreview": "SELECT COUNT(DISTINCT mo_number) as mo_count FROM mo_queue WHERE mo_number IS NOT NULL...",
-  "url": "http://localhost:2480/api/data-query"
-}
-[2025-10-31 05:15:59] [API] SQL QUERY RESPONSE - Status: 200, Rows: 1
-[2025-10-31 05:18:13] [API] LOGOUT REQUEST - Cleaning up all tracked tokens
-{
-  "serverUrl": "http://localhost:2480"
-}
-[2025-10-31 05:18:13] [API] LOGOUT - Current session logged out successfully
-[2025-10-31 05:18:13] [INFO] TOKEN TRACKING - No active tokens to logout
-[2025-10-31 05:18:13] [API] LOGOUT - Complete
+[2025-11-04 00:41:24] [API] LOGOUT - Current session logged out successfully
+[2025-11-04 00:41:24] [INFO] TOKEN TRACKING - No active tokens to logout
+[2025-11-04 00:41:24] [API] LOGOUT - Complete
 {
   "success": true,
   "loggedOut": 0,

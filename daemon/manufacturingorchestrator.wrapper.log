@@ -1,50 +1,8 @@
-2025-10-31 15:01:38 - Starting C:\Program Files\nodejs\node.exe  --harmony --max_old_space_size=4096 C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\node_modules\node-windows\lib\wrapper.js --file C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\server.js --scriptoptions= --log "ManufacturingOrchestrator wrapper" --grow 0.5 --wait 2 --maxrestarts 10 --abortonerror n --stopparentfirst undefined --maxretries 5
-2025-10-31 15:01:38 - Started 23968
-2025-10-31 15:05:52 - Stopping manufacturingorchestrator.exe
-2025-10-31 15:05:52 - ProcessKill 23968
-2025-10-31 15:05:52 - Found child process: 13712 Name: conhost.exe
-2025-10-31 15:05:52 - Found child process: 6232 Name: node.exe
-2025-10-31 15:05:52 - Stopping process 13712
-2025-10-31 15:05:52 - Send SIGINT 13712
-2025-10-31 15:05:52 - SIGINT to 13712 failed - Killing as fallback
-2025-10-31 15:05:52 - Stopping process 6232
-2025-10-31 15:05:52 - Send SIGINT 6232
-2025-10-31 15:05:52 - SIGINT to 6232 failed - Killing as fallback
-2025-10-31 15:05:52 - Stopping process 23968
-2025-10-31 15:05:52 - Send SIGINT 23968
-2025-10-31 15:05:52 - SIGINT to 23968 failed - Killing as fallback
-2025-10-31 15:05:52 - Finished manufacturingorchestrator.exe
-2025-10-31 15:05:54 - Starting C:\Program Files\nodejs\node.exe  --harmony --max_old_space_size=4096 C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\node_modules\node-windows\lib\wrapper.js --file C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\server.js --scriptoptions= --log "ManufacturingOrchestrator wrapper" --grow 0.5 --wait 2 --maxrestarts 10 --abortonerror n --stopparentfirst undefined --maxretries 5
-2025-10-31 15:05:54 - Started 28232
-2025-10-31 15:06:39 - Stopping manufacturingorchestrator.exe
-2025-10-31 15:06:39 - ProcessKill 28232
-2025-10-31 15:06:39 - Found child process: 14416 Name: conhost.exe
-2025-10-31 15:06:39 - Found child process: 15252 Name: node.exe
-2025-10-31 15:06:40 - Stopping process 14416
-2025-10-31 15:06:40 - Send SIGINT 14416
-2025-10-31 15:06:40 - SIGINT to 14416 failed - Killing as fallback
-2025-10-31 15:06:40 - Stopping process 15252
-2025-10-31 15:06:40 - Send SIGINT 15252
-2025-10-31 15:06:40 - SIGINT to 15252 failed - Killing as fallback
-2025-10-31 15:06:40 - Stopping process 28232
-2025-10-31 15:06:40 - Send SIGINT 28232
-2025-10-31 15:06:40 - SIGINT to 28232 failed - Killing as fallback
-2025-10-31 15:06:40 - Finished manufacturingorchestrator.exe
-2025-10-31 15:06:41 - Starting C:\Program Files\nodejs\node.exe  --harmony --max_old_space_size=4096 C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\node_modules\node-windows\lib\wrapper.js --file C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\server.js --scriptoptions= --log "ManufacturingOrchestrator wrapper" --grow 0.5 --wait 2 --maxrestarts 10 --abortonerror n --stopparentfirst undefined --maxretries 5
-2025-10-31 15:06:41 - Started 29612
-2025-10-31 15:13:30 - Stopping manufacturingorchestrator.exe
-2025-10-31 15:13:30 - ProcessKill 29612
-2025-10-31 15:13:30 - Found child process: 29356 Name: conhost.exe
-2025-10-31 15:13:30 - Found child process: 28064 Name: node.exe
-2025-10-31 15:13:30 - Stopping process 29356
-2025-10-31 15:13:30 - Send SIGINT 29356
-2025-10-31 15:13:30 - SIGINT to 29356 failed - Killing as fallback
-2025-10-31 15:13:31 - Stopping process 28064
-2025-10-31 15:13:31 - Send SIGINT 28064
-2025-10-31 15:13:31 - SIGINT to 28064 failed - Killing as fallback
-2025-10-31 15:13:31 - Stopping process 29612
-2025-10-31 15:13:31 - Send SIGINT 29612
-2025-10-31 15:13:31 - SIGINT to 29612 failed - Killing as fallback
-2025-10-31 15:13:31 - Finished manufacturingorchestrator.exe
-2025-10-31 15:13:32 - Starting C:\Program Files\nodejs\node.exe  --harmony --max_old_space_size=4096 C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\node_modules\node-windows\lib\wrapper.js --file C:\Users\kye.tonkin\Desktop\manufacturing_orchestrator\server.js --scriptoptions= --log "ManufacturingOrchestrator wrapper" --grow 0.5 --wait 2 --maxrestarts 10 --abortonerror n --stopparentfirst undefined --maxretries 5
-2025-10-31 15:13:32 - Started 11888
+2025-11-04 10:48:00 - SIGINT to 31796 failed - Killing as fallback
+2025-11-04 10:48:00 - Stopping process 27688
+2025-11-04 10:48:00 - Send SIGINT 27688
+2025-11-04 10:48:00 - SIGINT to 27688 failed - Killing as fallback
+2025-11-04 10:48:01 - Stopping process 30356
+2025-11-04 10:48:01 - Send SIGINT 30356
+2025-11-04 10:48:01 - SIGINT to 30356 failed - Killing as fallback
+2025-11-04 10:48:01 - Finished manufacturingorchestrator.exe

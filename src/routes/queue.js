@@ -111,6 +111,52 @@ function setupQueueRoutes(logger) {
     }
   });
 
+  // Get BOM and location info from pending jobs
+  router.post('/get-pending-job-info', async (req, res) => {
+    const { database } = req.body;
+
+    if (!database) {
+      return res.status(400).json({ error: 'Missing database parameter' });
+    }
+
+    logger.info('PENDING JOB INFO - Getting BOM and location from pending items', { database });
+
+    let connection;
+
+    try {
+      connection = await createConnection(database);
+
+      const [rows] = await connection.query(
+        'SELECT bom_num, bom_id, location_group_id FROM mo_queue WHERE status = "Pending" LIMIT 1'
+      );
+
+      if (!rows || rows.length === 0) {
+        return res.status(404).json({ error: 'No pending items found in queue' });
+      }
+
+      const bomNum = rows[0].bom_num;
+      const bomId = rows[0].bom_id;
+      const locationGroupId = rows[0].location_group_id;
+
+      logger.info(`PENDING JOB INFO - Retrieved: BOM=${bomNum}, Location Group=${locationGroupId}`);
+
+      res.json({
+        success: true,
+        bomNum: bomNum,
+        bomId: bomId,
+        locationGroupId: locationGroupId
+      });
+
+    } catch (error) {
+      logger.error('PENDING JOB INFO - Error', { error: error.message });
+      res.status(500).json({ error: error.message });
+    } finally {
+      if (connection) {
+        await connection.end();
+      }
+    }
+  });
+
   // Close short pending jobs
   router.post('/close-short-pending-jobs', async (req, res) => {
     const { serverUrl, token, database } = req.body;

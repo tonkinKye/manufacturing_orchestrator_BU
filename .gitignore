@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+daemon/*.log
+
+# Configuration files (may contain secrets)
+config.json
+active-tokens.json
+
+# nssm (downloaded automatically by install script)
+nssm/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
