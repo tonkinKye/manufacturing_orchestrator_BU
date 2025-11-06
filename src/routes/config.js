@@ -1,57 +1,47 @@
 const express = require('express');
 const router = express.Router();
-const { getFishbowlConfig, saveFishbowlConfig, isUsingEnvConfig } = require('../config/fishbowl');
+const { loadConfig, saveConfig } = require('../utils/secureConfig');
 
 /**
  * Configuration Routes
  */
 
 function setupConfigRoutes(logger) {
-  // Save configuration
+  // Save configuration (used by frontend after database detection)
   router.post('/save-config', async (req, res) => {
     const { serverUrl, username, password, database } = req.body;
 
-    logger.info('CONFIG - Saving configuration...');
-
-    // Check if using environment variables
-    if (isUsingEnvConfig()) {
-      logger.warn('CONFIG - Using environment variables, file save will be ignored at runtime');
-      // Still save to file for reference, but warn the user
-    }
+    logger.info('CONFIG - Saving configuration after database detection...');
 
     try {
-      await saveFishbowlConfig(serverUrl, username, password, database);
-      logger.info('CONFIG - Configuration saved successfully', { database });
+      // Load existing config
+      const existingConfig = await loadConfig();
 
-      res.json({
-        success: true,
-        warning: isUsingEnvConfig() ? 'Configuration saved to file, but environment variables take precedence' : null
-      });
+      // Update only the database field, keep other credentials
+      const updatedConfig = {
+        fishbowl: {
+          serverUrl: serverUrl || existingConfig.fishbowl?.serverUrl,
+          username: username || existingConfig.fishbowl?.username,
+          password: password || existingConfig.fishbowl?.password,
+          database: database || existingConfig.fishbowl?.database
+        },
+        mysql: existingConfig.mysql || {}
+      };
+
+      await saveConfig(updatedConfig);
+      logger.info('CONFIG - Configuration updated successfully', { database });
+
+      res.json({ success: true });
     } catch (error) {
       logger.error('CONFIG - Failed to save config', { error: error.message });
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Load configuration
+  // Load configuration (legacy endpoint - redirects to /api/config/load)
   router.get('/load-config', async (req, res) => {
-    logger.info('CONFIG - Loading configuration...');
-
-    try {
-      const config = await getFishbowlConfig();
-      logger.info('CONFIG - Configuration loaded successfully', {
-        database: config.database,
-        source: isUsingEnvConfig() ? 'environment' : 'file'
-      });
-
-      res.json({
-        ...config,
-        _source: isUsingEnvConfig() ? 'environment' : 'file'
-      });
-    } catch (error) {
-      logger.error('CONFIG - Failed to load config', { error: error.message });
-      res.status(500).json({ error: error.message });
-    }
+    logger.info('CONFIG - Legacy load-config endpoint called, redirecting to /api/config/load');
+    res.redirect('/api/config/load');
   });
 
   return router;
