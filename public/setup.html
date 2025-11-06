@@ -61,12 +61,17 @@
         <div class="row">
           <div class="col-sm-6">
             <label>Server URL:</label>
-            <input id="fishbowlUrl" type="text" class="form-control" placeholder="https://your-server:28192">
-            <small class="text-muted">Example: https://localhost:28192</small>
+            <input id="fishbowlUrl" type="text" class="form-control" placeholder="http://localhost:28192">
+            <small class="text-muted">
+              <strong>Standard ports:</strong><br>
+              • HTTP: <code>http://localhost:28192</code><br>
+              • HTTPS: <code>https://localhost:28193</code>
+            </small>
           </div>
           <div class="col-sm-6">
             <label>Username:</label>
             <input id="fishbowlUsername" type="text" class="form-control" placeholder="admin">
+            <small class="text-muted">Your Fishbowl login username</small>
           </div>
         </div>
         <div class="row" style="margin-top: 10px;">
@@ -228,7 +233,29 @@
             fishbowlTested = true;
             updateSetupButton();
           } else {
-            showFishbowlResult('error', '✗ ' + (data.error || 'Connection failed'));
+            let errorMsg = data.error || 'Connection failed';
+
+            // Detect SSL/protocol mismatch errors and provide helpful hints
+            if (errorMsg.includes('EPROTO') || errorMsg.includes('SSL') || errorMsg.includes('packet length too long')) {
+              errorMsg = '✗ SSL/Protocol mismatch! Try:<br>' +
+                         '• <strong>http://localhost:28192</strong> (HTTP, port 28192)<br>' +
+                         '• <strong>https://localhost:28193</strong> (HTTPS, port 28193)<br>' +
+                         '<small>Port 2480 is not a Fishbowl API port!</small>';
+            } else if (errorMsg.includes('ECONNREFUSED')) {
+              errorMsg = '✗ Connection refused! Make sure:<br>' +
+                         '• Fishbowl Server is running<br>' +
+                         '• Correct port: 28192 (HTTP) or 28193 (HTTPS)<br>' +
+                         '• Firewall allows the connection';
+            } else if (errorMsg.includes('ETIMEDOUT') || errorMsg.includes('timeout')) {
+              errorMsg = '✗ Connection timeout! Check:<br>' +
+                         '• Server is accessible<br>' +
+                         '• Network/firewall settings<br>' +
+                         '• Use correct IP or localhost';
+            } else {
+              errorMsg = '✗ ' + errorMsg;
+            }
+
+            showFishbowlResult('error', errorMsg);
             fishbowlTested = false;
             updateSetupButton();
           }
