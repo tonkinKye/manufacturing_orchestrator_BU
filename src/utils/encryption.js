@@ -1,14 +1,27 @@
 const crypto = require('crypto');
+const constants = require('../config/constants');
 
-// Load encryption key from environment variable or use legacy key for backward compatibility
+// Load encryption key from environment variable
 const getEncryptionKey = () => {
   if (process.env.ENCRYPTION_KEY) {
-    // Use environment variable if provided (recommended)
+    // Use environment variable (recommended and required)
     return Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
   }
-  // Fallback to legacy key for backward compatibility with existing encrypted data
-  console.warn('WARNING: Using legacy hardcoded encryption key. Set ENCRYPTION_KEY environment variable for better security.');
-  return crypto.createHash('sha256').update('manufacturing-orchestrator-secret-key-2024').digest();
+
+  // Only allow fallback if explicitly disabled in config
+  if (!constants.ENCRYPTION_REQUIRED) {
+    // This is ONLY for development/testing on non-Windows platforms
+    // NEVER use this in production!
+    console.error('⚠️  CRITICAL: Using insecure fallback encryption key! Set ENCRYPTION_KEY environment variable!');
+    console.error('⚠️  Generate a secure key with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+    return crypto.createHash('sha256').update('manufacturing-orchestrator-secret-key-2024').digest();
+  }
+
+  // Fail hard if encryption key is required but not provided
+  throw new Error(
+    'ENCRYPTION_KEY environment variable is required but not set.\n' +
+    'Generate a secure key with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"'
+  );
 };
 
 const ENCRYPTION_KEY = getEncryptionKey();

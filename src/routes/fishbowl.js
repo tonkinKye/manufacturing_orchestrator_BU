@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { fetchWithNode } = require('../utils/helpers');
+const { fetchWithNode, getHttpsOptions } = require('../utils/helpers');
+const { normalizeUrl } = require('../utils/urlHelpers');
 const { loadConfig } = require('../utils/secureConfig');
 
 /**
@@ -22,7 +23,7 @@ function setupFishbowlRoutes(logger) {
       }
 
       // Normalize serverUrl (remove trailing slash)
-      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+      serverUrl = normalizeUrl(serverUrl);
 
       logger.api('SQL QUERY', {
         serverUrl,
@@ -44,7 +45,7 @@ function setupFishbowlRoutes(logger) {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(sql)
         },
-        rejectUnauthorized: false
+        ...getHttpsOptions()
       };
 
       const promise = new Promise((resolve, reject) => {
@@ -107,7 +108,7 @@ function setupFishbowlRoutes(logger) {
       }
 
       // Normalize serverUrl (remove trailing slash)
-      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+      serverUrl = normalizeUrl(serverUrl);
 
       logger.api('WO STRUCTURE QUERY', {
         serverUrl,
@@ -146,7 +147,7 @@ function setupFishbowlRoutes(logger) {
           'Content-Type': 'text/plain',
           'Content-Length': Buffer.byteLength(sql)
         },
-        rejectUnauthorized: false
+        ...getHttpsOptions()
       };
 
       const promise = new Promise((resolve, reject) => {
@@ -208,7 +209,7 @@ function setupFishbowlRoutes(logger) {
       }
 
       // Normalize serverUrl (remove trailing slash)
-      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+      serverUrl = normalizeUrl(serverUrl);
 
       logger.api(`LEGACY API REQUEST: ${endpoint}`, {
         serverUrl,
@@ -256,7 +257,7 @@ function setupFishbowlRoutes(logger) {
       }
 
       // Normalize serverUrl (remove trailing slash)
-      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+      serverUrl = normalizeUrl(serverUrl);
 
       logger.api(`REST API REQUEST: ${httpMethod} /api/${endpoint}`, {
         serverUrl,

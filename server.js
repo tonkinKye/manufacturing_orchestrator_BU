@@ -3,12 +3,19 @@
  * Main entry point - modular architecture
  */
 
+// Load environment variables from .env file FIRST
+require('dotenv').config();
+
+// Validate configuration before starting
+const { validateConfig } = require('./src/utils/configValidator');
+validateConfig();
+
 const { app, logger } = require('./src/app');
 const { PORT } = require('./src/config');
 const { logoutAllTokens } = require('./src/services/authService');
 const { loadTokens } = require('./src/db/tokenStore');
 const { getCurrentJob } = require('./src/services/jobService');
-const { createConnection } = require('./src/db/connection');
+const { createConnection, closeAllPools } = require('./src/db/connection');
 const { getPendingCount } = require('./src/db/queries');
 
 // ============================================================================
@@ -58,43 +65,29 @@ async function gracefulShutdown(signal) {
     logger.info(`SHUTDOWN - No active job (status: ${currentJob.status})`);
   }
 
-  // Check for pending jobs before cleaning up tokens
-  let hasPendingJobs = false;
-  try {
-    const { getFishbowlConfig } = require('./src/config/fishbowl');
-    const config = await getFishbowlConfig();
+  // NEVER logout tokens on shutdown - preserve them for auto-resume functionality
+  logger.info('SHUTDOWN - Preserving session tokens for auto-resume functionality');
 
-    if (config.database) {
-      const connection = await createConnection(config.database);
-      const pendingCount = await getPendingCount(connection);
-      await connection.end();
+  // Stop the automatic scheduler
+  logger.info('SHUTDOWN - Stopping automatic job scheduler');
+  const { stopScheduler } = require('./src/services/schedulerService');
+  stopScheduler();
 
-      hasPendingJobs = pendingCount > 0;
-
-      if (hasPendingJobs) {
-        logger.info(`SHUTDOWN - Found ${pendingCount} pending job(s) - PRESERVING session tokens for resume`);
-      }
-    }
-  } catch (error) {
-    logger.warn('SHUTDOWN - Could not check for pending jobs', { error: error.message });
-  }
-
-  // Only cleanup tokens if there are NO pending jobs
-  if (!hasPendingJobs) {
-    try {
-      const result = await logoutAllTokens(logger);
-      logger.info('SHUTDOWN - Token cleanup complete', result);
-    } catch (error) {
-      logger.error('SHUTDOWN - Token cleanup error', { error: error.message });
-    }
-  } else {
-    logger.info('SHUTDOWN - Skipping token cleanup to preserve session for job resumption');
-  }
-
-  // Close HTTP server and exit
+  // Close HTTP server (fast, no await needed - server.close is synchronous for stopping new connections)
   logger.info('SHUTDOWN - Closing HTTP server');
   if (server) {
-    server.close();
+    server.close(() => {
+      logger.info('SHUTDOWN - HTTP server closed');
+    });
+  }
+
+  // Close all database connection pools
+  logger.info('SHUTDOWN - Closing database connection pools');
+  try {
+    await closeAllPools();
+    logger.info('SHUTDOWN - Database pools closed successfully');
+  } catch (error) {
+    logger.error('SHUTDOWN - Error closing database pools', { error: error.message });
   }
 
   logger.info('SHUTDOWN - Exiting process');
@@ -188,6 +181,10 @@ server = app.listen(PORT, async () => {
   } else {
     logger.info('No orphaned tokens found - starting fresh');
   }
+
+  // Start automatic job scheduler for scheduled work orders
+  const { startScheduler } = require('./src/services/schedulerService');
+  startScheduler();
 
   logger.info('='.repeat(60));
   logger.info('Server ready - Press Ctrl+C to stop');

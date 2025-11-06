@@ -5,6 +5,7 @@ const setupConfigRoutes = require('./config');
 const setupMySQLRoutes = require('./mysql');
 const setupQueueRoutes = require('./queue');
 const setupFishbowlRoutes = require('./fishbowl');
+const setupHealthRoutes = require('./health');
 
 /**
  * Route Aggregator
@@ -12,6 +13,9 @@ const setupFishbowlRoutes = require('./fishbowl');
  */
 
 function setupRoutes(app, logger) {
+  // Health check routes (no auth required, always accessible)
+  app.use('/api', setupHealthRoutes(logger));
+
   // Setup routes (no auth required, always accessible)
   app.use('/api', setupSetupRoutes(logger));
 

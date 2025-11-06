@@ -308,6 +308,28 @@ export async function confirmDisassembly() {
     log(`[OK] Successfully queued ${state.selectedFinishedGoods.length} finished goods\n`);
     alert(`Successfully queued ${state.selectedFinishedGoods.length} finished goods for disassembly`);
 
+    // Disable step 1 (BOM selection) to prevent changing BOM
+    const step1 = document.getElementById('step1');
+    if (step1) {
+      step1.classList.add('disabled');
+      step1.style.opacity = '0.5';
+      step1.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep1').collapse('hide');
+    }
+
+    // Disable step 1.5 (operation type) to prevent changing operation
+    const step1_5 = document.getElementById('step1_5');
+    if (step1_5) {
+      step1_5.classList.add('disabled');
+      step1_5.style.opacity = '0.5';
+      step1_5.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep1_5').collapse('hide');
+    }
+
     // Disable step 2b to prevent re-queueing
     const step2b = document.getElementById('step2b');
     step2b.classList.add('disabled');

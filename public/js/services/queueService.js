@@ -6,7 +6,7 @@
 import { log } from '../utils/helpers.js';
 import { state, sessionToken, sessionCredentials, getServerUrl, setPollInterval, clearPollInterval } from '../utils/state.js';
 import { getQueueStats } from '../api/queueApi.js';
-import { closeAndLogout, downloadFailedItemsCSV } from './authService.js';
+import { closeAndLogout, downloadFailedItemsCSV, exportAllResultsCSV } from './authService.js';
 
 // Local reference to poll interval
 let pollInterval = null;
@@ -472,25 +472,55 @@ export async function pollQueueStatus() {
             ${status.error ? `<p><strong>Error:</strong> ${status.error}</p>` : ''}
             <p><strong>Duration:</strong> ${calculateDuration(status.startTime, status.endTime)}</p>
           </div>
+
           <div style="margin-top:15px;">
-            <h5>Results:</h5>
-            <div style="max-height:400px; overflow-y:auto;">
-              ${status.results.map(r => `
-                <div class="alert ${r.status.includes('success') ? 'alert-success' : 'alert-danger'}" style="padding:8px; margin-bottom:5px;">
-                  <strong>${r.status.includes('success') ? '<img src="images/check.svg" class="icon" alt="Success">' : '<img src="images/x.svg" class="icon" alt="Error">'}</strong> WO ${r.woNum} | Barcode ${r.barcode} | ${r.serials} serials
-                  ${r.error ? `<br><small class="text-danger">${r.error}</small>` : ''}
+            <div class="panel panel-default">
+              <div class="panel-heading" style="cursor: pointer; background-color: #f5f5f5;" id="resultsToggle">
+                <h5 style="margin: 0; display: flex; justify-content: space-between; align-items: center;">
+                  <span><img src="images/clipboard.svg" class="icon" alt="Results"> Detailed Results (${status.results.length})</span>
+                  <span id="resultsToggleIcon" style="font-size: 20px;">▼</span>
+                </h5>
+              </div>
+              <div class="panel-body" id="resultsPanel" style="display: none; max-height: 500px; overflow-y: auto; padding: 10px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 10px;">
+                  ${status.results.map(r => {
+                    const isSuccess = r.status.includes('success');
+                    const operationIcon = r.operationType === 'disassemble' ? '⚙️' : '🏗️';
+                    const operationLabel = r.operationType === 'disassemble' ? 'DISASSEMBLE' : 'BUILD';
+                    const serialsText = r.operationType === 'disassemble' ? operationLabel : `${r.serials || 0} serials`;
+
+                    return `
+                      <div style="border: 1px solid ${isSuccess ? '#28a745' : '#dc3545'}; border-radius: 4px; padding: 10px; background-color: ${isSuccess ? '#f0fff0' : '#fff5f5'};">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                          ${isSuccess ? '<img src="images/check.svg" class="icon" alt="Success" style="color: #28a745;">' : '<img src="images/x.svg" class="icon" alt="Error" style="color: #dc3545;">'}
+                          <strong style="color: ${isSuccess ? '#28a745' : '#dc3545'};">${r.woNum}</strong>
+                          <span style="background: ${r.operationType === 'disassemble' ? '#ff9800' : '#2196f3'}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">${operationIcon} ${operationLabel}</span>
+                        </div>
+                        <div style="font-size: 13px; color: #666;">
+                          <div><strong>Barcode:</strong> ${r.barcode}</div>
+                          <div><strong>Output:</strong> ${serialsText}</div>
+                          ${r.status === 'success-retry' ? '<div style="color: #ff9800;"><strong>Status:</strong> Success (retry)</div>' : ''}
+                          ${r.error ? `<div style="color: #dc3545; margin-top: 5px;"><strong>Error:</strong> ${r.error}</div>` : ''}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
-              `).join('')}
+              </div>
             </div>
           </div>
+
           <div class="alert alert-info" style="margin-top:20px;">
             <strong><img src="images/check.svg" class="icon" alt="Complete"> Job Complete</strong><br>
-            Review the results above. When ready, click the button below to logout and start a new job.
+            Review the results above. When ready, export or close to start a new job.
           </div>
           <div style="margin-top:15px;">
+            <button id="btnExportAllResults" class="btn btn-info btn-lg btn-block" style="margin-bottom:10px;">
+              <img src="images/save.svg" class="icon" alt="Export"> Export All Results (CSV)
+            </button>
             ${status.failedItems > 0 ? `
             <button id="btnDownloadFailed" class="btn btn-warning btn-lg btn-block" style="margin-bottom:10px;">
-              <img src="images/save.svg" class="icon" alt="Download"> Download Failed Items (CSV)
+              <img src="images/save.svg" class="icon" alt="Download"> Export Failed Items Only (CSV)
             </button>
             ` : ''}
             <button id="btnCloseAndLogout" class="btn btn-primary btn-lg btn-block">
@@ -500,6 +530,24 @@ export async function pollQueueStatus() {
         `;
 
         document.getElementById('processResultContent').innerHTML = finalHtml;
+
+        // Wire up the results toggle
+        document.getElementById('resultsToggle').addEventListener('click', () => {
+          const panel = document.getElementById('resultsPanel');
+          const icon = document.getElementById('resultsToggleIcon');
+          if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            icon.textContent = '▲';
+          } else {
+            panel.style.display = 'none';
+            icon.textContent = '▼';
+          }
+        });
+
+        // Wire up the Export All Results button
+        document.getElementById('btnExportAllResults').addEventListener('click', () => {
+          exportAllResultsCSV(status.results);
+        });
 
         // Wire up the Download Failed Items button (if it exists)
         if (status.failedItems > 0) {

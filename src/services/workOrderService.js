@@ -1,4 +1,5 @@
 const { fishbowlQuery, callFishbowlLegacy } = require('./fishbowlApi');
+const { validateSerialNumbers, buildInClause, escapeSqlString, escapeSqlNumber } = require('../utils/sqlHelpers');
 
 /**
  * Work Order Service
@@ -83,7 +84,10 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
   }
 
   // STEP 3: Query serial locations from Fishbowl API - FILTERED BY SELECTED RAW GOODS PART
-  const serialsInClause = serials.map(s => `'${s.replace(/'/g, "''")}'`).join(',');
+  // Validate serial numbers before building query
+  validateSerialNumbers(serials);
+
+  const serialsInClause = buildInClause(serials, 'string');
 
   const locationSql = `
     SELECT
@@ -108,8 +112,8 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
     JOIN serialnum ON serialnum.serialid = serial.id AND serialnum.parttrackingid = 4
     JOIN location ON location.id = tag.locationid
     JOIN locationgroup ON locationgroup.id = location.locationgroupid
-    WHERE bom.num = '${bom.replace(/'/g, "''")}'
-      AND part.id = ${rawGoodsPartId}
+    WHERE bom.num = '${escapeSqlString(bom)}'
+      AND part.id = ${escapeSqlNumber(rawGoodsPartId, 'rawGoodsPartId')}
       AND serialnum.SerialNum IN (${serialsInClause})
     ORDER BY location.id, serialnum.SerialNum
   `;
@@ -335,8 +339,8 @@ async function processWorkOrder(serverUrl, token, database, connection, woNum, b
         FROM location
         JOIN locationgroup ON locationgroup.id = location.locationgroupid
         LEFT JOIN tag ON tag.locationid = location.id
-        WHERE locationgroup.name = '${locGroupName.replace(/'/g, "''")}'
-          AND location.name = '${locName.replace(/'/g, "''")}'
+        WHERE locationgroup.name = '${escapeSqlString(locGroupName)}'
+          AND location.name = '${escapeSqlString(locName)}'
       `;
       const locRows = await fishbowlQuery(locationQuerySql, serverUrl, token);
 

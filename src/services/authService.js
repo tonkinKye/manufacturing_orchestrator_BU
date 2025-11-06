@@ -1,4 +1,5 @@
 const { fetchWithNode } = require('../utils/helpers');
+const { normalizeUrl } = require('../utils/urlHelpers');
 const { decrypt } = require('../utils/encryption');
 const { loadTokens, addToken, removeToken, saveTokens } = require('../db/tokenStore');
 
@@ -16,7 +17,7 @@ const { loadTokens, addToken, removeToken, saveTokens } = require('../db/tokenSt
  */
 async function login(serverUrl, loginData, logger) {
   // Normalize serverUrl (remove trailing slash)
-  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+  const normalizedUrl = normalizeUrl(serverUrl);
 
   logger.api('LOGIN REQUEST', {
     serverUrl,
@@ -93,7 +94,7 @@ async function login(serverUrl, loginData, logger) {
  */
 async function logout(serverUrl, token, logoutData, logger) {
   // Normalize serverUrl (remove trailing slash)
-  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+  const normalizedUrl = normalizeUrl(serverUrl);
 
   logger.api('LOGOUT REQUEST - Cleaning up all tracked tokens', { serverUrl });
 
@@ -154,9 +155,7 @@ async function logoutAllTokens(logger) {
   for (const tokenInfo of tokens) {
     try {
       // Normalize serverUrl (remove trailing slash)
-      const normalizedUrl = tokenInfo.serverUrl.endsWith('/')
-        ? tokenInfo.serverUrl.slice(0, -1)
-        : tokenInfo.serverUrl;
+      const normalizedUrl = normalizeUrl(tokenInfo.serverUrl);
 
       logger.info(`TOKEN TRACKING - Logging out ${tokenInfo.username}@${tokenInfo.serverUrl}`);
 

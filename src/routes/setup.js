@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const http = require('http');
 const https = require('https');
+const { getHttpsOptions } = require('../utils/helpers');
 const {
   isSetupComplete,
   saveConfig,
@@ -75,8 +76,7 @@ function setupSetupRoutes(logger) {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(postData)
           },
-          // Allow self-signed certificates (only for HTTPS)
-          rejectUnauthorized: false
+          ...getHttpsOptions()
         };
 
         const req = httpModule.request(options, (res) => {
@@ -153,7 +153,7 @@ function setupSetupRoutes(logger) {
             'Content-Type': 'text/plain',
             'Content-Length': Buffer.byteLength(dbQuery)
           },
-          rejectUnauthorized: false
+          ...getHttpsOptions()
         };
 
         const req = httpModule.request(options, (res) => {
@@ -198,7 +198,7 @@ function setupSetupRoutes(logger) {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        rejectUnauthorized: false
+        ...getHttpsOptions()
       }, () => {});
       logoutReq.end();
 

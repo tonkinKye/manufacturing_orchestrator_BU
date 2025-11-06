@@ -292,10 +292,268 @@ export async function login() {
       $('#collapseStep4').collapse('show');
     }
 
+    // Check for scheduled and failed jobs
+    await checkScheduledAndFailedJobs();
+
   } catch (e) {
     statusEl.innerHTML = '<span class="text-danger"><img src="images/x.svg" class="icon" alt="Error"> Login failed</span>';
     log(`[ERROR] Login failed: ${e.message}\n`);
     alert(`Login failed: ${e.message}\n\nMake sure:\n1. Node.js proxy server is running (node server.js)\n2. Fishbowl server URL is correct\n3. Username and password are valid`);
+  }
+}
+
+/**
+ * Check for scheduled and failed jobs on login
+ */
+async function checkScheduledAndFailedJobs() {
+  try {
+    log('[LOGIN] Checking for scheduled and failed jobs...\n');
+
+    // Fetch scheduled jobs
+    const scheduledResponse = await fetch('/api/mysql/scheduled-jobs');
+    const scheduledData = await scheduledResponse.json();
+
+    // Fetch failed jobs
+    const failedResponse = await fetch('/api/mysql/failed-jobs');
+    const failedData = await failedResponse.json();
+
+    const scheduledJobs = scheduledData.jobs || [];
+    const failedJobs = failedData.jobs || [];
+
+    if (scheduledJobs.length === 0 && failedJobs.length === 0) {
+      log('[LOGIN] No scheduled or failed jobs found\n');
+      return;
+    }
+
+    // Build the notification message
+    let message = '';
+
+    if (scheduledJobs.length > 0) {
+      message += `📅 SCHEDULED JOBS:\n\n`;
+      scheduledJobs.forEach(job => {
+        const scheduledFor = new Date(job.scheduled_for).toLocaleString();
+        message += `  • ${job.count} job(s) scheduled for ${scheduledFor}\n`;
+      });
+      message += '\n';
+    }
+
+    if (failedJobs.length > 0) {
+      message += `❌ FAILED JOBS:\n\n`;
+      const displayCount = Math.min(failedJobs.length, 5);
+      for (let i = 0; i < displayCount; i++) {
+        const job = failedJobs[i];
+        const barcode = job.barcode || 'N/A';
+        const error = (job.error_message || 'Unknown error').substring(0, 50);
+        message += `  • ${barcode}: ${error}...\n`;
+      }
+      if (failedJobs.length > 5) {
+        message += `  ... and ${failedJobs.length - 5} more\n`;
+      }
+      message += '\n';
+    }
+
+    message += 'Would you like to manage these jobs now?';
+
+    log(`[LOGIN] Found ${scheduledJobs.length} scheduled job group(s) and ${failedJobs.length} failed job(s)\n`);
+
+    // Show confirmation dialog
+    if (confirm(message)) {
+      showScheduledJobsManager(scheduledJobs, failedJobs);
+    }
+
+  } catch (error) {
+    log(`[ERROR] Failed to check scheduled/failed jobs: ${error.message}\n`);
+    // Don't block login if this fails
+  }
+}
+
+/**
+ * Show scheduled jobs management UI
+ */
+function showScheduledJobsManager(scheduledJobs, failedJobs) {
+  // Create modal HTML
+  const modalHtml = `
+    <div class="modal fade" id="jobManagerModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Manage Scheduled & Failed Jobs</h4>
+          </div>
+          <div class="modal-body">
+            ${scheduledJobs.length > 0 ? `
+              <h5>📅 Scheduled Jobs</h5>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Scheduled For</th>
+                      <th>Job Count</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${scheduledJobs.map((job, index) => `
+                      <tr>
+                        <td>${new Date(job.scheduled_for).toLocaleString()}</td>
+                        <td>${job.count} item(s)</td>
+                        <td><button class="btn btn-sm btn-danger delete-scheduled" data-scheduled-index="${index}">Delete</button></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+
+            ${failedJobs.length > 0 ? `
+              <h5 style="margin-top: 20px;">❌ Failed Jobs</h5>
+              <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Barcode</th>
+                      <th>WO Number</th>
+                      <th>Error</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${failedJobs.map(job => `
+                      <tr>
+                        <td>${job.barcode || 'N/A'}</td>
+                        <td>${job.wo_number || 'N/A'}</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${job.error_message || 'Unknown error'}">${(job.error_message || 'Unknown error').substring(0, 50)}...</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+              <button class="btn btn-warning btn-block" id="btnClearAllFailed">Clear All Failed Jobs</button>
+            ` : ''}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Remove existing modal if any
+  $('#jobManagerModal').remove();
+
+  // Add modal to page
+  $('body').append(modalHtml);
+
+  // Setup event handlers
+  $('.delete-scheduled').on('click', async function() {
+    const index = $(this).data('scheduled-index');
+    const job = scheduledJobs[index];
+    if (job && confirm(`Delete all jobs scheduled for ${new Date(job.scheduled_for).toLocaleString()}?`)) {
+      await deleteScheduledJobs(job.scheduled_for);
+    }
+  });
+
+  $('#btnClearAllFailed').on('click', async function() {
+    if (confirm(`Clear all ${failedJobs.length} failed job(s)?`)) {
+      await clearFailedJobs();
+    }
+  });
+
+  // Show modal
+  $('#jobManagerModal').modal('show');
+}
+
+/**
+ * Delete scheduled jobs by scheduled_for time
+ */
+async function deleteScheduledJobs(scheduledFor) {
+  try {
+    const response = await fetch('/api/mysql/scheduled-jobs', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scheduledFor: scheduledFor })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(`Successfully deleted ${result.deletedCount} scheduled job(s)`);
+
+      // Check if there are any remaining jobs
+      const scheduledResponse = await fetch('/api/mysql/scheduled-jobs');
+      const scheduledData = await scheduledResponse.json();
+      const failedResponse = await fetch('/api/mysql/failed-jobs');
+      const failedData = await failedResponse.json();
+
+      const scheduledJobs = scheduledData.jobs || [];
+      const failedJobs = failedData.jobs || [];
+
+      // If no jobs remaining, close modal completely
+      if (scheduledJobs.length === 0 && failedJobs.length === 0) {
+        $('#jobManagerModal').modal('hide');
+        // Remove modal and backdrop completely to prevent overlay issues
+        setTimeout(() => {
+          $('#jobManagerModal').remove();
+          $('.modal-backdrop').remove();
+          $('body').removeClass('modal-open');
+        }, 500);
+      } else {
+        // Refresh the modal with remaining jobs
+        $('#jobManagerModal').modal('hide');
+        showScheduledJobsManager(scheduledJobs, failedJobs);
+      }
+    } else {
+      alert('Failed to delete scheduled jobs');
+    }
+  } catch (error) {
+    alert(`Error: ${error.message}`);
+  }
+}
+
+/**
+ * Clear all failed jobs
+ */
+async function clearFailedJobs() {
+  try {
+    const response = await fetch('/api/mysql/failed-jobs', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(`Successfully cleared ${result.clearedCount} failed job(s)`);
+
+      // Check if there are any remaining jobs
+      const scheduledResponse = await fetch('/api/mysql/scheduled-jobs');
+      const scheduledData = await scheduledResponse.json();
+      const failedResponse = await fetch('/api/mysql/failed-jobs');
+      const failedData = await failedResponse.json();
+
+      const scheduledJobs = scheduledData.jobs || [];
+      const failedJobs = failedData.jobs || [];
+
+      // If no jobs remaining, close modal completely
+      if (scheduledJobs.length === 0 && failedJobs.length === 0) {
+        $('#jobManagerModal').modal('hide');
+        // Remove modal and backdrop completely to prevent overlay issues
+        setTimeout(() => {
+          $('#jobManagerModal').remove();
+          $('.modal-backdrop').remove();
+          $('body').removeClass('modal-open');
+        }, 500);
+      } else {
+        // Refresh the modal with remaining jobs
+        $('#jobManagerModal').modal('hide');
+        showScheduledJobsManager(scheduledJobs, failedJobs);
+      }
+    } else {
+      alert('Failed to clear failed jobs');
+    }
+  } catch (error) {
+    alert(`Error: ${error.message}`);
   }
 }
 
@@ -403,4 +661,42 @@ export function downloadFailedItemsCSV(results) {
   document.body.removeChild(link);
 
   log(`[EXPORT] Downloaded ${failedItems.length} failed items to CSV\n`);
+}
+
+/**
+ * Export all results as CSV
+ */
+export function exportAllResultsCSV(results) {
+  if (!results || results.length === 0) {
+    alert('No results to export.');
+    return;
+  }
+
+  let csvContent = 'WO Number,Barcode,Operation Type,Status,Serials/Output,Error Message\n';
+
+  results.forEach(item => {
+    const woNum = item.woNum || 'N/A';
+    const barcode = item.barcode || 'N/A';
+    const operationType = item.operationType || 'N/A';
+    const status = item.status || 'N/A';
+    const serialsOrOutput = item.operationType === 'disassemble' ? 'DISASSEMBLE' : (item.serials || 0);
+    const error = (item.error || '').replace(/"/g, '""'); // Escape quotes
+
+    csvContent += `"${woNum}","${barcode}","${operationType}","${status}","${serialsOrOutput}","${error}"\n`;
+  });
+
+  // Create download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+
+  link.setAttribute('href', url);
+  link.setAttribute('download', `all-results-${new Date().toISOString().slice(0, 10)}.csv`);
+  link.style.visibility = 'hidden';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  log(`[EXPORT] Downloaded ${results.length} results to CSV\n`);
 }

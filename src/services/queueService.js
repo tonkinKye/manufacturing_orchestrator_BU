@@ -4,6 +4,8 @@ const { assignWONumbersToQueueItems, batchUpdateMONumber } = require('../db/help
 const { fishbowlQuery, callFishbowlREST } = require('./fishbowlApi');
 const { processWorkOrder } = require('./workOrderService');
 const { getCurrentJob } = require('./jobService');
+const { escapeSqlString, buildInClause, validateSerialNumbers } = require('../utils/sqlHelpers');
+const constants = require('../config/constants');
 
 /**
  * Queue Service
@@ -142,7 +144,7 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
       SELECT wo.num, wo.id FROM wo
       JOIN moitem ON moitem.id = wo.moitemid
       JOIN mo ON mo.id = moitem.moid
-      WHERE mo.num = '${moNum.replace(/'/g, "''")}'
+      WHERE mo.num = '${escapeSqlString(moNum)}'
       ORDER BY wo.id
     `;
     const woRows = await fishbowlQuery(woSql, serverUrl, token);
@@ -228,7 +230,7 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
 
         currentJob.successItems++;
         currentJob.results.push({
-          woNum, barcode, status: 'success'
+          woNum, barcode, status: 'success', operationType: 'disassemble'
         });
 
         logger.info(`DISASSEMBLY - Success: ${woNum} | ${barcode}`);
@@ -244,7 +246,7 @@ async function processDisassemblyBatch(serverUrl, token, database, connection, b
 
         currentJob.failedItems++;
         currentJob.results.push({
-          woNum, barcode, status: 'failed', error: error.message
+          woNum, barcode, status: 'failed', error: error.message, operationType: 'disassemble'
         });
       }
 
@@ -416,8 +418,8 @@ async function processDisassemblyWorkOrder(serverUrl, token, woNum, barcode, ori
         FROM location
         JOIN locationgroup ON locationgroup.id = location.locationgroupid
         LEFT JOIN tag ON tag.locationid = location.id
-        WHERE locationgroup.name = '${locGroupName.replace(/'/g, "''")}'
-          AND location.name = '${locName.replace(/'/g, "''")}'
+        WHERE locationgroup.name = '${escapeSqlString(locGroupName)}'
+          AND location.name = '${escapeSqlString(locName)}'
       `;
     } else {
       // Format: Location ID
@@ -615,7 +617,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
     const moPattern = `${bom}|${dateStr}|%`;
 
     // Get ALL matching MOs from Fishbowl API
-    const moSql = `SELECT num FROM mo WHERE num LIKE '${moPattern.replace(/'/g, "''")}'`;
+    const moSql = `SELECT num FROM mo WHERE num LIKE '${escapeSqlString(moPattern)}'`;
     const existingMOs = await fishbowlQuery(moSql, serverUrl, token);
 
     let startingSequence = 1;
@@ -756,7 +758,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
           SELECT wo.num, wo.id FROM wo
           JOIN moitem ON moitem.id = wo.moitemid
           JOIN mo ON mo.id = moitem.moid
-          WHERE mo.num = '${moNum.replace(/'/g, "''")}'
+          WHERE mo.num = '${escapeSqlString(moNum)}'
           ORDER BY wo.id
         `;
         const woRows = await fishbowlQuery(woSql, serverUrl, token);
@@ -779,7 +781,20 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
         }
 
         // Process each queue item using its assigned WO number
-        for (const queueItem of batch) {
+        // Supports both sequential (CONCURRENT_WO_LIMIT=1) and concurrent processing
+
+        // Determine processing mode
+        const useConcurrency = constants.CONCURRENT_WO_LIMIT > 1;
+
+        if (useConcurrency) {
+          logger.info(`BACKGROUND PROCESSOR - Concurrent processing ENABLED (limit: ${constants.CONCURRENT_WO_LIMIT})`);
+          logger.warn(`BACKGROUND PROCESSOR - ⚠️  Monitor Fishbowl performance - reduce limit if issues occur`);
+        } else {
+          logger.info(`BACKGROUND PROCESSOR - Sequential processing (CONCURRENT_WO_LIMIT=1)`);
+        }
+
+        // Helper function to process a single queue item
+        const processQueueItem = async (queueItem) => {
           // Use the wo_number from the database (already assigned above or from previous run)
           const woNum = queueItem.wo_number;
 
@@ -791,7 +806,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
               `UPDATE mo_queue SET status = 'Failed', error_message = ? WHERE id = ?`,
               ['No WO number assigned', queueItem.id]
             );
-            continue;
+            return; // Exit this function early (was 'continue' when inside loop)
           }
 
           const itemId = queueItem.id;
@@ -817,7 +832,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
             currentJob.successItems++;
             currentJob.results.push({
-              woNum, barcode, serials: serials.length, status: 'success'
+              woNum, barcode, serials: serials.length, status: 'success', operationType: 'build'
             });
 
             logger.info(`BACKGROUND PROCESSOR - Success: ${woNum} | ${barcode}`);
@@ -842,7 +857,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
                 currentJob.successItems++;
                 currentJob.results.push({
-                  woNum, barcode, serials: serials.length, status: 'success-retry'
+                  woNum, barcode, serials: serials.length, status: 'success-retry', operationType: 'build'
                 });
 
                 logger.info(`BACKGROUND PROCESSOR - Success on retry: ${woNum}`);
@@ -855,7 +870,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
                 currentJob.failedItems++;
                 currentJob.results.push({
-                  woNum, barcode, serials: serials.length, status: 'failed', error: retryError.message
+                  woNum, barcode, serials: serials.length, status: 'failed', error: retryError.message, operationType: 'build'
                 });
 
                 logger.error(`BACKGROUND PROCESSOR - Failed on retry: ${woNum}`);
@@ -869,7 +884,7 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
 
               currentJob.failedItems++;
               currentJob.results.push({
-                woNum, barcode, serials: serials.length, status: 'failed', error: error.message
+                woNum, barcode, serials: serials.length, status: 'failed', error: error.message, operationType: 'build'
               });
             }
           }
@@ -886,7 +901,39 @@ async function processQueueBackground(serverUrl, token, database, bom, bomId, lo
             currentJob.endTime = new Date().toISOString();
             currentJob.stopRequested = false;
             logger.info(`BACKGROUND PROCESSOR - Job status is now: ${currentJob.status}`);
-            return;
+            // Signal to stop processing remaining items
+            throw new Error('STOP_REQUESTED');
+          }
+        };
+
+        // Execute processing - either concurrent or sequential
+        if (useConcurrency) {
+          try {
+            // Dynamic import for ES module p-limit (v5.x is ESM only)
+            const pLimit = (await import('p-limit')).default;
+            const limit = pLimit(constants.CONCURRENT_WO_LIMIT);
+
+            // Process items concurrently with controlled limit
+            await Promise.all(batch.map(queueItem => limit(() => processQueueItem(queueItem))));
+          } catch (error) {
+            if (error.message === 'STOP_REQUESTED') {
+              // Stop was requested, exit gracefully
+              return;
+            }
+            throw error; // Re-throw other errors
+          }
+        } else {
+          // Sequential processing (original behavior)
+          for (const queueItem of batch) {
+            try {
+              await processQueueItem(queueItem);
+            } catch (error) {
+              if (error.message === 'STOP_REQUESTED') {
+                // Stop was requested, exit gracefully
+                return;
+              }
+              // Individual item errors are handled inside processQueueItem
+            }
           }
         }
 
@@ -976,7 +1023,7 @@ async function closeShortPendingJobs(serverUrl, token, database, logger) {
         logger.info(`CLOSE SHORT - Processing MO: ${moNum}`);
 
         // Get MO ID from Fishbowl API
-        const moSql = `SELECT id FROM mo WHERE num = '${moNum.replace(/'/g, "''")}'`;
+        const moSql = `SELECT id FROM mo WHERE num = '${escapeSqlString(moNum)}'`;
         const moRows = await fishbowlQuery(moSql, serverUrl, token);
 
         if (!moRows || moRows.length === 0) {

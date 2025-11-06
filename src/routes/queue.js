@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { createConnection } = require('../db/connection');
-const { getPendingCount } = require('../db/queries');
+const { getPendingCount, getScheduledCount, getTotalPendingCount } = require('../db/queries');
 const jobService = require('../services/jobService');
 const queueService = require('../services/queueService');
 const { fishbowlQuery } = require('../services/fishbowlApi');
 const { loadConfig } = require('../utils/secureConfig');
+const { normalizeUrl } = require('../utils/urlHelpers');
+const { validateRequired, validateString, validateNumber, validate } = require('../middleware/validation');
 
 /**
  * Queue Management Routes
@@ -32,12 +34,11 @@ function setupQueueRoutes(logger) {
   });
 
   // Clear pending jobs
-  router.post('/clear-pending-jobs', async (req, res) => {
+  router.post('/clear-pending-jobs',
+    validateRequired(['token']),
+    validateString('token', { minLength: 1, maxLength: 500 }),
+    async (req, res) => {
     const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
 
     // Load serverUrl and database from secure config
     const config = await loadConfig();
@@ -49,7 +50,7 @@ function setupQueueRoutes(logger) {
     }
 
     // Normalize serverUrl (remove trailing slash)
-    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+    serverUrl = normalizeUrl(serverUrl);
 
     logger.info('CLEAR - Clearing pending jobs and closing short MOs', { database });
 
@@ -104,14 +105,27 @@ function setupQueueRoutes(logger) {
     try {
       connection = await createConnection(database);
 
-      const pendingCount = await getPendingCount(connection);
+      // Get different counts
+      const pendingCount = await getPendingCount(connection); // Ready to process now
+      const scheduledCount = await getScheduledCount(connection); // Scheduled for future
+      const totalPendingCount = await getTotalPendingCount(connection); // Total pending (ready + scheduled)
 
-      logger.info(`PENDING JOBS - Found ${pendingCount} pending item(s)`);
+      // Get failed count
+      const [failedResult] = await connection.query(`
+        SELECT COUNT(*) as count FROM mo_queue WHERE status = 'Failed'
+      `);
+      const failedCount = failedResult[0].count;
+
+      logger.info(`PENDING JOBS - Ready: ${pendingCount}, Scheduled: ${scheduledCount}, Failed: ${failedCount}`);
 
       res.json({
         success: true,
         hasPendingJobs: pendingCount > 0,
-        pendingCount: pendingCount
+        pendingCount: pendingCount, // Ready to process now
+        readyCount: pendingCount, // Alias for clarity
+        scheduledCount: scheduledCount, // Scheduled for future
+        totalPendingCount: totalPendingCount, // Total (ready + scheduled)
+        failedCount: failedCount
       });
 
     } catch (error) {
@@ -188,7 +202,7 @@ function setupQueueRoutes(logger) {
     }
 
     // Normalize serverUrl (remove trailing slash)
-    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+    serverUrl = normalizeUrl(serverUrl);
 
     logger.info('CLOSE SHORT - Starting close short for pending jobs', { database });
 
@@ -294,7 +308,7 @@ function setupQueueRoutes(logger) {
     }
 
     // Normalize serverUrl (remove trailing slash)
-    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+    serverUrl = normalizeUrl(serverUrl);
 
     logger.info('FINISHED GOODS - Fetching on-hand for disassembly', { bomNum });
 
@@ -506,7 +520,7 @@ function setupQueueRoutes(logger) {
     }
 
     // Normalize serverUrl (remove trailing slash)
-    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+    serverUrl = normalizeUrl(serverUrl);
 
     // Check if a job is already running
     const currentStatus = jobService.getJobStatus();

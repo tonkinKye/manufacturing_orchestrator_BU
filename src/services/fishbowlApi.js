@@ -1,4 +1,4 @@
-const { fetchWithNode } = require('../utils/helpers');
+const { fetchWithNode, getHttpsOptions } = require('../utils/helpers');
 const https = require('https');
 const http = require('http');
 
@@ -29,7 +29,7 @@ async function fishbowlQuery(sql, serverUrl, token) {
       'Content-Type': 'text/plain',
       'Content-Length': Buffer.byteLength(sql)
     },
-    rejectUnauthorized: false
+    ...getHttpsOptions()
   };
 
   return new Promise((resolve, reject) => {

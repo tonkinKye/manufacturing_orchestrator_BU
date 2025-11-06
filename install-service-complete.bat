@@ -339,7 +339,7 @@ echo [7/8] Configuring logging...
 "%NSSM_EXE%" set ManufacturingOrchestrator AppStderr "%APP_DIR%\server.log"
 
 echo [8/8] Setting environment...
-"%NSSM_EXE%" set ManufacturingOrchestrator AppEnvironmentExtra NODE_ENV=production
+"%NSSM_EXE%" set ManufacturingOrchestrator AppEnvironmentExtra "NODE_ENV=production" "PORT=3000" "ENCRYPTION_REQUIRED=false" "LOG_LEVEL=INFO"
 
 echo.
 echo ============================================================

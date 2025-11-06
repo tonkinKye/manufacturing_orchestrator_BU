@@ -447,8 +447,86 @@ export async function saveToQueue() {
     return alert('No valid items to save');
   }
 
+  // Reset modal to default state (Process Immediately)
+  document.querySelector('input[name="scheduleOption"][value="immediate"]').checked = true;
+  document.getElementById('scheduleOptions').style.display = 'none';
+  document.getElementById('scheduleHour').value = '';
+
+  // Set minimum date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('scheduleDate').min = today;
+  document.getElementById('scheduleDate').value = today;
+
+  // Show the scheduling modal
+  $('#scheduleModal').modal('show');
+
+  // Setup radio button handlers
+  const scheduleOptions = document.getElementById('scheduleOptions');
+  const radioButtons = document.querySelectorAll('input[name="scheduleOption"]');
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if (e.target.value === 'scheduled') {
+        scheduleOptions.style.display = 'block';
+      } else {
+        scheduleOptions.style.display = 'none';
+      }
+    });
+  });
+
+  // Setup confirm button handler (one-time)
+  const btnConfirm = document.getElementById('btnConfirmSchedule');
+  btnConfirm.onclick = async () => {
+    await performSaveToQueue();
+  };
+}
+
+/**
+ * Perform the actual save to queue operation with optional scheduling
+ */
+async function performSaveToQueue() {
+  const results = state.validationResults;
+
+  if (!results || results.valid.size === 0) {
+    return alert('No valid items to save');
+  }
+
+  // Get scheduling option
+  const scheduleOption = document.querySelector('input[name="scheduleOption"]:checked').value;
+  let scheduledFor = null;
+
+  if (scheduleOption === 'scheduled') {
+    const scheduleDate = document.getElementById('scheduleDate').value;
+    const scheduleHour = document.getElementById('scheduleHour').value;
+
+    if (!scheduleDate || !scheduleHour) {
+      alert('Please select both date and hour for scheduling');
+      return;
+    }
+
+    // Format as MySQL DATETIME: YYYY-MM-DD HH:00:00
+    scheduledFor = `${scheduleDate} ${scheduleHour}:00:00`;
+
+    // Validate that scheduled time is not in the past
+    const scheduledDateTime = new Date(scheduledFor);
+    const now = new Date();
+    if (scheduledDateTime <= now) {
+      alert('Cannot schedule a job for a time in the past. Please select a future date and time.');
+      return;
+    }
+  }
+
+  // Close the modal
+  $('#scheduleModal').modal('hide');
+
   try {
     log(`\n${'='.repeat(60)}\nSAVING TO QUEUE\n${'='.repeat(60)}\n`);
+
+    if (scheduledFor) {
+      log(`[INFO] Job scheduled for: ${scheduledFor}\n`);
+    } else {
+      log(`[INFO] Job will be available for immediate processing\n`);
+    }
 
     // Get config to get database name
     const configResponse = await fetch('/api/load-config');
@@ -464,7 +542,8 @@ export async function saveToQueue() {
 
     const barcodes = Array.from(results.valid.keys());
 
-    const checkResponse = await fetch('/api/mysql/delete-pending-barcodes', {
+    // Always check without deleting (for both immediate and scheduled)
+    const checkOnlyResponse = await fetch('/api/mysql/check-pending-barcodes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -473,19 +552,20 @@ export async function saveToQueue() {
       })
     });
 
-    if (!checkResponse.ok) {
-      throw new Error('Failed to check for existing records');
+    if (checkOnlyResponse.ok) {
+      const checkOnlyResult = await checkOnlyResponse.json();
+      if (checkOnlyResult.foundCount > 0) {
+        const duplicates = checkOnlyResult.barcodes.slice(0, 5).join(', ');
+        const actionText = scheduledFor ? 'schedule' : 'process';
+        const message = `Cannot ${actionText} job: ${checkOnlyResult.foundCount} barcode(s) already have pending jobs.\n\n` +
+          `Duplicates: ${duplicates}${checkOnlyResult.barcodes.length > 5 ? '...' : ''}\n\n` +
+          `Please complete or delete the existing pending jobs before queueing new ones.`;
+        alert(message);
+        log(`[ERROR] Found ${checkOnlyResult.foundCount} duplicate pending barcodes\n`);
+        return;
+      }
     }
-
-    const checkResult = await checkResponse.json();
-
-    if (checkResult.deletedCount > 0) {
-      log(`[CLEANUP] Found and deleted ${checkResult.deletedCount} existing PENDING record(s)\n`);
-      log(`[INFO] Barcodes cleaned up: ${checkResult.barcodes.slice(0, 5).join(', ')}${checkResult.barcodes.length > 5 ? '...' : ''}\n`);
-      log(`[REASON] Removing stale records from previous attempts\n`);
-    } else {
-      log(`[OK] No existing PENDING records found - starting fresh\n`);
-    }
+    log(`[OK] No duplicate PENDING records found\n`);
 
     // Now insert the new records
     log(`Saving ${results.valid.size} barcode(s) to queue...\n`);
@@ -509,7 +589,8 @@ export async function saveToQueue() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         database: database,
-        items: items
+        items: items,
+        scheduledFor: scheduledFor
       })
     });
 
@@ -523,13 +604,68 @@ export async function saveToQueue() {
 
     let alertMessage = `✓ Successfully saved ${results.valid.size} item(s) to queue!`;
 
-    if (checkResult.deletedCount > 0) {
-      alertMessage += `\n\n⚠ Note: ${checkResult.deletedCount} previous PENDING record(s) were replaced with your new data.`;
+    if (scheduledFor) {
+      alertMessage += `\n\n📅 Scheduled for: ${scheduledFor}`;
+      alertMessage += `\n\n⏰ The job will automatically start processing at the scheduled time.`;
+    } else {
+      alertMessage += `\n\nProceed to Step 4 to process immediately.`;
     }
 
-    alertMessage += `\n\nProceed to Step 4 to process.`;
-
     alert(alertMessage);
+
+    // If scheduled, logout and refresh the page
+    if (scheduledFor) {
+      log('[INFO] Scheduled job saved - logging out and refreshing page\n');
+      const { logout } = await import('./authService.js');
+      await logout(false); // Don't preserve results
+      location.reload();
+      return;
+    }
+
+    // For immediate jobs, disable previous steps and enable step 4
+    // Disable step 1 (BOM selection) to prevent changing BOM
+    const step1 = document.getElementById('step1');
+    if (step1) {
+      step1.classList.add('disabled');
+      step1.style.opacity = '0.5';
+      step1.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep1').collapse('hide');
+    }
+
+    // Disable step 1.5 (operation type) to prevent changing operation
+    const step1_5 = document.getElementById('step1_5');
+    if (step1_5) {
+      step1_5.classList.add('disabled');
+      step1_5.style.opacity = '0.5';
+      step1_5.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep1_5').collapse('hide');
+    }
+
+    // Disable step 2 (CSV upload) to prevent re-uploading
+    const step2 = document.getElementById('step2');
+    if (step2) {
+      step2.classList.add('disabled');
+      step2.style.opacity = '0.5';
+      step2.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep2').collapse('hide');
+    }
+
+    // Disable step 3 (CSV validation) to prevent re-validating
+    const step3 = document.getElementById('step3');
+    if (step3) {
+      step3.classList.add('disabled');
+      step3.style.opacity = '0.5';
+      step3.style.pointerEvents = 'none';
+    }
+    if (window.jQuery) {
+      window.jQuery('#collapseStep3').collapse('hide');
+    }
 
     // Enable step 4 and update queue stats
     const { enableStep } = await import('../ui/stepManager.js');
