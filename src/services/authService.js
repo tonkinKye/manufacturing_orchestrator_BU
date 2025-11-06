@@ -15,10 +15,13 @@ const { loadTokens, addToken, removeToken, saveTokens } = require('../db/tokenSt
  * @returns {Promise<Object>} Login response with token
  */
 async function login(serverUrl, loginData, logger) {
+  // Normalize serverUrl (remove trailing slash)
+  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
   logger.api('LOGIN REQUEST', {
     serverUrl,
     username: loginData.username,
-    url: `${serverUrl}/api/login`
+    url: `${normalizedUrl}/api/login`
   });
 
   // Build REST API login payload (only include fields Fishbowl expects)
@@ -36,11 +39,11 @@ async function login(serverUrl, loginData, logger) {
   }
 
   logger.info('LOGIN - Sending to Fishbowl:', {
-    url: `${serverUrl}/api/login`,
+    url: `${normalizedUrl}/api/login`,
     payload: { ...fishbowlPayload, password: '***' }
   });
 
-  const response = await fetchWithNode(`${serverUrl}/api/login`, {
+  const response = await fetchWithNode(`${normalizedUrl}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(fishbowlPayload)
@@ -76,12 +79,15 @@ async function login(serverUrl, loginData, logger) {
  * @returns {Promise<Object>} Logout result
  */
 async function logout(serverUrl, token, logoutData, logger) {
+  // Normalize serverUrl (remove trailing slash)
+  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
   logger.api('LOGOUT REQUEST - Cleaning up all tracked tokens', { serverUrl });
 
   // First, try to logout the current token
   if (token) {
     try {
-      const response = await fetchWithNode(`${serverUrl}/api/logout`, {
+      const response = await fetchWithNode(`${normalizedUrl}/api/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,6 +140,11 @@ async function logoutAllTokens(logger) {
 
   for (const tokenInfo of tokens) {
     try {
+      // Normalize serverUrl (remove trailing slash)
+      const normalizedUrl = tokenInfo.serverUrl.endsWith('/')
+        ? tokenInfo.serverUrl.slice(0, -1)
+        : tokenInfo.serverUrl;
+
       logger.info(`TOKEN TRACKING - Logging out ${tokenInfo.username}@${tokenInfo.serverUrl}`);
 
       // Decrypt password if available
@@ -146,7 +157,7 @@ async function logoutAllTokens(logger) {
         }
       }
 
-      const response = await fetchWithNode(`${tokenInfo.serverUrl}/api/logout`, {
+      const response = await fetchWithNode(`${normalizedUrl}/api/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
