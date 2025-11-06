@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const http = require('http');
 const https = require('https');
 const {
   isSetupComplete,
@@ -64,24 +65,30 @@ function setupSetupRoutes(logger) {
       // Parse server URL
       const url = new URL(serverUrl);
 
-      // Make HTTPS request
+      // Determine which module to use based on protocol
+      const isHttps = url.protocol === 'https:';
+      const httpModule = isHttps ? https : http;
+
+      logger.info(`SETUP - Using ${url.protocol} to connect to ${url.hostname}:${url.port || (isHttps ? 443 : 80)}`);
+
+      // Make HTTP/HTTPS request
       const response = await new Promise((resolve, reject) => {
         const postData = JSON.stringify(loginPayload);
 
         const options = {
           hostname: url.hostname,
-          port: url.port || 28192,
+          port: url.port || (isHttps ? 443 : 80),
           path: '/api/login',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(postData)
           },
-          // Allow self-signed certificates
+          // Allow self-signed certificates (only for HTTPS)
           rejectUnauthorized: false
         };
 
-        const req = https.request(options, (res) => {
+        const req = httpModule.request(options, (res) => {
           let data = '';
 
           res.on('data', (chunk) => {
