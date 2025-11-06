@@ -118,6 +118,9 @@ function setupSetupRoutes(logger) {
         req.end();
       });
 
+      // Log full response for debugging
+      logger.info('SETUP - Fishbowl response:', JSON.stringify(response, null, 2));
+
       // Check for errors
       if (response.FbiJson?.FbiMsgsRs?.ErrorRs) {
         const errorMsg = response.FbiJson.FbiMsgsRs.ErrorRs.Message || 'Login failed';
@@ -125,11 +128,19 @@ function setupSetupRoutes(logger) {
         return res.status(400).json({ error: errorMsg });
       }
 
-      // Extract token from login response
-      const token = response.FbiJson?.Ticket?.Key;
+      // Extract token from login response - try multiple possible locations
+      let token = response.FbiJson?.Ticket?.Key ||
+                  response.token ||
+                  response.FbiJson?.FbiMsgsRs?.LoginRs?.Key;
+
       if (!token) {
-        logger.warn('SETUP - Login succeeded but no token received');
-        return res.status(500).json({ error: 'Login succeeded but no token received' });
+        logger.warn('SETUP - Login succeeded but no token received. Response structure:', {
+          hasResponse: !!response,
+          hasFbiJson: !!response.FbiJson,
+          hasTicket: !!response.FbiJson?.Ticket,
+          ticketStructure: response.FbiJson?.Ticket
+        });
+        return res.status(500).json({ error: 'Login succeeded but no token received. Check server logs.' });
       }
 
       logger.info('SETUP - Login successful, querying database name...');
