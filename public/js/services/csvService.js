@@ -177,13 +177,11 @@ export async function loadRawGoods() {
   try {
     log('Loading raw goods with serial tracking...\n');
     const select = document.getElementById('rawGoodPart');
-    const serverUrl = getServerUrl();
 
     const response = await fetch('/api/get-raw-goods', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        serverUrl: serverUrl,
         token: sessionToken,
         bomNum: state.bom
       })
@@ -456,7 +454,8 @@ export async function saveToQueue() {
     const configResponse = await fetch('/api/load-config');
     const config = await configResponse.json();
 
-    if (!config.database) {
+    const database = config.fishbowl?.database || config.database;
+    if (!database) {
       throw new Error('Database not configured');
     }
 
@@ -469,7 +468,7 @@ export async function saveToQueue() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        database: config.database,
+        database: database,
         barcodes: barcodes
       })
     });
@@ -509,7 +508,7 @@ export async function saveToQueue() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        database: config.database,
+        database: database,
         items: items
       })
     });

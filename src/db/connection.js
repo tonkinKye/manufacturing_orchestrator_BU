@@ -7,11 +7,12 @@ const { MYSQL_CONFIG, getMySQLPassword } = require('../config/database');
  * @returns {Promise<Connection>} MySQL connection
  */
 async function createConnection(database) {
+  const password = await getMySQLPassword();
   return await mysql.createConnection({
     host: MYSQL_CONFIG.host,
     port: MYSQL_CONFIG.port,
     user: MYSQL_CONFIG.user,
-    password: getMySQLPassword(),
+    password: password,
     database: database
   });
 }

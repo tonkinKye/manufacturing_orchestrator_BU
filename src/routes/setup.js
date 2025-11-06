@@ -246,18 +246,19 @@ function setupSetupRoutes(logger) {
       }
 
       // Build config, using existing passwords if not provided (for reconfiguration)
+      // Note: Empty string "" is falsy in || check, but we need to check for empty/whitespace explicitly
       const configToSave = {
         fishbowl: {
           serverUrl: fishbowl.serverUrl,
           username: fishbowl.username,
-          password: fishbowl.password || existingConfig?.fishbowl?.password,
+          password: (fishbowl.password && fishbowl.password.trim()) ? fishbowl.password : existingConfig?.fishbowl?.password,
           database: fishbowl.database || null
         },
         mysql: {
           host: mysql.host,
           port: mysql.port || 3306,
           user: mysql.user,
-          password: mysql.password || existingConfig?.mysql?.password
+          password: (mysql.password && mysql.password.trim()) ? mysql.password : existingConfig?.mysql?.password
         }
       };
 

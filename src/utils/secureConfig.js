@@ -178,7 +178,7 @@ async function saveConfig(config) {
   // Save to file
   await fs.writeFile(CONFIG_FILE, JSON.stringify(encryptedConfig, null, 2), 'utf8');
 
-  // Update cache
+  // Update cache with the config we just saved
   cachedConfig = config;
 }
 

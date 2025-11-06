@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createConnection } = require('../db/connection');
 const { createMOQueueTable, getMOQueueCount, deletePendingBarcodes, queueWorkOrder, batchQueueWorkOrders } = require('../db/queries');
+const { loadConfig } = require('../utils/secureConfig');
 
 /**
  * MySQL Routes
@@ -118,7 +119,6 @@ function setupMySQLRoutes(logger) {
   // Queue work order
   router.post('/queue-work-order', async (req, res) => {
     const {
-      database,
       barcode,
       serialNumbers,
       fgLocationId,
@@ -131,8 +131,16 @@ function setupMySQLRoutes(logger) {
       originalWoStructure
     } = req.body;
 
-    if (!database || !barcode || !serialNumbers || !bomNum || !bomId || !locationGroupId || !operationType) {
+    if (!barcode || !serialNumbers || !bomNum || !bomId || !locationGroupId || !operationType) {
       return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    // Load database from secure config
+    const config = await loadConfig();
+    const database = config?.fishbowl?.database;
+
+    if (!database) {
+      return res.status(500).json({ error: 'Server configuration not complete' });
     }
 
     logger.info('QUEUE WORK ORDER - Queueing', { barcode, operationType });

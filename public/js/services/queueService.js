@@ -42,7 +42,8 @@ export async function processQueue() {
     const configResponse = await fetch('/api/load-config');
     const config = await configResponse.json();
 
-    if (!config.database) {
+    const database = config.fishbowl?.database || config.database;
+    if (!database) {
       throw new Error('Database not configured. Please login first.');
     }
 
@@ -62,7 +63,7 @@ export async function processQueue() {
       const infoResponse = await fetch('/api/get-pending-job-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ database: config.database })
+        body: JSON.stringify({ database: database })
       });
 
       if (!infoResponse.ok) {
@@ -87,9 +88,7 @@ export async function processQueue() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        serverUrl: getServerUrl(),
         token: sessionToken,
-        database: config.database,
         bom: bomNum,
         bomId: bomId,
         locationGroup: locationGroupId
@@ -122,10 +121,7 @@ export async function processQueue() {
     configPanel.style.opacity = '0.6';
     configPanel.style.pointerEvents = 'none';
 
-    // Disable login inputs
-    document.getElementById('serverUrl').disabled = true;
-    document.getElementById('username').disabled = true;
-    document.getElementById('password').disabled = true;
+    // Disable login buttons (serverUrl, username, password fields don't exist - managed in backend)
     document.getElementById('btnLogin').disabled = true;
     document.getElementById('btnLogout').disabled = true;
 
@@ -250,18 +246,11 @@ export async function clearJob() {
   try {
     log('[CLEAR] Clearing job and closing short MOs...\n');
 
-    const configResponse = await fetch('/api/load-config');
-    const config = await configResponse.json();
-
-    const serverUrl = getServerUrl();
-
     const response = await fetch('/api/clear-pending-jobs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        serverUrl: serverUrl,
-        token: sessionToken,
-        database: config.database
+        token: sessionToken
       })
     });
 
@@ -355,12 +344,13 @@ export async function pollQueueStatus() {
             try {
               const configResponse = await fetch('/api/load-config');
               const config = await configResponse.json();
+              const database = config.fishbowl?.database || config.database;
 
-              if (config.database) {
+              if (database) {
                 const checkResponse = await fetch('/api/check-pending-jobs', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ database: config.database })
+                  body: JSON.stringify({ database: database })
                 });
 
                 const result = await checkResponse.json();
@@ -577,14 +567,15 @@ export async function checkForPendingJobs() {
     const configResponse = await fetch('/api/load-config');
     const config = await configResponse.json();
 
-    if (!config.database) {
+    const database = config.fishbowl?.database || config.database;
+    if (!database) {
       return false;
     }
 
     const response = await fetch('/api/check-pending-jobs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ database: config.database })
+      body: JSON.stringify({ database: database })
     });
 
     if (!response.ok) {
@@ -595,7 +586,7 @@ export async function checkForPendingJobs() {
 
     if (result.hasPendingJobs) {
       log(`[PENDING JOBS] Found ${result.pendingCount} pending item(s) in queue\n`);
-      return await handlePendingJobs(result.pendingCount, config.database);
+      return await handlePendingJobs(result.pendingCount, database);
     }
 
     return false;
@@ -635,8 +626,6 @@ async function closeShortPendingJobs(database) {
   try {
     log('[CLOSE SHORT] Starting close short process...\n');
 
-    const serverUrl = getServerUrl();
-
     if (!sessionToken) {
       throw new Error('Not logged in');
     }
@@ -645,9 +634,7 @@ async function closeShortPendingJobs(database) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        serverUrl: serverUrl,
-        token: sessionToken,
-        database: database
+        token: sessionToken
       })
     });
 
@@ -707,9 +694,7 @@ export async function checkAndResumeJob() {
       configPanel.style.opacity = '0.6';
       configPanel.style.pointerEvents = 'none';
 
-      document.getElementById('serverUrl').disabled = true;
-      document.getElementById('username').disabled = true;
-      document.getElementById('password').disabled = true;
+      // Disable login button (serverUrl, username, password fields don't exist - managed in backend)
       document.getElementById('btnLogin').disabled = true;
 
       // Show logged in status with restored session

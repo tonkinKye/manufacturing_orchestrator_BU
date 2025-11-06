@@ -5,6 +5,7 @@ const { getPendingCount } = require('../db/queries');
 const jobService = require('../services/jobService');
 const queueService = require('../services/queueService');
 const { fishbowlQuery } = require('../services/fishbowlApi');
+const { loadConfig } = require('../utils/secureConfig');
 
 /**
  * Queue Management Routes
@@ -32,11 +33,23 @@ function setupQueueRoutes(logger) {
 
   // Clear pending jobs
   router.post('/clear-pending-jobs', async (req, res) => {
-    const { serverUrl, token, database } = req.body;
+    const { token } = req.body;
 
-    if (!serverUrl || !token || !database) {
+    if (!token) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
+
+    // Load serverUrl and database from secure config
+    const config = await loadConfig();
+    let serverUrl = config?.fishbowl?.serverUrl;
+    const database = config?.fishbowl?.database;
+
+    if (!serverUrl || !database) {
+      return res.status(500).json({ error: 'Server configuration not complete' });
+    }
+
+    // Normalize serverUrl (remove trailing slash)
+    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
     logger.info('CLEAR - Clearing pending jobs and closing short MOs', { database });
 
@@ -159,11 +172,23 @@ function setupQueueRoutes(logger) {
 
   // Close short pending jobs
   router.post('/close-short-pending-jobs', async (req, res) => {
-    const { serverUrl, token, database } = req.body;
+    const { token } = req.body;
 
-    if (!serverUrl || !token || !database) {
+    if (!token) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
+
+    // Load serverUrl and database from secure config
+    const config = await loadConfig();
+    let serverUrl = config?.fishbowl?.serverUrl;
+    const database = config?.fishbowl?.database;
+
+    if (!serverUrl || !database) {
+      return res.status(500).json({ error: 'Server configuration not complete' });
+    }
+
+    // Normalize serverUrl (remove trailing slash)
+    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
     logger.info('CLOSE SHORT - Starting close short for pending jobs', { database });
 
@@ -253,11 +278,23 @@ function setupQueueRoutes(logger) {
 
   // Get finished goods on hand (for disassembly)
   router.post('/get-finished-goods-on-hand', async (req, res) => {
-    const { database, serverUrl, token, bomNum, bomId } = req.body;
+    const { token, bomNum, bomId } = req.body;
 
-    if (!database || !serverUrl || !token || !bomNum || !bomId) {
+    if (!token || !bomNum || !bomId) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
+
+    // Load serverUrl and database from secure config
+    const config = await loadConfig();
+    let serverUrl = config?.fishbowl?.serverUrl;
+    const database = config?.fishbowl?.database;
+
+    if (!serverUrl || !database) {
+      return res.status(500).json({ error: 'Server configuration not complete' });
+    }
+
+    // Normalize serverUrl (remove trailing slash)
+    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
     logger.info('FINISHED GOODS - Fetching on-hand for disassembly', { bomNum });
 
@@ -358,15 +395,26 @@ function setupQueueRoutes(logger) {
 
   // Get raw goods
   router.post('/get-raw-goods', async (req, res) => {
-    const { serverUrl, token, bomNum } = req.body;
+    const { token, bomNum } = req.body;
 
-    if (!serverUrl || !token || !bomNum) {
+    if (!token || !bomNum) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
     logger.info('RAW GOODS - Fetching for BOM', { bomNum });
 
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      let serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
       const sql = `
         SELECT DISTINCT
           part.num AS part_num,
@@ -395,15 +443,26 @@ function setupQueueRoutes(logger) {
 
   // Get locations
   router.post('/get-locations', async (req, res) => {
-    const { serverUrl, token, locationGroupId } = req.body;
+    const { token, locationGroupId } = req.body;
 
-    if (!serverUrl || !token || !locationGroupId) {
+    if (!token || !locationGroupId) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
 
     logger.info('LOCATIONS - Fetching for location group', { locationGroupId });
 
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      let serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
       const sql = `
         SELECT
           location.id AS location_id,
@@ -431,11 +490,23 @@ function setupQueueRoutes(logger) {
 
   // Start queue processing
   router.post('/start-queue-processing', async (req, res) => {
-    const { serverUrl, token, database, bom, bomId, locationGroup } = req.body;
+    const { token, bom, bomId, locationGroup } = req.body;
 
-    if (!serverUrl || !token || !database || !bom || !bomId || !locationGroup) {
+    if (!token || !bom || !bomId || !locationGroup) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
+
+    // Load serverUrl and database from secure config
+    const config = await loadConfig();
+    let serverUrl = config?.fishbowl?.serverUrl;
+    const database = config?.fishbowl?.database;
+
+    if (!serverUrl || !database) {
+      return res.status(500).json({ error: 'Server configuration not complete' });
+    }
+
+    // Normalize serverUrl (remove trailing slash)
+    serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
     // Check if a job is already running
     const currentStatus = jobService.getJobStatus();

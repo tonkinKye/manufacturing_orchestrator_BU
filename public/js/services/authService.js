@@ -78,11 +78,10 @@ export async function restoreSessionIfAvailable() {
   log('[SESSION] Found stored session, attempting to restore...\n');
 
   try {
-    // Restore session variables
+    // Restore session variables (no password - it's in secure server-side config)
     setSessionToken(storedSession.token);
     setSessionCredentials({
       username: storedSession.username,
-      password: storedSession.password,
       database: storedSession.database || ''
     });
 
@@ -101,9 +100,7 @@ export async function restoreSessionIfAvailable() {
       toggleDisplay('btnLogin', false);
       toggleDisplay('btnLogout', true);
 
-      document.getElementById('serverUrl').disabled = true;
-      document.getElementById('username').disabled = true;
-      document.getElementById('password').disabled = true;
+      // Note: serverUrl, username, password fields don't exist - managed in backend secure config
 
       // Enable Step 1 since we're logged in
       document.getElementById('step1').classList.remove('disabled');
@@ -177,7 +174,7 @@ export async function saveConfig(config) {
       body: JSON.stringify({
         serverUrl: config.serverUrl,
         username: config.username,
-        password: config.password,
+        // Don't send password - backend will keep existing password from secure config
         database: config.database
       })
     });
@@ -255,15 +252,16 @@ export async function login() {
     const databaseName = await detectDatabaseName();
     log(`[OK] Database detected: ${databaseName}\n`);
 
-    // Store credentials including database
-    const credentials = { username, password, database: databaseName };
+    // Store credentials including database (no password - it's in secure server-side config)
+    const credentials = { username, database: databaseName };
     setSessionCredentials(credentials);
 
-    // Save session to browser storage (now with database)
+    // Save session to browser storage (now with database, no password)
     saveSessionToStorage(data.token, credentials);
 
-    await saveConfig({ serverUrl, username, password, database: databaseName });
-    log('[CONFIG] Credentials and database name saved securely\n');
+    // Save config (no password - backend will keep existing password from secure config)
+    await saveConfig({ serverUrl, username, database: databaseName });
+    log('[CONFIG] Database name saved securely\n');
 
     await initializeQueueTable(databaseName);
 

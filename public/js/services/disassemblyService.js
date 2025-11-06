@@ -19,8 +19,6 @@ export async function loadFinishedGoods() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        database: sessionCredentials.database,
-        serverUrl: getServerUrl(),
         token: sessionToken,
         bomNum: state.bom,
         bomId: state.bomId
@@ -62,7 +60,6 @@ export async function loadReturnLocations() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        serverUrl: getServerUrl(),
         token: sessionToken,
         locationGroupId: locGroupId
       })
@@ -262,7 +259,6 @@ export async function confirmDisassembly() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            serverUrl: getServerUrl(),
             token: sessionToken,
             woNumber: fg.wo_number
           })
@@ -278,9 +274,6 @@ export async function confirmDisassembly() {
         log(`[OK] Retrieved ${woStructure.length} items from original WO ${fg.wo_number}\n`);
 
         const queueData = {
-          serverUrl: getServerUrl(),
-          token: sessionToken,
-          database: sessionCredentials.database,
           barcode: fg.barcode,
           serialNumbers: fg.serial_numbers, // Legacy field, kept for compatibility
           fgLocationId: returnLocation,
