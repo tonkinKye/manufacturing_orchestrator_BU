@@ -44,26 +44,18 @@ function setupSetupRoutes(logger) {
     logger.info('SETUP - Testing Fishbowl connection...');
 
     try {
-      // Build login request
-      const loginPayload = {
-        FbiJson: {
-          Ticket: {
-            Key: ''
-          },
-          FbiMsgsRq: {
-            LoginRq: {
-              IAID: '999999',
-              IAName: 'Manufacturing Orchestrator',
-              IADescription: 'Queue-based work order processing',
-              UserName: username,
-              UserPassword: password
-            }
-          }
-        }
-      };
-
       // Parse server URL
       const url = new URL(serverUrl);
+
+      // Build login request (Fishbowl REST API format)
+      const loginPayload = {
+        username: username,
+        password: password,
+        name: 'Manufacturing Orchestrator',
+        description: 'Queue-based work order processing',
+        appId: '999999',
+        appKey: 'MFG_ORCH_KEY_2024'
+      };
 
       // Determine which module to use based on protocol
       const isHttps = url.protocol === 'https:';
@@ -119,57 +111,48 @@ function setupSetupRoutes(logger) {
       });
 
       // Log full response for debugging
-      logger.info('SETUP - Fishbowl response:', JSON.stringify(response, null, 2));
+      logger.info('SETUP - Fishbowl login response:', JSON.stringify(response, null, 2));
 
-      // Check for errors
+      // Check for REST API error response
+      if (response.status && response.status >= 400) {
+        const errorMsg = response.message || 'Login failed';
+        logger.warn('SETUP - Fishbowl login failed', { error: errorMsg, status: response.status });
+        return res.status(400).json({ error: errorMsg });
+      }
+
+      // Check for legacy API error
       if (response.FbiJson?.FbiMsgsRs?.ErrorRs) {
         const errorMsg = response.FbiJson.FbiMsgsRs.ErrorRs.Message || 'Login failed';
         logger.warn('SETUP - Fishbowl login failed', { error: errorMsg });
         return res.status(400).json({ error: errorMsg });
       }
 
-      // Extract token from login response - try multiple possible locations
-      let token = response.FbiJson?.Ticket?.Key ||
-                  response.token ||
+      // Extract token - REST API returns simple { token: "..." } format
+      let token = response.token ||
+                  response.FbiJson?.Ticket?.Key ||
                   response.FbiJson?.FbiMsgsRs?.LoginRs?.Key;
 
       if (!token) {
-        logger.warn('SETUP - Login succeeded but no token received. Response structure:', {
-          hasResponse: !!response,
-          hasFbiJson: !!response.FbiJson,
-          hasTicket: !!response.FbiJson?.Ticket,
-          ticketStructure: response.FbiJson?.Ticket
-        });
+        logger.warn('SETUP - Login succeeded but no token received.');
         return res.status(500).json({ error: 'Login succeeded but no token received. Check server logs.' });
       }
 
       logger.info('SETUP - Login successful, querying database name...');
 
       // Query for database name using SELECT DATABASE()
-      const dbQueryPayload = {
-        FbiJson: {
-          Ticket: {
-            Key: token
-          },
-          FbiMsgsRq: {
-            ExecuteQueryRq: {
-              Query: 'SELECT DATABASE() as current_db'
-            }
-          }
-        }
-      };
+      // REST API uses the SQL query directly in the body with Bearer token
+      const dbQuery = 'SELECT DATABASE() as current_db';
 
       const dbResponse = await new Promise((resolve, reject) => {
-        const postData = JSON.stringify(dbQueryPayload);
-
         const options = {
           hostname: url.hostname,
           port: url.port || (isHttps ? 443 : 80),
-          path: '/api/query',
-          method: 'POST',
+          path: '/api/data-query',  // REST API query endpoint
+          method: 'GET',  // REST API uses GET with SQL in body
           headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData)
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'text/plain',
+            'Content-Length': Buffer.byteLength(dbQuery)
           },
           rejectUnauthorized: false
         };
@@ -192,34 +175,20 @@ function setupSetupRoutes(logger) {
           reject(new Error('Database query timeout'));
         });
 
-        req.write(postData);
+        req.write(dbQuery);
         req.end();
       });
 
-      // Extract database name from query result
+      // Extract database name from REST API query result
+      // REST API returns array of objects: [{ current_db: "database_name" }]
       let databaseName = null;
-      const rows = dbResponse.FbiJson?.FbiMsgsRs?.ExecuteQueryRs?.Rows?.Row;
-      if (rows) {
-        const rowArray = Array.isArray(rows) ? rows : [rows];
-        if (rowArray.length > 0 && rowArray[0].current_db) {
-          databaseName = rowArray[0].current_db;
-        }
+      if (Array.isArray(dbResponse) && dbResponse.length > 0) {
+        databaseName = dbResponse[0].current_db || dbResponse[0].DATABASE();
       }
 
       logger.info('SETUP - Database name detected', { database: databaseName });
 
-      // Logout to clean up the test token
-      const logoutPayload = {
-        FbiJson: {
-          Ticket: {
-            Key: token
-          },
-          FbiMsgsRq: {
-            LogoutRq: {}
-          }
-        }
-      };
-
+      // Logout to clean up the test token (REST API)
       // Fire and forget logout (don't wait for response)
       const logoutReq = httpModule.request({
         hostname: url.hostname,
@@ -227,12 +196,11 @@ function setupSetupRoutes(logger) {
         path: '/api/logout',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(JSON.stringify(logoutPayload))
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         rejectUnauthorized: false
       }, () => {});
-      logoutReq.write(JSON.stringify(logoutPayload));
       logoutReq.end();
 
       logger.info('SETUP - Test complete, token cleaned up');
