@@ -1,38 +1,46 @@
-const { decrypt } = require('../utils/encryption');
+const { loadConfig } = require('../utils/secureConfig');
 
-// Legacy encrypted password (fallback)
-const LEGACY_PASSWORD_ENCRYPTED = 'e71963f4d621d03a9826635bafc0c669:91229c8e37cf2b34b23fb4082db46b58e7740096c2424a3e8ded85052cc34e6bc714304cb0e0c8d859bfd65135ca7028';
+let cachedMySQLConfig = null;
 
 /**
- * Get MySQL password from environment or decrypt legacy password
+ * Get MySQL configuration from secure encrypted config
+ * Uses Windows DPAPI for encryption key protection
  */
-function getMySQLPassword() {
-  // Prefer environment variable
-  if (process.env.DB_PASSWORD) {
-    return process.env.DB_PASSWORD;
+async function getMySQLConfig() {
+  try {
+    const config = await loadConfig();
+    cachedMySQLConfig = config.mysql || {
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: ''
+    };
+    return cachedMySQLConfig;
+  } catch (error) {
+    // Setup not complete - return defaults
+    return {
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: ''
+    };
   }
-  // Fall back to decrypting legacy password
-  return decrypt(LEGACY_PASSWORD_ENCRYPTED);
 }
 
 /**
- * Get MySQL configuration with environment variable support
+ * Get MySQL password from secure config
  */
-function getMySQLConfig() {
-  return {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
-    password: getMySQLPassword()
-  };
+async function getMySQLPassword() {
+  const config = await getMySQLConfig();
+  return config.password;
 }
 
-// Expose MYSQL_CONFIG for backward compatibility
+// Expose MYSQL_CONFIG for backward compatibility (synchronous access)
+// Note: This requires setup to be complete before server starts
 const MYSQL_CONFIG = {
-  get host() { return process.env.DB_HOST || 'localhost'; },
-  get port() { return parseInt(process.env.DB_PORT || '3306', 10); },
-  get user() { return process.env.DB_USER || 'root'; },
-  get passwordEncrypted() { return LEGACY_PASSWORD_ENCRYPTED; }
+  get host() { return cachedMySQLConfig?.host || 'localhost'; },
+  get port() { return cachedMySQLConfig?.port || 3306; },
+  get user() { return cachedMySQLConfig?.user || 'root'; }
 };
 
 module.exports = {

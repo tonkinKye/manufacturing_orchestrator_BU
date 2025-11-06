@@ -1,5 +1,6 @@
 const express = require('express');
 const setupAuthRoutes = require('./auth');
+const setupSetupRoutes = require('./setup');
 const setupConfigRoutes = require('./config');
 const setupMySQLRoutes = require('./mysql');
 const setupQueueRoutes = require('./queue');
@@ -11,6 +12,9 @@ const setupFishbowlRoutes = require('./fishbowl');
  */
 
 function setupRoutes(app, logger) {
+  // Setup routes (no auth required, always accessible)
+  app.use('/api', setupSetupRoutes(logger));
+
   // Authentication routes
   app.use('/api', setupAuthRoutes(logger));
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const setupEnforcerMiddleware = require('./setupEnforcer');
 const errorHandler = require('./errorHandler');
 
 /**
@@ -19,6 +20,9 @@ function setupMiddleware(app, logger) {
 
   // Also serve images from root
   app.use('/images', express.static('images'));
+
+  // Setup enforcer - redirect to setup wizard if not configured
+  app.use(setupEnforcerMiddleware(logger));
 
   // Error handler (must be last)
   app.use(errorHandler(logger));

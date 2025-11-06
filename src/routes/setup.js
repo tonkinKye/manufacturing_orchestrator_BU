@@ -1,0 +1,294 @@
+const express = require('express');
+const router = express.Router();
+const https = require('https');
+const {
+  isSetupComplete,
+  saveConfig,
+  loadConfig,
+  updateConfigSection,
+  clearConfig,
+  getConfigStatus
+} = require('../utils/secureConfig');
+
+/**
+ * Setup and Configuration Management Routes
+ */
+
+function setupSetupRoutes(logger) {
+  /**
+   * GET /api/setup/status
+   * Check if initial setup is complete
+   */
+  router.get('/setup/status', async (req, res) => {
+    try {
+      const status = await getConfigStatus();
+      res.json(status);
+    } catch (error) {
+      logger.error('SETUP - Failed to get status', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/setup/test-fishbowl
+   * Test Fishbowl connection and fetch database name
+   */
+  router.post('/setup/test-fishbowl', async (req, res) => {
+    const { serverUrl, username, password } = req.body;
+
+    if (!serverUrl || !username || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    logger.info('SETUP - Testing Fishbowl connection...');
+
+    try {
+      // Build login request
+      const loginPayload = {
+        FbiJson: {
+          Ticket: {
+            Key: ''
+          },
+          FbiMsgsRq: {
+            LoginRq: {
+              IAID: '999999',
+              IAName: 'Manufacturing Orchestrator',
+              IADescription: 'Queue-based work order processing',
+              UserName: username,
+              UserPassword: password
+            }
+          }
+        }
+      };
+
+      // Parse server URL
+      const url = new URL(serverUrl);
+
+      // Make HTTPS request
+      const response = await new Promise((resolve, reject) => {
+        const postData = JSON.stringify(loginPayload);
+
+        const options = {
+          hostname: url.hostname,
+          port: url.port || 28192,
+          path: '/api/login',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          },
+          // Allow self-signed certificates
+          rejectUnauthorized: false
+        };
+
+        const req = https.request(options, (res) => {
+          let data = '';
+
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+
+          res.on('end', () => {
+            try {
+              const parsed = JSON.parse(data);
+              resolve(parsed);
+            } catch (err) {
+              reject(new Error('Invalid JSON response from Fishbowl'));
+            }
+          });
+        });
+
+        req.on('error', (err) => {
+          reject(err);
+        });
+
+        req.setTimeout(10000, () => {
+          req.destroy();
+          reject(new Error('Connection timeout'));
+        });
+
+        req.write(postData);
+        req.end();
+      });
+
+      // Check for errors
+      if (response.FbiJson?.FbiMsgsRs?.ErrorRs) {
+        const errorMsg = response.FbiJson.FbiMsgsRs.ErrorRs.Message || 'Login failed';
+        logger.warn('SETUP - Fishbowl login failed', { error: errorMsg });
+        return res.status(400).json({ error: errorMsg });
+      }
+
+      // Extract database name from response
+      const loginRs = response.FbiJson?.FbiMsgsRs?.LoginRs;
+      const databaseName = loginRs?.dbName || loginRs?.DatabaseName || null;
+
+      logger.info('SETUP - Fishbowl connection successful', { database: databaseName });
+
+      res.json({
+        success: true,
+        database: databaseName,
+        message: 'Connection successful'
+      });
+    } catch (error) {
+      logger.error('SETUP - Fishbowl connection test failed', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/setup/complete
+   * Complete initial setup with all credentials
+   */
+  router.post('/setup/complete', async (req, res) => {
+    const { fishbowl, mysql } = req.body;
+
+    // Validate required fields
+    if (!fishbowl?.serverUrl || !fishbowl?.username || !fishbowl?.password) {
+      return res.status(400).json({ error: 'Missing Fishbowl credentials' });
+    }
+
+    if (!mysql?.host || !mysql?.user || !mysql?.password) {
+      return res.status(400).json({ error: 'Missing MySQL credentials' });
+    }
+
+    logger.info('SETUP - Saving initial configuration...');
+
+    try {
+      // Save encrypted configuration
+      await saveConfig({
+        fishbowl: {
+          serverUrl: fishbowl.serverUrl,
+          username: fishbowl.username,
+          password: fishbowl.password,
+          database: fishbowl.database || null
+        },
+        mysql: {
+          host: mysql.host,
+          port: mysql.port || 3306,
+          user: mysql.user,
+          password: mysql.password
+        }
+      });
+
+      logger.info('SETUP - Configuration saved successfully');
+
+      res.json({
+        success: true,
+        message: 'Setup complete'
+      });
+    } catch (error) {
+      logger.error('SETUP - Failed to save configuration', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * GET /api/config/load
+   * Load current configuration (passwords masked for security)
+   */
+  router.get('/config/load', async (req, res) => {
+    try {
+      const setupComplete = await isSetupComplete();
+
+      if (!setupComplete) {
+        return res.json({});
+      }
+
+      const config = await loadConfig();
+
+      // Mask passwords
+      const masked = {
+        fishbowl: {
+          serverUrl: config.fishbowl?.serverUrl || '',
+          username: config.fishbowl?.username || '',
+          password: config.fishbowl?.password ? '••••••••' : '',
+          database: config.fishbowl?.database || ''
+        },
+        mysql: {
+          host: config.mysql?.host || 'localhost',
+          port: config.mysql?.port || 3306,
+          user: config.mysql?.user || 'root',
+          password: config.mysql?.password ? '••••••••' : ''
+        }
+      };
+
+      res.json(masked);
+    } catch (error) {
+      logger.error('CONFIG - Failed to load configuration', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/config/update
+   * Update specific configuration fields
+   */
+  router.post('/config/update', async (req, res) => {
+    const { section, data } = req.body;
+
+    if (!section || !data) {
+      return res.status(400).json({ error: 'Missing section or data' });
+    }
+
+    if (section !== 'fishbowl' && section !== 'mysql') {
+      return res.status(400).json({ error: 'Invalid section' });
+    }
+
+    logger.info('CONFIG - Updating configuration', { section });
+
+    try {
+      // Load current config
+      const config = await loadConfig();
+
+      // Update only provided fields (don't replace masked passwords)
+      const updated = { ...config[section] };
+
+      for (const [key, value] of Object.entries(data)) {
+        // Skip if password is still masked
+        if (key === 'password' && value === '••••••••') {
+          continue;
+        }
+        updated[key] = value;
+      }
+
+      // Save updated section
+      await updateConfigSection(section, updated);
+
+      logger.info('CONFIG - Configuration updated successfully', { section });
+
+      res.json({
+        success: true,
+        message: 'Configuration updated'
+      });
+    } catch (error) {
+      logger.error('CONFIG - Failed to update configuration', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  /**
+   * POST /api/config/clear
+   * Clear all configuration (factory reset)
+   */
+  router.post('/config/clear', async (req, res) => {
+    logger.info('CONFIG - Clearing all configuration...');
+
+    try {
+      await clearConfig();
+
+      logger.info('CONFIG - Configuration cleared successfully');
+
+      res.json({
+        success: true,
+        message: 'Configuration cleared'
+      });
+    } catch (error) {
+      logger.error('CONFIG - Failed to clear configuration', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  return router;
+}
+
+module.exports = setupSetupRoutes;
