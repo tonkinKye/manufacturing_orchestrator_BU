@@ -262,7 +262,7 @@ async function getConfigStatus() {
 
   return {
     setupComplete: true,
-    usingDPAPI: isWindows && !!dpapi,
+    usingDPAPI: isDpapiAvailable,
     createdAt: file.metadata?.createdAt,
     updatedAt: file.metadata?.updatedAt,
     platform: file.metadata?.platform

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authService = require('../services/authService');
 const { loadTokens } = require('../db/tokenStore');
+const { loadConfig } = require('../utils/secureConfig');
 
 /**
  * Authentication Routes
@@ -10,10 +11,27 @@ const { loadTokens } = require('../db/tokenStore');
 function setupAuthRoutes(logger) {
   // Login
   router.post('/login', async (req, res) => {
-    const { serverUrl, ...loginData } = req.body;
-
     try {
-      const data = await authService.login(serverUrl, loginData, logger);
+      // Load credentials from secure storage (don't trust frontend)
+      const config = await loadConfig();
+
+      if (!config?.fishbowl?.serverUrl || !config?.fishbowl?.username || !config?.fishbowl?.password) {
+        return res.status(400).json({ error: 'Configuration not found. Please complete setup first.' });
+      }
+
+      logger.info('LOGIN - Using credentials from secure storage');
+
+      // Use credentials from secure storage
+      const loginData = {
+        appName: req.body.appName || 'ManufacturingOrchestrator',
+        appDescription: req.body.appDescription || 'Queue-based work order processing',
+        appId: req.body.appId || 20251022,
+        username: config.fishbowl.username,
+        password: config.fishbowl.password,
+        mfaCode: req.body.mfaCode || ''
+      };
+
+      const data = await authService.login(config.fishbowl.serverUrl, loginData, logger);
       res.json(data);
     } catch (error) {
       logger.error('LOGIN ERROR', { error: error.message, stack: error.stack });
