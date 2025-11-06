@@ -175,7 +175,7 @@
           if (config.fishbowl) {
             $('#fishbowlUrl').val(config.fishbowl.serverUrl || '');
             $('#fishbowlUsername').val(config.fishbowl.username || '');
-            $('#fishbowlPassword').val(''); // Don't show password
+            $('#fishbowlPassword').val('').attr('placeholder', '(password saved - leave blank to keep current)');
             $('#fishbowlDatabase').val(config.fishbowl.database || '');
           }
 
@@ -183,7 +183,7 @@
             $('#mysqlHost').val(config.mysql.host || 'localhost');
             $('#mysqlPort').val(config.mysql.port || 3306);
             $('#mysqlUser').val(config.mysql.user || 'root');
-            $('#mysqlPassword').val(''); // Don't show password
+            $('#mysqlPassword').val('').attr('placeholder', '(password saved - leave blank to keep current)');
           }
 
           // For reconfiguration, assume Fishbowl is "tested" if we have the URL

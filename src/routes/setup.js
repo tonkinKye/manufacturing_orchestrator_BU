@@ -223,32 +223,51 @@ function setupSetupRoutes(logger) {
     const { fishbowl, mysql } = req.body;
 
     // Validate required fields
-    if (!fishbowl?.serverUrl || !fishbowl?.username || !fishbowl?.password) {
+    if (!fishbowl?.serverUrl || !fishbowl?.username) {
       return res.status(400).json({ error: 'Missing Fishbowl credentials' });
     }
 
-    if (!mysql?.host || !mysql?.user || !mysql?.password) {
+    if (!mysql?.host || !mysql?.user) {
       return res.status(400).json({ error: 'Missing MySQL credentials' });
     }
 
-    logger.info('SETUP - Saving initial configuration...');
+    logger.info('SETUP - Saving configuration...');
 
     try {
-      // Save encrypted configuration
-      await saveConfig({
+      // Check if this is a reconfiguration (existing config exists)
+      const setupComplete = await isSetupComplete();
+      let existingConfig = null;
+
+      if (setupComplete) {
+        existingConfig = await loadConfig();
+      }
+
+      // Build config, using existing passwords if not provided (for reconfiguration)
+      const configToSave = {
         fishbowl: {
           serverUrl: fishbowl.serverUrl,
           username: fishbowl.username,
-          password: fishbowl.password,
+          password: fishbowl.password || existingConfig?.fishbowl?.password,
           database: fishbowl.database || null
         },
         mysql: {
           host: mysql.host,
           port: mysql.port || 3306,
           user: mysql.user,
-          password: mysql.password
+          password: mysql.password || existingConfig?.mysql?.password
         }
-      });
+      };
+
+      // Validate we have passwords (either new or existing)
+      if (!configToSave.fishbowl.password) {
+        return res.status(400).json({ error: 'Fishbowl password required' });
+      }
+      if (!configToSave.mysql.password) {
+        return res.status(400).json({ error: 'MySQL password required' });
+      }
+
+      // Save encrypted configuration
+      await saveConfig(configToSave);
 
       logger.info('SETUP - Configuration saved successfully');
 

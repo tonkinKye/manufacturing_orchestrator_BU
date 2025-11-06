@@ -21,10 +21,24 @@ async function login(serverUrl, loginData, logger) {
     url: `${serverUrl}/api/login`
   });
 
+  // Build REST API login payload (only include fields Fishbowl expects)
+  const fishbowlPayload = {
+    appName: loginData.appName || 'ManufacturingOrchestrator',
+    appDescription: loginData.appDescription || 'Queue-based work order processing',
+    appId: loginData.appId || 20251022,
+    username: loginData.username,
+    password: loginData.password
+  };
+
+  // Only include mfaCode if provided
+  if (loginData.mfaCode) {
+    fishbowlPayload.mfaCode = loginData.mfaCode;
+  }
+
   const response = await fetchWithNode(`${serverUrl}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(loginData)
+    body: JSON.stringify(fishbowlPayload)
   });
 
   const data = await response.json();
