@@ -6,6 +6,7 @@ node_modules/
 daemon/*.log
 
 # Configuration files (may contain secrets)
+.env
 config.json
 active-tokens.json
 *.backup
