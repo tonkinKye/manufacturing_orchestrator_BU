@@ -15,11 +15,14 @@ function setupFishbowlRoutes(logger) {
     try {
       // Load serverUrl from secure config
       const config = await loadConfig();
-      const serverUrl = config?.fishbowl?.serverUrl;
+      let serverUrl = config?.fishbowl?.serverUrl;
 
       if (!serverUrl) {
         return res.status(400).json({ error: 'Server URL not configured' });
       }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
       logger.api('SQL QUERY', {
         serverUrl,
@@ -97,11 +100,14 @@ function setupFishbowlRoutes(logger) {
     try {
       // Load serverUrl from secure config
       const config = await loadConfig();
-      const serverUrl = config?.fishbowl?.serverUrl;
+      let serverUrl = config?.fishbowl?.serverUrl;
 
       if (!serverUrl) {
         return res.status(400).json({ error: 'Server URL not configured' });
       }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
       logger.api('WO STRUCTURE QUERY', {
         serverUrl,
@@ -195,11 +201,14 @@ function setupFishbowlRoutes(logger) {
     try {
       // Load serverUrl from secure config
       const config = await loadConfig();
-      const serverUrl = config?.fishbowl?.serverUrl;
+      let serverUrl = config?.fishbowl?.serverUrl;
 
       if (!serverUrl) {
         return res.status(400).json({ error: 'Server URL not configured' });
       }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
       logger.api(`LEGACY API REQUEST: ${endpoint}`, {
         serverUrl,
@@ -240,11 +249,14 @@ function setupFishbowlRoutes(logger) {
     try {
       // Load serverUrl from secure config
       const config = await loadConfig();
-      const serverUrl = config?.fishbowl?.serverUrl;
+      let serverUrl = config?.fishbowl?.serverUrl;
 
       if (!serverUrl) {
         return res.status(400).json({ error: 'Server URL not configured' });
       }
+
+      // Normalize serverUrl (remove trailing slash)
+      serverUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
 
       logger.api(`REST API REQUEST: ${httpMethod} /api/${endpoint}`, {
         serverUrl,
