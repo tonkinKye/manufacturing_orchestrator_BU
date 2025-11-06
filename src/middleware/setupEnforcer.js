@@ -1,17 +1,33 @@
 const { isSetupComplete } = require('../utils/secureConfig');
+const path = require('path');
 
 /**
  * Middleware to enforce setup completion
  * Redirects to setup wizard if configuration is not complete
  */
 
-// Paths that don't require setup
+// Paths and extensions that don't require setup or allowed after setup
 const ALLOWED_PATHS = [
   '/setup.html',
-  '/api/setup/status',
-  '/api/setup/test-fishbowl',
-  '/api/setup/complete',
+  '/config.html',
+  '/api/setup/',
+  '/api/config/',
   '/favicon.ico'
+];
+
+const ALLOWED_EXTENSIONS = [
+  '.css',
+  '.js',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.svg',
+  '.ico',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.eot'
 ];
 
 function setupEnforcerMiddleware(logger) {
@@ -20,8 +36,14 @@ function setupEnforcerMiddleware(logger) {
   const CACHE_TTL = 5000; // 5 seconds
 
   return async function (req, res, next) {
+    // Allow static assets (CSS, JS, images, fonts)
+    const ext = path.extname(req.path).toLowerCase();
+    if (ALLOWED_EXTENSIONS.includes(ext)) {
+      return next();
+    }
+
     // Allow certain paths without setup
-    if (ALLOWED_PATHS.some(path => req.path.startsWith(path))) {
+    if (ALLOWED_PATHS.some(allowedPath => req.path.startsWith(allowedPath))) {
       return next();
     }
 
@@ -42,6 +64,7 @@ function setupEnforcerMiddleware(logger) {
         });
       } else {
         // HTML requests get redirected
+        logger.info('SETUP - Redirecting to setup wizard (setup not complete)');
         return res.redirect('/setup.html');
       }
     }

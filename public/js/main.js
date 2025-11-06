@@ -74,6 +74,11 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Set up all event listeners
  */
 function setupEventListeners() {
+  // Settings button
+  document.getElementById('btnSettings')?.addEventListener('click', () => {
+    window.location.href = '/config.html';
+  });
+
   // Authentication
   document.getElementById('btnLogin')?.addEventListener('click', login);
   document.getElementById('btnLogout')?.addEventListener('click', logout);
