@@ -239,7 +239,10 @@ function setupSetupRoutes(logger) {
       let existingConfig = null;
 
       if (setupComplete) {
+        logger.info('SETUP - Reconfiguration mode, loading existing config');
         existingConfig = await loadConfig();
+      } else {
+        logger.info('SETUP - First-time setup');
       }
 
       // Build config, using existing passwords if not provided (for reconfiguration)
@@ -258,6 +261,21 @@ function setupSetupRoutes(logger) {
         }
       };
 
+      logger.info('SETUP - Config to save:', {
+        fishbowl: {
+          serverUrl: configToSave.fishbowl.serverUrl,
+          username: configToSave.fishbowl.username,
+          hasPassword: !!configToSave.fishbowl.password,
+          database: configToSave.fishbowl.database
+        },
+        mysql: {
+          host: configToSave.mysql.host,
+          port: configToSave.mysql.port,
+          user: configToSave.mysql.user,
+          hasPassword: !!configToSave.mysql.password
+        }
+      });
+
       // Validate we have passwords (either new or existing)
       if (!configToSave.fishbowl.password) {
         return res.status(400).json({ error: 'Fishbowl password required' });
@@ -267,7 +285,29 @@ function setupSetupRoutes(logger) {
       }
 
       // Save encrypted configuration
+      logger.info('SETUP - Calling saveConfig()...');
       await saveConfig(configToSave);
+      logger.info('SETUP - saveConfig() returned successfully');
+
+      // Verify file was created
+      const path = require('path');
+      const configPath = path.join(__dirname, '../../config.encrypted.json');
+      const fs = require('fs').promises;
+      try {
+        await fs.access(configPath);
+        const stats = await fs.stat(configPath);
+        logger.info('SETUP - Config file verified:', {
+          path: configPath,
+          size: stats.size,
+          modified: stats.mtime
+        });
+      } catch (err) {
+        logger.error('SETUP - Config file NOT found:', {
+          path: configPath,
+          error: err.message
+        });
+        throw new Error('Config file was not created');
+      }
 
       logger.info('SETUP - Configuration saved successfully');
 
@@ -276,7 +316,10 @@ function setupSetupRoutes(logger) {
         message: 'Setup complete'
       });
     } catch (error) {
-      logger.error('SETUP - Failed to save configuration', { error: error.message });
+      logger.error('SETUP - Failed to save configuration', {
+        error: error.message,
+        stack: error.stack
+      });
       res.status(500).json({ error: error.message });
     }
   });

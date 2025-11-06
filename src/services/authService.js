@@ -61,6 +61,19 @@ async function login(serverUrl, loginData, logger) {
 
   const data = await response.json();
 
+  // Log the response for debugging
+  if (!response.ok) {
+    logger.error('LOGIN - Fishbowl rejected login:', {
+      status: response.status,
+      response: data
+    });
+  } else {
+    logger.info('LOGIN - Success:', {
+      hasToken: !!data.token,
+      tokenPreview: data.token ? data.token.substring(0, 20) + '...' : 'none'
+    });
+  }
+
   // Track the token if login was successful
   if (response.ok && data.token) {
     const tokenCount = await addToken(data.token, serverUrl, loginData.username, loginData.password);
