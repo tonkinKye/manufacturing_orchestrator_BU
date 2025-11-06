@@ -55,12 +55,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set up event listeners
     setupEventListeners();
 
+    // Check if we just saved configuration
+    if (sessionStorage.getItem('configSaved') === 'true') {
+      sessionStorage.removeItem('configSaved');
+      log('\n' + '='.repeat(60) + '\n');
+      log('✓ CONFIGURATION SAVED!\n');
+      log('Your Fishbowl and MySQL credentials have been encrypted\n');
+      log('and stored securely using Windows DPAPI.\n');
+      log('='.repeat(60) + '\n\n');
+      log('Click "Login to Fishbowl" button to get started.\n\n');
+    }
+
     // Display ready message
     if (!jobResumed) {
       if (sessionRestored) {
         log('Session restored! You can continue working or start a new job.\n');
       } else {
-        log('Ready! Enter your Fishbowl credentials and click Login to begin.\n');
+        log('Ready! Click "Login to Fishbowl" button to begin.\n');
       }
     }
 

@@ -303,12 +303,15 @@
             $('#setupStatus')
               .removeClass('alert-danger')
               .addClass('alert alert-success')
-              .html('<strong>Success!</strong> Configuration saved and encrypted. Redirecting...')
+              .html('<strong>✓ Success!</strong> Configuration saved and encrypted with Windows DPAPI.<br>Redirecting to application...')
               .show();
+
+            // Set flag for success message on main page
+            sessionStorage.setItem('configSaved', 'true');
 
             setTimeout(() => {
               window.location.href = '/index.html';
-            }, 1500);
+            }, 2000);
           } else {
             $('#setupStatus')
               .removeClass('alert-success')
