@@ -2,14 +2,13 @@
  * Fishbowl API communication layer
  */
 
-import { sessionToken, getServerUrl } from '../utils/state.js';
+import { sessionToken } from '../utils/state.js';
 
 /**
  * Call Fishbowl API endpoint
+ * (serverUrl is loaded from secure config on backend)
  */
 export async function fishbowlAPI(endpoint, payload) {
-  const serverUrl = getServerUrl();
-
   if (!sessionToken) {
     throw new Error('Not logged in. Please login first.');
   }
@@ -18,7 +17,6 @@ export async function fishbowlAPI(endpoint, payload) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      serverUrl: serverUrl,
       token: sessionToken,
       payload: payload
     })
@@ -39,10 +37,9 @@ export async function fishbowlAPI(endpoint, payload) {
 
 /**
  * Call Fishbowl REST endpoint
+ * (serverUrl is loaded from secure config on backend)
  */
 export async function fishbowlREST(endpoint, method = 'POST', payload = null) {
-  const serverUrl = getServerUrl();
-
   if (!sessionToken) {
     throw new Error('Not logged in. Please login first.');
   }
@@ -51,7 +48,6 @@ export async function fishbowlREST(endpoint, method = 'POST', payload = null) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      serverUrl: serverUrl,
       token: sessionToken,
       method: method,
       payload: payload
@@ -68,10 +64,9 @@ export async function fishbowlREST(endpoint, method = 'POST', payload = null) {
 
 /**
  * Execute SQL query via Fishbowl
+ * (serverUrl is loaded from secure config on backend)
  */
 export async function fishbowlQuery(sql) {
-  const serverUrl = getServerUrl();
-
   if (!sessionToken) {
     throw new Error('Not logged in. Please login first.');
   }
@@ -80,7 +75,6 @@ export async function fishbowlQuery(sql) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      serverUrl: serverUrl,
       token: sessionToken,
       sql: sql
     })

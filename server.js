@@ -61,11 +61,8 @@ async function gracefulShutdown(signal) {
   // Check for pending jobs before cleaning up tokens
   let hasPendingJobs = false;
   try {
-    const fs = require('fs').promises;
-    const { CONFIG_FILE } = require('./src/config');
-
-    const configData = await fs.readFile(CONFIG_FILE, 'utf8');
-    const config = JSON.parse(configData);
+    const { getFishbowlConfig } = require('./src/config/fishbowl');
+    const config = await getFishbowlConfig();
 
     if (config.database) {
       const connection = await createConnection(config.database);
@@ -155,12 +152,8 @@ server = app.listen(PORT, async () => {
     // Check for pending jobs before cleaning up tokens
     let hasPendingJobs = false;
     try {
-      const fs = require('fs').promises;
-      const { CONFIG_FILE } = require('./src/config');
-
-      // Load database name from config.json
-      const configData = await fs.readFile(CONFIG_FILE, 'utf8');
-      const config = JSON.parse(configData);
+      const { getFishbowlConfig } = require('./src/config/fishbowl');
+      const config = await getFishbowlConfig();
 
       if (config.database) {
         const connection = await createConnection(config.database);

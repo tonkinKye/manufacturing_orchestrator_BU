@@ -1,22 +1,47 @@
-const { decrypt } = require('../utils/encryption');
+const { loadConfig } = require('../utils/secureConfig');
 
+let cachedMySQLConfig = null;
+
+/**
+ * Get MySQL configuration from secure encrypted config
+ * Uses Windows DPAPI for encryption key protection
+ */
+async function getMySQLConfig() {
+  try {
+    const config = await loadConfig();
+    cachedMySQLConfig = config.mysql || {
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: ''
+    };
+    return cachedMySQLConfig;
+  } catch (error) {
+    // Setup not complete - return defaults
+    return {
+      host: 'localhost',
+      port: 3306,
+      user: 'root',
+      password: ''
+    };
+  }
+}
+
+/**
+ * Get MySQL password from secure config
+ */
+async function getMySQLPassword() {
+  const config = await getMySQLConfig();
+  return config.password;
+}
+
+// Expose MYSQL_CONFIG for backward compatibility (synchronous access)
+// Note: This requires setup to be complete before server starts
 const MYSQL_CONFIG = {
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  passwordEncrypted: 'e71963f4d621d03a9826635bafc0c669:91229c8e37cf2b34b23fb4082db46b58e7740096c2424a3e8ded85052cc34e6bc714304cb0e0c8d859bfd65135ca7028'
+  get host() { return cachedMySQLConfig?.host || 'localhost'; },
+  get port() { return cachedMySQLConfig?.port || 3306; },
+  get user() { return cachedMySQLConfig?.user || 'root'; }
 };
-
-function getMySQLPassword() {
-  return decrypt(MYSQL_CONFIG.passwordEncrypted);
-}
-
-function getMySQLConfig() {
-  return {
-    ...MYSQL_CONFIG,
-    password: getMySQLPassword()
-  };
-}
 
 module.exports = {
   MYSQL_CONFIG,

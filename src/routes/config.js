@@ -1,30 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs').promises;
-const { CONFIG_FILE } = require('../config');
-const { encrypt, decrypt } = require('../utils/encryption');
+const { loadConfig, saveConfig } = require('../utils/secureConfig');
 
 /**
  * Configuration Routes
  */
 
 function setupConfigRoutes(logger) {
-  // Save configuration
+  // Save configuration (used by frontend after database detection)
   router.post('/save-config', async (req, res) => {
     const { serverUrl, username, password, database } = req.body;
 
-    logger.info('CONFIG - Saving configuration...');
+    logger.info('CONFIG - Saving configuration after database detection...');
 
     try {
-      const config = {
-        serverUrl: serverUrl,
-        username: username,
-        password: encrypt(password),
-        database: database || null
+      // Load existing config
+      const existingConfig = await loadConfig();
+
+      // Update only the database field, keep other credentials
+      const updatedConfig = {
+        fishbowl: {
+          serverUrl: serverUrl || existingConfig.fishbowl?.serverUrl,
+          username: username || existingConfig.fishbowl?.username,
+          password: password || existingConfig.fishbowl?.password,
+          database: database || existingConfig.fishbowl?.database
+        },
+        mysql: existingConfig.mysql || {}
       };
 
-      await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
-      logger.info('CONFIG - Configuration saved successfully', { database });
+      await saveConfig(updatedConfig);
+      logger.info('CONFIG - Configuration updated successfully', { database });
 
       res.json({ success: true });
     } catch (error) {
@@ -33,30 +38,10 @@ function setupConfigRoutes(logger) {
     }
   });
 
-  // Load configuration
+  // Load configuration (legacy endpoint - redirects to /api/config/load)
   router.get('/load-config', async (req, res) => {
-    logger.info('CONFIG - Loading configuration...');
-
-    try {
-      const configData = await fs.readFile(CONFIG_FILE, 'utf8');
-      const config = JSON.parse(configData);
-
-      if (config.password) {
-        config.password = decrypt(config.password);
-      }
-
-      logger.info('CONFIG - Configuration loaded successfully', { database: config.database });
-
-      res.json(config);
-    } catch (error) {
-      if (error.code === 'ENOENT') {
-        logger.info('CONFIG - No config file found (first run)');
-        res.json({});
-      } else {
-        logger.error('CONFIG - Failed to load config', { error: error.message });
-        res.status(500).json({ error: error.message });
-      }
-    }
+    logger.info('CONFIG - Legacy load-config endpoint called, redirecting to /api/config/load');
+    res.redirect('/api/config/load');
   });
 
   return router;

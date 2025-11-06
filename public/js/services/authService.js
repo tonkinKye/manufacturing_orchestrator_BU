@@ -86,10 +86,7 @@ export async function restoreSessionIfAvailable() {
       database: storedSession.database || ''
     });
 
-    // Restore UI fields
-    document.getElementById('serverUrl').value = storedSession.serverUrl;
-    document.getElementById('username').value = storedSession.username;
-    document.getElementById('password').value = storedSession.password;
+    // Note: No need to restore UI fields anymore since credentials come from secure config
 
     // Test if token is still valid by making a simple query
     try {
@@ -146,28 +143,26 @@ export async function restoreSessionIfAvailable() {
 }
 
 /**
- * Load config from server
+ * Load config from server (secure encrypted config)
  */
 export async function loadConfig() {
   try {
-    log('[CONFIG] Loading saved configuration...\n');
-    const response = await fetch('/api/load-config');
+    log('[CONFIG] Loading configuration from secure storage...\n');
+    const response = await fetch('/api/config/load');
     if (response.ok) {
       const config = await response.json();
-      if (config.serverUrl) {
-        document.getElementById('serverUrl').value = config.serverUrl;
-        document.getElementById('username').value = config.username || '';
-        document.getElementById('password').value = config.password || '';
-
-        log('[OK] Loaded saved Fishbowl credentials\n');
+      if (config.fishbowl?.serverUrl) {
+        // Store config globally for login to use
+        window.APP_SECURE_CONFIG = config;
+        log('[OK] Loaded encrypted credentials from DPAPI-protected storage\n');
       } else {
-        log('[INFO] No saved config found (first run)\n');
+        log('[INFO] No configuration found - setup may be required\n');
       }
     } else {
-      log('[INFO] No saved config found (first run)\n');
+      log('[INFO] No configuration found - setup may be required\n');
     }
   } catch (e) {
-    log(`[INFO] No saved config found: ${e.message}\n`);
+    log(`[INFO] Could not load config: ${e.message}\n`);
   }
 }
 
@@ -196,12 +191,17 @@ export async function saveConfig(config) {
  * Login to Fishbowl
  */
 export async function login() {
-  const serverUrl = document.getElementById('serverUrl').value.trim();
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
+  // Get credentials from secure config (loaded at startup)
+  const config = window.APP_SECURE_CONFIG;
+
+  if (!config || !config.fishbowl) {
+    return alert('Configuration not loaded. Please check setup.');
+  }
+
+  const { serverUrl, username, password, database } = config.fishbowl;
 
   if (!serverUrl || !username || !password) {
-    return alert('Please enter server URL, username, and password');
+    return alert('Incomplete configuration. Please check settings.');
   }
 
   const statusEl = document.getElementById('sessionStatus');
@@ -209,6 +209,7 @@ export async function login() {
 
   try {
     log('[LOGIN] Logging in to Fishbowl via proxy...\n');
+    log(`[LOGIN] Server: ${serverUrl}, User: ${username}\n`);
 
     const response = await fetch('/api/login', {
       method: 'POST',
@@ -247,10 +248,6 @@ export async function login() {
     statusEl.innerHTML = `<span class="text-success"><img src="images/check.svg" class="icon" alt="Success"> Logged in as ${username}</span>`;
     toggleDisplay('btnLogin', false);
     toggleDisplay('btnLogout', true);
-
-    document.getElementById('serverUrl').disabled = true;
-    document.getElementById('username').disabled = true;
-    document.getElementById('password').disabled = true;
 
     log(`[OK] Login successful! Token: ${data.token.substring(0, 20)}...\n`);
 
@@ -346,10 +343,6 @@ export async function logout(preserveResults = false) {
     setButtonEnabled('btnLogin', true);
     toggleDisplay('btnLogout', false);
     setButtonEnabled('btnLogout', true);
-
-    document.getElementById('serverUrl').disabled = false;
-    document.getElementById('username').disabled = false;
-    document.getElementById('password').disabled = false;
 
     // Reset entire page to initial state (optionally preserving results)
     const { resetPage } = await import('../ui/stepManager.js');

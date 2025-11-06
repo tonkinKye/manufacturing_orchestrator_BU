@@ -15,20 +15,64 @@ const { loadTokens, addToken, removeToken, saveTokens } = require('../db/tokenSt
  * @returns {Promise<Object>} Login response with token
  */
 async function login(serverUrl, loginData, logger) {
+  // Normalize serverUrl (remove trailing slash)
+  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
   logger.api('LOGIN REQUEST', {
     serverUrl,
     username: loginData.username,
-    url: `${serverUrl}/api/login`
+    url: `${normalizedUrl}/api/login`
   });
 
-  const response = await fetchWithNode(`${serverUrl}/api/login`, {
+  // Build REST API login payload (only include fields Fishbowl expects)
+  const fishbowlPayload = {
+    appName: loginData.appName || 'ManufacturingOrchestrator',
+    appDescription: loginData.appDescription || 'Queue-based work order processing',
+    appId: loginData.appId || 20251022,
+    username: loginData.username,
+    password: loginData.password
+  };
+
+  // Only include mfaCode if provided
+  if (loginData.mfaCode) {
+    fishbowlPayload.mfaCode = loginData.mfaCode;
+  }
+
+  logger.info('LOGIN - Sending to Fishbowl:', {
+    url: `${normalizedUrl}/api/login`,
+    payload: { ...fishbowlPayload, password: '***' }
+  });
+
+  const response = await fetchWithNode(`${normalizedUrl}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(loginData)
+    body: JSON.stringify(fishbowlPayload)
   });
 
+  logger.api(`LOGIN RESPONSE - Status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
+
+  // Check if response is JSON before parsing
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    logger.error('LOGIN - Received non-JSON response:', text.substring(0, 500));
+    throw new Error('Fishbowl returned an error page instead of JSON. Check server URL and port.');
+  }
+
   const data = await response.json();
-  logger.api(`LOGIN RESPONSE - Status: ${response.status}`);
+
+  // Log the response for debugging
+  if (!response.ok) {
+    logger.error('LOGIN - Fishbowl rejected login:', {
+      status: response.status,
+      response: data
+    });
+  } else {
+    logger.info('LOGIN - Success:', {
+      hasToken: !!data.token,
+      tokenPreview: data.token ? data.token.substring(0, 20) + '...' : 'none'
+    });
+  }
 
   // Track the token if login was successful
   if (response.ok && data.token) {
@@ -48,12 +92,15 @@ async function login(serverUrl, loginData, logger) {
  * @returns {Promise<Object>} Logout result
  */
 async function logout(serverUrl, token, logoutData, logger) {
+  // Normalize serverUrl (remove trailing slash)
+  const normalizedUrl = serverUrl.endsWith('/') ? serverUrl.slice(0, -1) : serverUrl;
+
   logger.api('LOGOUT REQUEST - Cleaning up all tracked tokens', { serverUrl });
 
   // First, try to logout the current token
   if (token) {
     try {
-      const response = await fetchWithNode(`${serverUrl}/api/logout`, {
+      const response = await fetchWithNode(`${normalizedUrl}/api/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +153,11 @@ async function logoutAllTokens(logger) {
 
   for (const tokenInfo of tokens) {
     try {
+      // Normalize serverUrl (remove trailing slash)
+      const normalizedUrl = tokenInfo.serverUrl.endsWith('/')
+        ? tokenInfo.serverUrl.slice(0, -1)
+        : tokenInfo.serverUrl;
+
       logger.info(`TOKEN TRACKING - Logging out ${tokenInfo.username}@${tokenInfo.serverUrl}`);
 
       // Decrypt password if available
@@ -118,7 +170,7 @@ async function logoutAllTokens(logger) {
         }
       }
 
-      const response = await fetchWithNode(`${tokenInfo.serverUrl}/api/logout`, {
+      const response = await fetchWithNode(`${normalizedUrl}/api/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
