@@ -331,6 +331,7 @@ async function checkScheduledAndFailedJobs() {
     if (scheduledJobs.length > 0) {
       message += `📅 SCHEDULED JOBS:\n\n`;
       scheduledJobs.forEach(job => {
+        // MySQL returns datetime in local timezone (matches server timezone)
         const scheduledFor = new Date(job.scheduled_for).toLocaleString();
         message += `  • ${job.count} job(s) scheduled for ${scheduledFor}\n`;
       });

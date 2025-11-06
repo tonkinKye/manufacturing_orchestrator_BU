@@ -3,6 +3,18 @@
  * Main entry point - modular architecture
  */
 
+// Auto-detect and set system timezone BEFORE anything else
+// This ensures Windows services (which default to UTC) use the system timezone
+if (!process.env.TZ) {
+  try {
+    const systemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    process.env.TZ = systemTimezone;
+    console.log(`✓ Auto-detected system timezone: ${systemTimezone}`);
+  } catch (error) {
+    console.warn('⚠️  Could not detect system timezone, using system default');
+  }
+}
+
 // Load environment variables from .env file FIRST
 require('dotenv').config();
 

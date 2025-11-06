@@ -452,8 +452,12 @@ export async function saveToQueue() {
   document.getElementById('scheduleOptions').style.display = 'none';
   document.getElementById('scheduleHour').value = '';
 
-  // Set minimum date to today
-  const today = new Date().toISOString().split('T')[0];
+  // Set minimum date to today (using local time, not UTC)
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const today = `${year}-${month}-${day}`;
   document.getElementById('scheduleDate').min = today;
   document.getElementById('scheduleDate').value = today;
 
@@ -504,16 +508,19 @@ async function performSaveToQueue() {
       return;
     }
 
-    // Format as MySQL DATETIME: YYYY-MM-DD HH:00:00
-    scheduledFor = `${scheduleDate} ${scheduleHour}:00:00`;
+    // Create datetime in user's local timezone
+    const localDateTime = new Date(`${scheduleDate}T${scheduleHour}:00:00`);
 
     // Validate that scheduled time is not in the past
-    const scheduledDateTime = new Date(scheduledFor);
     const now = new Date();
-    if (scheduledDateTime <= now) {
+    if (localDateTime <= now) {
       alert('Cannot schedule a job for a time in the past. Please select a future date and time.');
       return;
     }
+
+    // Format as MySQL DATETIME in local time (MySQL NOW() uses server's local timezone)
+    // No UTC conversion needed - keep everything in local timezone for consistency
+    scheduledFor = `${scheduleDate} ${scheduleHour}:00:00`;
   }
 
   // Close the modal
@@ -523,7 +530,7 @@ async function performSaveToQueue() {
     log(`\n${'='.repeat(60)}\nSAVING TO QUEUE\n${'='.repeat(60)}\n`);
 
     if (scheduledFor) {
-      log(`[INFO] Job scheduled for: ${scheduledFor}\n`);
+      log(`[INFO] Job scheduled for: ${scheduledFor} (local time)\n`);
     } else {
       log(`[INFO] Job will be available for immediate processing\n`);
     }

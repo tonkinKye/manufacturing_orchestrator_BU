@@ -8,7 +8,7 @@ const { createConnection } = require('../db/connection');
 const { getPendingItems } = require('../db/queries');
 const { processQueue } = require('./queueService');
 const { loadConfig } = require('../utils/secureConfig');
-const logger = require('../utils/logger');
+const { logger } = require('../app');
 
 let schedulerInterval = null;
 let isChecking = false;
