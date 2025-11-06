@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { fetchWithNode } = require('../utils/helpers');
+const { loadConfig } = require('../utils/secureConfig');
 
 /**
  * Fishbowl API Proxy Routes
@@ -9,15 +10,23 @@ const { fetchWithNode } = require('../utils/helpers');
 function setupFishbowlRoutes(logger) {
   // Data query
   router.post('/data-query', async (req, res) => {
-    const { serverUrl, token, sql } = req.body;
-
-    logger.api('SQL QUERY', {
-      serverUrl,
-      sqlPreview: sql.substring(0, 100) + '...',
-      url: `${serverUrl}/api/data-query`
-    });
+    const { token, sql } = req.body;
 
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      const serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      logger.api('SQL QUERY', {
+        serverUrl,
+        sqlPreview: sql.substring(0, 100) + '...',
+        url: `${serverUrl}/api/data-query`
+      });
+
       const url = new URL(`${serverUrl}/api/data-query`);
       const isHttps = url.protocol === 'https:';
       const httpModule = isHttps ? require('https') : require('http');
@@ -78,19 +87,26 @@ function setupFishbowlRoutes(logger) {
 
   // Get original work order structure for disassembly
   router.post('/fishbowl/workorder-structure', async (req, res) => {
-    const { serverUrl, token, woNumber } = req.body;
+    const { token, woNumber } = req.body;
 
-    if (!serverUrl || !token || !woNumber) {
-      logger.error('WO STRUCTURE - Missing required parameters', { serverUrl: !!serverUrl, token: !!token, woNumber: !!woNumber });
-      return res.status(400).json({ error: 'Missing required parameters: serverUrl, token, woNumber' });
+    if (!token || !woNumber) {
+      logger.error('WO STRUCTURE - Missing required parameters', { token: !!token, woNumber: !!woNumber });
+      return res.status(400).json({ error: 'Missing required parameters: token, woNumber' });
     }
 
-    logger.api('WO STRUCTURE QUERY', {
-      serverUrl,
-      woNumber
-    });
-
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      const serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      logger.api('WO STRUCTURE QUERY', {
+        serverUrl,
+        woNumber
+      });
       const sql = `
         SELECT
           bomitemtype.name AS woitem_type,
@@ -174,15 +190,23 @@ function setupFishbowlRoutes(logger) {
   // Legacy API proxy
   router.post('/fishbowl/:endpoint', async (req, res) => {
     const { endpoint } = req.params;
-    const { serverUrl, token, payload } = req.body;
-
-    logger.api(`LEGACY API REQUEST: ${endpoint}`, {
-      serverUrl,
-      url: `${serverUrl}/api/legacy/external/${endpoint}`,
-      payloadPreview: payload ? JSON.stringify(payload).substring(0, 300) : 'No payload'
-    });
+    const { token, payload } = req.body;
 
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      const serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      logger.api(`LEGACY API REQUEST: ${endpoint}`, {
+        serverUrl,
+        url: `${serverUrl}/api/legacy/external/${endpoint}`,
+        payloadPreview: payload ? JSON.stringify(payload).substring(0, 300) : 'No payload'
+      });
+
       const response = await fetchWithNode(`${serverUrl}/api/legacy/external/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -209,17 +233,25 @@ function setupFishbowlRoutes(logger) {
     }
 
     const endpoint = req.path.substring(1);
-    const { serverUrl, token, method, payload } = req.body;
+    const { token, method, payload } = req.body;
 
     const httpMethod = method || req.method;
 
-    logger.api(`REST API REQUEST: ${httpMethod} /api/${endpoint}`, {
-      serverUrl,
-      url: `${serverUrl}/api/${endpoint}`,
-      payloadPreview: payload ? JSON.stringify(payload).substring(0, 300) : null
-    });
-
     try {
+      // Load serverUrl from secure config
+      const config = await loadConfig();
+      const serverUrl = config?.fishbowl?.serverUrl;
+
+      if (!serverUrl) {
+        return res.status(400).json({ error: 'Server URL not configured' });
+      }
+
+      logger.api(`REST API REQUEST: ${httpMethod} /api/${endpoint}`, {
+        serverUrl,
+        url: `${serverUrl}/api/${endpoint}`,
+        payloadPreview: payload ? JSON.stringify(payload).substring(0, 300) : null
+      });
+
       const options = {
         method: httpMethod,
         headers: {
