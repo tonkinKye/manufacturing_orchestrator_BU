@@ -49,12 +49,11 @@ function setupSetupRoutes(logger) {
 
       // Build login request (Fishbowl REST API format)
       const loginPayload = {
+        appName: 'Manufacturing Orchestrator',
+        appDescription: 'Queue-based work order processing',
+        appId: 999999,
         username: username,
-        password: password,
-        name: 'Manufacturing Orchestrator',
-        description: 'Queue-based work order processing',
-        appId: '999999',
-        appKey: 'MFG_ORCH_KEY_2024'
+        password: password
       };
 
       // Determine which module to use based on protocol
