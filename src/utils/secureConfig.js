@@ -22,10 +22,13 @@ const path = require('path');
 const isWindows = process.platform === 'win32';
 
 // DPAPI module (Windows-only)
-let dpapi;
+let Dpapi;
+let isDpapiAvailable = false;
 if (isWindows) {
   try {
-    dpapi = require('@primno/dpapi');
+    const dpapiModule = require('@primno/dpapi');
+    Dpapi = dpapiModule.Dpapi;
+    isDpapiAvailable = dpapiModule.isPlatformSupported && !!Dpapi;
   } catch (err) {
     console.warn('DPAPI module not available, falling back to basic encryption');
   }
@@ -50,15 +53,15 @@ function generateDEK() {
  * @returns {string} Base64-encoded DPAPI-protected DEK
  */
 function protectDEK(dek) {
-  if (!isWindows || !dpapi) {
+  if (!isDpapiAvailable) {
     // Fallback: Base64 encode (not secure, but allows cross-platform dev)
     console.warn('WARNING: DPAPI not available. DEK stored with basic encoding. Use Windows for production!');
     return dek.toString('base64');
   }
 
   // DPAPI protect (bound to current user/service account)
-  const protectedData = dpapi.protectData(dek, null, 'CurrentUser');
-  return protectedData.toString('base64');
+  const protectedData = Dpapi.protectData(dek, null, 'CurrentUser');
+  return Buffer.from(protectedData).toString('base64');
 }
 
 /**
@@ -69,14 +72,15 @@ function protectDEK(dek) {
 function unprotectDEK(protectedDEK) {
   const protectedBuffer = Buffer.from(protectedDEK, 'base64');
 
-  if (!isWindows || !dpapi) {
+  if (!isDpapiAvailable) {
     // Fallback: Base64 decode
     console.warn('WARNING: DPAPI not available. Using basic decoding.');
     return protectedBuffer;
   }
 
   // DPAPI unprotect
-  return dpapi.unprotectData(protectedBuffer, null, 'CurrentUser');
+  const unprotectedData = Dpapi.unprotectData(protectedBuffer, null, 'CurrentUser');
+  return Buffer.from(unprotectedData);
 }
 
 /**
