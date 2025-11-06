@@ -8,7 +8,6 @@ daemon/*.log
 # Configuration files (may contain secrets)
 config.json
 active-tokens.json
-.env
 *.backup
 
 # nssm (downloaded automatically by install script)
