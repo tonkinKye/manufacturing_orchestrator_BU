@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs').promises;
-const { CONFIG_FILE } = require('../config');
-const { encrypt, decrypt } = require('../utils/encryption');
+const { getFishbowlConfig, saveFishbowlConfig, isUsingEnvConfig } = require('../config/fishbowl');
 
 /**
  * Configuration Routes
@@ -15,18 +13,20 @@ function setupConfigRoutes(logger) {
 
     logger.info('CONFIG - Saving configuration...');
 
-    try {
-      const config = {
-        serverUrl: serverUrl,
-        username: username,
-        password: encrypt(password),
-        database: database || null
-      };
+    // Check if using environment variables
+    if (isUsingEnvConfig()) {
+      logger.warn('CONFIG - Using environment variables, file save will be ignored at runtime');
+      // Still save to file for reference, but warn the user
+    }
 
-      await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
+    try {
+      await saveFishbowlConfig(serverUrl, username, password, database);
       logger.info('CONFIG - Configuration saved successfully', { database });
 
-      res.json({ success: true });
+      res.json({
+        success: true,
+        warning: isUsingEnvConfig() ? 'Configuration saved to file, but environment variables take precedence' : null
+      });
     } catch (error) {
       logger.error('CONFIG - Failed to save config', { error: error.message });
       res.status(500).json({ error: error.message });
@@ -38,24 +38,19 @@ function setupConfigRoutes(logger) {
     logger.info('CONFIG - Loading configuration...');
 
     try {
-      const configData = await fs.readFile(CONFIG_FILE, 'utf8');
-      const config = JSON.parse(configData);
+      const config = await getFishbowlConfig();
+      logger.info('CONFIG - Configuration loaded successfully', {
+        database: config.database,
+        source: isUsingEnvConfig() ? 'environment' : 'file'
+      });
 
-      if (config.password) {
-        config.password = decrypt(config.password);
-      }
-
-      logger.info('CONFIG - Configuration loaded successfully', { database: config.database });
-
-      res.json(config);
+      res.json({
+        ...config,
+        _source: isUsingEnvConfig() ? 'environment' : 'file'
+      });
     } catch (error) {
-      if (error.code === 'ENOENT') {
-        logger.info('CONFIG - No config file found (first run)');
-        res.json({});
-      } else {
-        logger.error('CONFIG - Failed to load config', { error: error.message });
-        res.status(500).json({ error: error.message });
-      }
+      logger.error('CONFIG - Failed to load config', { error: error.message });
+      res.status(500).json({ error: error.message });
     }
   });
 

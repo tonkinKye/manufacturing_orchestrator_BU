@@ -1,8 +1,10 @@
-# Environment Variables - What Actually Works
+# Environment Variables Guide
 
-This file documents which environment variables are **actually implemented** in the code.
+This file documents all environment variables supported by the Manufacturing Orchestrator.
 
-## ✅ IMPLEMENTED (These Actually Work)
+**Status:** ✅ **ALL ENVIRONMENT VARIABLES ARE NOW FULLY IMPLEMENTED**
+
+## ✅ IMPLEMENTED - All Variables Work
 
 ### Security
 ```bash
@@ -38,30 +40,30 @@ NODE_TLS_REJECT_UNAUTHORIZED=false
 **Default:** '0' (disabled, for dev with self-signed certs)
 **Required:** No
 
----
-
-## ❌ NOT IMPLEMENTED (In .env.example but Ignored)
-
-These are listed in `.env.example` for **documentation purposes** and as **future enhancements**, but the code does NOT currently read them:
-
-### Fishbowl Credentials (Uses config.json Instead)
+### Fishbowl Configuration (Optional)
 ```bash
-# ❌ These are IGNORED - use config.json instead
-FISHBOWL_SERVER_URL=...     # Use config.json: "serverUrl"
-FISHBOWL_USERNAME=...       # Use config.json: "username"
-FISHBOWL_PASSWORD=...       # Use config.json: "password" (encrypted)
-FISHBOWL_DATABASE=...       # Use config.json: "database"
+FISHBOWL_SERVER_URL=https://your-fishbowl-server:28192
+FISHBOWL_USERNAME=your-username
+FISHBOWL_PASSWORD=your-password
+FISHBOWL_DATABASE=your-database-name
 ```
+**Used by:** `src/config/fishbowl.js`
+**Purpose:** Fishbowl API connection credentials
+**Default:** Falls back to config.json if not set
+**Required:** No (can use config.json or web UI instead)
+**Priority:** Environment variables take precedence over config.json
 
-### MySQL Credentials (Hardcoded in src/config/database.js)
+### MySQL Database Configuration (Optional)
 ```bash
-# ❌ These are IGNORED - hardcoded in code
-DB_HOST=localhost           # Hardcoded: src/config/database.js line 4
-DB_PORT=3306                # Hardcoded: src/config/database.js line 5
-DB_USER=root                # Hardcoded: src/config/database.js line 6
-DB_PASSWORD=...             # Hardcoded (encrypted): src/config/database.js line 7
-DB_NAME=...                 # Uses config.json: "database"
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your-mysql-password
 ```
+**Used by:** `src/config/database.js`
+**Purpose:** MySQL database connection credentials
+**Default:** localhost:3306, root user, legacy encrypted password
+**Required:** No (uses sensible defaults)
 
 ---
 
@@ -115,7 +117,24 @@ set LOG_LEVEL=DEBUG
 npm start
 ```
 
-### ❌ Fishbowl Credentials (Doesn't Work - Use config.json)
+### ✅ Fishbowl Credentials (Multiple Options)
+
+**Option 1 - Environment Variables (Recommended for Production):**
+```bash
+# In .env
+FISHBOWL_SERVER_URL=https://your-server:28192
+FISHBOWL_USERNAME=admin
+FISHBOWL_PASSWORD=your-password
+FISHBOWL_DATABASE=your_database
+```
+
+**Option 2 - config.json (Web UI):**
+1. Open http://localhost:3000/index.html
+2. Click Settings
+3. Enter new credentials
+4. Click Save (auto-encrypts and saves to config.json)
+
+**Option 3 - config.json (Manual):**
 ```json
 // config.json
 {
@@ -126,126 +145,121 @@ npm start
 }
 ```
 
-**To change:**
-1. Open http://localhost:3000/index.html
-2. Click Settings
-3. Enter new credentials
-4. Click Save (auto-encrypts and saves to config.json)
+**Note:** Environment variables take precedence over config.json
 
-### ❌ MySQL Credentials (Doesn't Work - Hardcoded)
-**Current location:** `src/config/database.js`
+### ✅ MySQL Credentials (Multiple Options)
 
-**To change:**
-1. Edit `src/config/database.js`
-2. Modify lines 4-7:
-```javascript
-const MYSQL_CONFIG = {
-  host: 'your-host',        // Change this
-  port: 3306,                // Change this
-  user: 'your-user',         // Change this
-  passwordEncrypted: '...'   // Encrypt password first
-};
-```
-
-**To encrypt MySQL password:**
+**Option 1 - Environment Variables (Recommended):**
 ```bash
-node -e "const {encrypt} = require('./src/utils/encryption'); console.log(encrypt('your-mysql-password'));"
+# In .env
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your-mysql-password
 ```
+
+**Option 2 - Use Defaults:**
+```bash
+# Don't set environment variables
+# Uses: localhost:3306, root user, legacy encrypted password
+```
+
+**Note:** No need to encrypt passwords when using environment variables - they're used as plain text
 
 ---
 
-## Why Some Vars Aren't Implemented
+## Configuration Priority
 
-### Design Decision: Minimize Breaking Changes
+The system uses the following priority order (highest to lowest):
 
-The optimization focused on:
-- ✅ Security improvements (ENCRYPTION_KEY)
-- ✅ Code quality (SQL injection, deduplication)
-- ✅ Backward compatibility (nothing breaks)
+1. **Environment Variables (.env file)** - HIGHEST PRIORITY
+2. **config.json file** (for Fishbowl credentials only)
+3. **Built-in Defaults** (for MySQL configuration)
 
-**Not implemented to avoid:**
-- ❌ Breaking existing config.json workflows
-- ❌ Requiring users to migrate all settings
-- ❌ Extensive testing of new config system
-
-### Future Enhancement Opportunity
-
-To fully implement environment-based config:
-
-1. **Create new config loader** that checks env first, falls back to config.json
-2. **Update all config readers** to use new loader
-3. **Add migration guide** for users
-4. **Test extensively** with all combinations
-5. **Update documentation** and examples
-
-**Estimated effort:** 4-6 hours of development + testing
+This design ensures:
+- ✅ Production deployments can use secure environment variables
+- ✅ Development can use the convenient web UI (config.json)
+- ✅ Backward compatibility with existing config.json workflows
+- ✅ Sensible defaults for quick setup
 
 ---
 
 ## Quick Reference
 
-| Setting | Source | Can Change? |
-|---------|--------|-------------|
-| Encryption Key | .env or hardcoded | ✅ Yes (via .env) |
-| Server Port | .env or default 3000 | ✅ Yes (via .env) |
-| Log Level | .env or default INFO | ✅ Yes (via .env) |
-| TLS Validation | .env or default '0' | ✅ Yes (via .env) |
-| Fishbowl Server | config.json | ✅ Yes (via UI or edit file) |
-| Fishbowl User | config.json | ✅ Yes (via UI or edit file) |
-| Fishbowl Password | config.json (encrypted) | ✅ Yes (via UI) |
-| Fishbowl Database | config.json | ✅ Yes (via UI or edit file) |
-| MySQL Host | Hardcoded | ⚠️ Edit code |
-| MySQL Port | Hardcoded | ⚠️ Edit code |
-| MySQL User | Hardcoded | ⚠️ Edit code |
-| MySQL Password | Hardcoded (encrypted) | ⚠️ Edit code |
+| Setting | Primary Source | Fallback | Can Change? |
+|---------|---------------|----------|-------------|
+| Encryption Key | .env | Hardcoded legacy key | ✅ Yes (via .env) |
+| Server Port | .env | Default: 3000 | ✅ Yes (via .env) |
+| Log Level | .env | Default: INFO | ✅ Yes (via .env) |
+| TLS Validation | .env | Default: '0' | ✅ Yes (via .env) |
+| Fishbowl Server | .env | config.json | ✅ Yes (via .env, UI, or edit file) |
+| Fishbowl User | .env | config.json | ✅ Yes (via .env, UI, or edit file) |
+| Fishbowl Password | .env | config.json (encrypted) | ✅ Yes (via .env or UI) |
+| Fishbowl Database | .env | config.json | ✅ Yes (via .env, UI, or edit file) |
+| MySQL Host | .env | Default: localhost | ✅ Yes (via .env) |
+| MySQL Port | .env | Default: 3306 | ✅ Yes (via .env) |
+| MySQL User | .env | Default: root | ✅ Yes (via .env) |
+| MySQL Password | .env | Legacy encrypted password | ✅ Yes (via .env) |
 
 ---
 
-## Example .env (Realistic)
+## Example .env Files
 
-**This .env only includes what actually works:**
-
+### Minimal Configuration (Development)
 ```bash
 # Manufacturing Orchestrator Environment Configuration
+# Uses defaults and config.json for credentials
 
-# Security (ACTUALLY WORKS)
+# Security - Use your own key for production
 ENCRYPTION_KEY=a3d5f9e8c2b1a7f4e6d8c9b2a5f8e7d6c4b3a9f2e5d7c8b6a4f9e8d7c6b5a4f3
-# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
-# Server Configuration (ACTUALLY WORKS)
+# Server Configuration
+PORT=3000
+LOG_LEVEL=INFO
+
+# TLS Configuration (for self-signed certs)
+NODE_TLS_REJECT_UNAUTHORIZED=false
+```
+
+### Full Configuration (Production)
+```bash
+# Manufacturing Orchestrator Environment Configuration
+# All settings via environment variables
+
+# Security
+ENCRYPTION_KEY=your-secure-64-char-hex-key-here
+# Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Server Configuration
 PORT=3000
 LOG_LEVEL=INFO
 # Options: ERROR, WARN, INFO, DEBUG
 
-# TLS Configuration (ACTUALLY WORKS)
-NODE_TLS_REJECT_UNAUTHORIZED=false
-# Set to true for production with valid certificates
-# Set to false for development with self-signed certificates
+# TLS Configuration
+NODE_TLS_REJECT_UNAUTHORIZED=true
 
-# ────────────────────────────────────────────────────────
-# The following settings are NOT implemented yet
-# They are here for documentation only
-# ────────────────────────────────────────────────────────
+# Fishbowl Configuration
+FISHBOWL_SERVER_URL=https://your-fishbowl-server:28192
+FISHBOWL_USERNAME=your-username
+FISHBOWL_PASSWORD=your-password
+FISHBOWL_DATABASE=your-database-name
 
-# Fishbowl Configuration (NOT IMPLEMENTED - use config.json)
-# FISHBOWL_SERVER_URL=https://your-server:28192
-# FISHBOWL_USERNAME=admin
-# FISHBOWL_PASSWORD=your-password
-# FISHBOWL_DATABASE=your-database
-
-# MySQL Configuration (NOT IMPLEMENTED - hardcoded in code)
-# DB_HOST=localhost
-# DB_PORT=3306
-# DB_USER=root
-# DB_PASSWORD=your-mysql-password
-# DB_NAME=ceres_tracking_v2
+# MySQL Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your-mysql-password
 ```
 
 ---
 
 ## Summary
 
-**Currently Implemented:** 4 environment variables
-**Currently Ignored:** 9 environment variables in .env.example
+**Status:** ✅ **ALL ENVIRONMENT VARIABLES ARE NOW FULLY IMPLEMENTED**
 
-The `.env.example` file was aspirational - showing best practices - but most variables aren't actually implemented in the code yet. This document clarifies what actually works vs what's planned for the future.
+- **Total Variables:** 12 environment variables
+- **All Implemented:** 100% coverage
+- **Backward Compatible:** Existing config.json workflows still work
+- **Flexible:** Use environment variables, config.json, or defaults
+
+The system intelligently chooses the right configuration source based on what's available, ensuring a smooth experience for both development and production deployments.
