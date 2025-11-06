@@ -35,14 +35,28 @@ async function login(serverUrl, loginData, logger) {
     fishbowlPayload.mfaCode = loginData.mfaCode;
   }
 
+  logger.info('LOGIN - Sending to Fishbowl:', {
+    url: `${serverUrl}/api/login`,
+    payload: { ...fishbowlPayload, password: '***' }
+  });
+
   const response = await fetchWithNode(`${serverUrl}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(fishbowlPayload)
   });
 
+  logger.api(`LOGIN RESPONSE - Status: ${response.status}, Content-Type: ${response.headers.get('content-type')}`);
+
+  // Check if response is JSON before parsing
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    logger.error('LOGIN - Received non-JSON response:', text.substring(0, 500));
+    throw new Error('Fishbowl returned an error page instead of JSON. Check server URL and port.');
+  }
+
   const data = await response.json();
-  logger.api(`LOGIN RESPONSE - Status: ${response.status}`);
 
   // Track the token if login was successful
   if (response.ok && data.token) {
