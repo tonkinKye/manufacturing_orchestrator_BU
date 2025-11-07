@@ -3,6 +3,7 @@ const router = express.Router();
 const authService = require('../services/authService');
 const { loadTokens } = require('../db/tokenStore');
 const { loadConfig } = require('../utils/secureConfig');
+const uiSessionService = require('../services/uiSessionService');
 
 /**
  * Authentication Routes
@@ -32,6 +33,13 @@ function setupAuthRoutes(logger) {
       };
 
       const data = await authService.login(config.fishbowl.serverUrl, loginData, logger);
+
+      // Track UI session if login was successful
+      if (data.token) {
+        uiSessionService.startUISession(data.token);
+        logger.info('UI SESSION - Started for token:', data.token.substring(0, 20) + '...');
+      }
+
       res.json(data);
     } catch (error) {
       logger.error('LOGIN ERROR', { error: error.message, stack: error.stack });
@@ -45,6 +53,11 @@ function setupAuthRoutes(logger) {
 
     try {
       const result = await authService.logout(serverUrl, token, logoutData, logger);
+
+      // End UI session
+      uiSessionService.endUISession();
+      logger.info('UI SESSION - Ended');
+
       res.json(result);
     } catch (error) {
       logger.error('LOGOUT ERROR', { error: error.message });
@@ -72,6 +85,32 @@ function setupAuthRoutes(logger) {
       res.json(status);
     } catch (error) {
       logger.error('TOKEN STATUS - Error', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Activity heartbeat - update last activity time
+  router.post('/activity-heartbeat', async (req, res) => {
+    try {
+      uiSessionService.updateActivity();
+      res.json({ success: true });
+    } catch (error) {
+      logger.error('ACTIVITY HEARTBEAT - Error', { error: error.message });
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get UI session status
+  router.get('/ui-session-status', async (req, res) => {
+    try {
+      const session = uiSessionService.getUISession();
+      const { UI_INACTIVITY_TIMEOUT_MS } = require('../config');
+      res.json({
+        isActive: session.isActive,
+        inactivityTimeoutMs: UI_INACTIVITY_TIMEOUT_MS
+      });
+    } catch (error) {
+      logger.error('UI SESSION STATUS - Error', { error: error.message });
       res.status(500).json({ error: error.message });
     }
   });

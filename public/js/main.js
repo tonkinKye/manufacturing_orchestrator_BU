@@ -16,7 +16,7 @@ import {
   renderSelectedFGList,
   confirmDisassembly
 } from './services/disassemblyService.js';
-import { processQueue, checkAndResumeJob } from './services/queueService.js';
+import { processQueue, checkAndResumeJob, startLoginPageJobPolling, stopLoginPageJobPolling } from './services/queueService.js';
 
 /**
  * Initialize application on DOM ready
@@ -54,6 +54,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set up event listeners
     setupEventListeners();
+
+    // Start polling for job status (to prevent login during scheduled jobs)
+    // This will be stopped when user logs in
+    if (!sessionRestored && !jobResumed) {
+      startLoginPageJobPolling();
+    }
 
     // Check if we just saved configuration
     if (sessionStorage.getItem('configSaved') === 'true') {

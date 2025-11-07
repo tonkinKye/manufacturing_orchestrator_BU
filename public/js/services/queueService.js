@@ -912,3 +912,112 @@ function calculateDuration(startTime, endTime) {
   const diffSecs = Math.floor((diffMs % 60000) / 1000);
   return `${diffMins}m ${diffSecs}s`;
 }
+
+/**
+ * Poll job status while on login page to prevent login during scheduled jobs
+ * Returns the interval ID so it can be cleared when logged in
+ */
+let loginPagePollingInterval = null;
+let lastJobStatus = null;
+let lastJobTriggeredBy = null;
+
+export function startLoginPageJobPolling() {
+  // Clear any existing polling
+  if (loginPagePollingInterval) {
+    clearInterval(loginPagePollingInterval);
+  }
+
+  // Reset tracking
+  lastJobStatus = null;
+  lastJobTriggeredBy = null;
+
+  // Check immediately
+  checkJobStatusForLogin();
+
+  // Then check every 5 seconds
+  loginPagePollingInterval = setInterval(checkJobStatusForLogin, 5000);
+}
+
+export function stopLoginPageJobPolling() {
+  if (loginPagePollingInterval) {
+    clearInterval(loginPagePollingInterval);
+    loginPagePollingInterval = null;
+  }
+  lastJobStatus = null;
+  lastJobTriggeredBy = null;
+}
+
+async function checkJobStatusForLogin() {
+  try {
+    const statusResponse = await fetch('/api/queue-status');
+    const status = await statusResponse.json();
+
+    const btnLogin = document.getElementById('btnLogin');
+    const sessionStatus = document.getElementById('sessionStatus');
+
+    if (status.status === 'running') {
+      // Job is running - disable login
+      if (btnLogin) {
+        btnLogin.disabled = true;
+        btnLogin.innerHTML = '<img src="images/lock.svg" class="icon" alt="Locked"> Job Running...';
+      }
+      if (sessionStatus) {
+        const percentage = status.totalItems > 0 ? Math.round((status.processedItems / status.totalItems) * 100) : 0;
+        sessionStatus.innerHTML = `
+          <div class="text-warning" style="margin-bottom: 5px;">
+            ⏱️ Scheduled job running: ${status.processedItems}/${status.totalItems} (${percentage}%)
+          </div>
+          <div class="progress" style="height: 8px; margin-top: 5px; opacity: 0.8;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                 role="progressbar"
+                 style="width: ${percentage}%;"
+                 aria-valuenow="${status.processedItems}"
+                 aria-valuemin="0"
+                 aria-valuemax="${status.totalItems}">
+            </div>
+          </div>
+        `;
+      }
+
+      // Grey out login panel (but keep it visible enough to see progress)
+      const configPanel = document.querySelector('.config-panel');
+      if (configPanel) {
+        configPanel.style.opacity = '0.8';
+        configPanel.style.pointerEvents = 'none';
+      }
+    } else {
+      // No job running - enable login
+      if (btnLogin && btnLogin.disabled && btnLogin.textContent.includes('Job Running')) {
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = '<img src="images/lock.svg" class="icon" alt="Login"> Login to Fishbowl';
+      }
+      if (sessionStatus && sessionStatus.textContent.includes('Scheduled job running')) {
+        sessionStatus.innerHTML = '<span class="text-muted">Not logged in</span>';
+      }
+
+      // Re-enable login panel
+      const configPanel = document.querySelector('.config-panel');
+      if (configPanel && configPanel.style.opacity === '0.8') {
+        configPanel.style.opacity = '1';
+        configPanel.style.pointerEvents = 'auto';
+      }
+    }
+
+    // Detect scheduler job completion and auto-logout
+    // If UI is logged in and a scheduler job just completed, trigger logout
+    const isLoggedIn = sessionStorage.getItem('sessionToken');
+    if (isLoggedIn && lastJobStatus === 'running' &&
+        (status.status === 'completed' || status.status === 'idle') &&
+        status.triggeredBy === 'scheduler') {
+      console.log('[SCHEDULER] Scheduler job completed, auto-logging out UI session');
+      const { logout } = await import('./authService.js');
+      await logout(true); // Preserve results
+    }
+
+    // Update tracking
+    lastJobStatus = status.status;
+    lastJobTriggeredBy = status.triggeredBy;
+  } catch (error) {
+    // Silently fail - don't spam console during polling
+  }
+}

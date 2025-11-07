@@ -42,11 +42,13 @@ function requestStop() {
 /**
  * Start a new job
  * @param {Object} params - Job parameters
+ * @param {string} triggeredBy - Who triggered the job: 'ui' or 'scheduler'
  */
-function startJob(params) {
+function startJob(params, triggeredBy = 'ui') {
   currentJob.reset();
   currentJob.status = 'running';
   currentJob.startTime = new Date().toISOString();
+  currentJob.triggeredBy = triggeredBy;
 }
 
 /**

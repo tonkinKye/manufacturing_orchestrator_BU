@@ -402,8 +402,16 @@
               </select>
             </div>
 
-            <div class="alert alert-info" style="margin-top:10px; margin-bottom:0;">
-              <strong>Note:</strong> Jobs are automatically processed at the scheduled hour. The server checks every minute for jobs that are due to run.
+            <div class="form-group" id="scheduleMinuteGroup" style="display:none;">
+              <label for="scheduleMinute">Minute:</label>
+              <input type="number" id="scheduleMinute" class="form-control" min="0" max="59" step="1" value="00" placeholder="00-59">
+            </div>
+
+            <div class="alert alert-info" id="scheduleNoteHourly" style="margin-top:10px; margin-bottom:0;">
+              <strong>Note:</strong> Jobs are automatically processed at the scheduled hour.
+            </div>
+            <div class="alert alert-info" id="scheduleNoteAnyTime" style="margin-top:10px; margin-bottom:0; display:none;">
+              <strong>Note:</strong> Jobs are automatically processed at the scheduled time.
             </div>
           </div>
         </div>

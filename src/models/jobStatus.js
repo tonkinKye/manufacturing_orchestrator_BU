@@ -19,6 +19,7 @@ class JobStatus {
     this.totalBatches = 0;
     this.error = null;
     this.results = [];
+    this.triggeredBy = null;     // 'ui' or 'scheduler'
   }
 
   /**
@@ -39,6 +40,7 @@ class JobStatus {
     this.totalBatches = 0;
     this.error = null;
     this.results = [];
+    this.triggeredBy = null;
   }
 
   /**
@@ -60,7 +62,8 @@ class JobStatus {
       currentBatch: this.currentBatch,
       totalBatches: this.totalBatches,
       error: this.error,
-      results: this.results
+      results: this.results,
+      triggeredBy: this.triggeredBy
     };
   }
 }

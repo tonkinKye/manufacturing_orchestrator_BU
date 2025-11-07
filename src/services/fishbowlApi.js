@@ -15,7 +15,9 @@ const http = require('http');
  * @returns {Promise<Array>} Query results
  */
 async function fishbowlQuery(sql, serverUrl, token) {
-  const url = new URL(`${serverUrl}/api/data-query`);
+  // Remove trailing slash from serverUrl to avoid double slashes
+  const cleanServerUrl = serverUrl.replace(/\/$/, '');
+  const url = new URL(`${cleanServerUrl}/api/data-query`);
   const isHttps = url.protocol === 'https:';
   const httpModule = isHttps ? https : http;
 
@@ -45,7 +47,12 @@ async function fishbowlQuery(sql, serverUrl, token) {
           const parsed = JSON.parse(data);
           resolve(parsed);
         } catch (e) {
-          reject(new Error('Invalid JSON response from Fishbowl API'));
+          console.error('FISHBOWL API - Invalid JSON response');
+          console.error('Requested URL:', `${url.protocol}//${url.hostname}:${url.port}${url.pathname}`);
+          console.error('Status Code:', apiRes.statusCode);
+          console.error('Headers:', JSON.stringify(apiRes.headers));
+          console.error('Raw Response (first 500 chars):', data.substring(0, 500));
+          reject(new Error(`Invalid JSON response from Fishbowl API (Status: ${apiRes.statusCode}, Length: ${data.length})`));
         }
       });
     });
@@ -69,6 +76,10 @@ async function fishbowlQuery(sql, serverUrl, token) {
  * @returns {Promise<Object>} API response
  */
 async function callFishbowlREST(serverUrl, token, endpoint, method = 'POST', payload = null) {
+  // Remove trailing slash from serverUrl to avoid double slashes
+  const cleanServerUrl = serverUrl.replace(/\/$/, '');
+  const fullUrl = `${cleanServerUrl}/api/${endpoint}`;
+
   const options = {
     method: method,
     headers: {
@@ -81,10 +92,14 @@ async function callFishbowlREST(serverUrl, token, endpoint, method = 'POST', pay
     options.body = JSON.stringify(payload);
   }
 
-  const response = await fetchWithNode(`${serverUrl}/api/${endpoint}`, options);
+  const response = await fetchWithNode(fullUrl, options);
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error('FISHBOWL REST API - Error');
+    console.error('Requested URL:', fullUrl);
+    console.error('Status Code:', response.status);
+    console.error('Response:', errorText.substring(0, 500));
     throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
 
@@ -100,7 +115,11 @@ async function callFishbowlREST(serverUrl, token, endpoint, method = 'POST', pay
  * @returns {Promise<Object>} API response
  */
 async function callFishbowlLegacy(serverUrl, token, endpoint, payload) {
-  const response = await fetchWithNode(`${serverUrl}/api/legacy/external/${endpoint}`, {
+  // Remove trailing slash from serverUrl to avoid double slashes
+  const cleanServerUrl = serverUrl.replace(/\/$/, '');
+  const fullUrl = `${cleanServerUrl}/api/legacy/external/${endpoint}`;
+
+  const response = await fetchWithNode(fullUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -111,6 +130,10 @@ async function callFishbowlLegacy(serverUrl, token, endpoint, payload) {
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error('FISHBOWL LEGACY API - Error');
+    console.error('Requested URL:', fullUrl);
+    console.error('Status Code:', response.status);
+    console.error('Response:', errorText.substring(0, 500));
     throw new Error(`HTTP ${response.status}: ${errorText}`);
   }
 

@@ -12,5 +12,9 @@ module.exports = {
   // Set NODE_TLS_REJECT_UNAUTHORIZED=true (or omit) for production
   NODE_TLS_REJECT_UNAUTHORIZED: process.env.NODE_TLS_REJECT_UNAUTHORIZED !== undefined
     ? process.env.NODE_TLS_REJECT_UNAUTHORIZED
-    : '0' // Default to permissive for backward compatibility
+    : '0', // Default to permissive for backward compatibility
+
+  // UI inactivity timeout
+  UI_INACTIVITY_TIMEOUT_MINUTES: parseInt(process.env.UI_INACTIVITY_TIMEOUT_MINUTES) || 2,
+  UI_INACTIVITY_TIMEOUT_MS: (parseInt(process.env.UI_INACTIVITY_TIMEOUT_MINUTES) || 2) * 60 * 1000
 };

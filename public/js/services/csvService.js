@@ -461,6 +461,33 @@ export async function saveToQueue() {
   document.getElementById('scheduleDate').min = today;
   document.getElementById('scheduleDate').value = today;
 
+  // Load scheduler settings to configure UI
+  try {
+    const settingsResponse = await fetch('/api/scheduler-settings');
+    const settings = await settingsResponse.json();
+    const granularity = settings.scheduleGranularity;
+
+    // Show/hide minute selector based on granularity mode
+    const minuteGroup = document.getElementById('scheduleMinuteGroup');
+    const noteHourly = document.getElementById('scheduleNoteHourly');
+    const noteAnyTime = document.getElementById('scheduleNoteAnyTime');
+
+    if (granularity === 'any-time') {
+      minuteGroup.style.display = 'block';
+      noteHourly.style.display = 'none';
+      noteAnyTime.style.display = 'block';
+      document.getElementById('scheduleMinute').value = '00';
+    } else {
+      minuteGroup.style.display = 'none';
+      noteHourly.style.display = 'block';
+      noteAnyTime.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Failed to load scheduler settings:', error);
+    // Default to hourly mode if fetch fails
+    document.getElementById('scheduleMinuteGroup').style.display = 'none';
+  }
+
   // Show the scheduling modal
   $('#scheduleModal').modal('show');
 
@@ -502,14 +529,23 @@ async function performSaveToQueue() {
   if (scheduleOption === 'scheduled') {
     const scheduleDate = document.getElementById('scheduleDate').value;
     const scheduleHour = document.getElementById('scheduleHour').value;
+    let scheduleMinute = document.getElementById('scheduleMinute')?.value || '00';
 
     if (!scheduleDate || !scheduleHour) {
       alert('Please select both date and hour for scheduling');
       return;
     }
 
+    // Validate and format minute value
+    const minuteNum = parseInt(scheduleMinute, 10);
+    if (isNaN(minuteNum) || minuteNum < 0 || minuteNum > 59) {
+      alert('Please enter a valid minute value (0-59)');
+      return;
+    }
+    scheduleMinute = String(minuteNum).padStart(2, '0');
+
     // Create datetime in user's local timezone
-    const localDateTime = new Date(`${scheduleDate}T${scheduleHour}:00:00`);
+    const localDateTime = new Date(`${scheduleDate}T${scheduleHour}:${scheduleMinute}:00`);
 
     // Validate that scheduled time is not in the past
     const now = new Date();
@@ -520,7 +556,7 @@ async function performSaveToQueue() {
 
     // Format as MySQL DATETIME in local time (MySQL NOW() uses server's local timezone)
     // No UTC conversion needed - keep everything in local timezone for consistency
-    scheduledFor = `${scheduleDate} ${scheduleHour}:00:00`;
+    scheduledFor = `${scheduleDate} ${scheduleHour}:${scheduleMinute}:00`;
   }
 
   // Close the modal

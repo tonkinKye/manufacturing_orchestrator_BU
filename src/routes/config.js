@@ -1,12 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { loadConfig, saveConfig } = require('../utils/secureConfig');
+const { SCHEDULE_GRANULARITY } = require('../config');
 
 /**
  * Configuration Routes
  */
 
 function setupConfigRoutes(logger) {
+  // Get scheduler settings (public endpoint for frontend)
+  router.get('/scheduler-settings', async (req, res) => {
+    res.json({
+      scheduleGranularity: SCHEDULE_GRANULARITY
+    });
+  });
   // Save configuration (used by frontend after database detection)
   router.post('/save-config', async (req, res) => {
     const { serverUrl, username, password, database } = req.body;

@@ -8,6 +8,84 @@ import { setSessionToken, setSessionCredentials, clearSession, getServerUrl } fr
 import { detectDatabaseName } from '../api/fishbowlApi.js';
 import { initializeQueueTable } from '../api/queueApi.js';
 
+// Inactivity tracking
+let inactivityTimer = null;
+let inactivityTimeoutMs = 120000; // Default 2 minutes
+
+/**
+ * Reset inactivity timer
+ */
+function resetInactivityTimer() {
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer);
+  }
+
+  inactivityTimer = setTimeout(async () => {
+    // Check if a job is running
+    try {
+      const response = await fetch('/api/queue-status');
+      const status = await response.json();
+
+      // Don't auto-logout if job is running
+      if (status.status === 'running') {
+        // Retry after 30 seconds
+        resetInactivityTimer();
+        return;
+      }
+
+      // Auto-logout
+      log('[SESSION] Auto-logout due to inactivity\n');
+      await logout();
+    } catch (error) {
+      console.error('Inactivity check error:', error);
+    }
+  }, inactivityTimeoutMs);
+}
+
+/**
+ * Start tracking user activity
+ */
+function startActivityTracking() {
+  // Event types that indicate activity
+  const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+
+  activityEvents.forEach(eventType => {
+    document.addEventListener(eventType, resetInactivityTimer, { passive: true });
+  });
+
+  // Start initial timer
+  resetInactivityTimer();
+}
+
+/**
+ * Stop tracking user activity
+ */
+function stopActivityTracking() {
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = null;
+  }
+
+  // Note: We don't remove event listeners as they just call resetInactivityTimer
+  // which checks if timer exists
+}
+
+/**
+ * Load inactivity timeout from server
+ */
+async function loadInactivityTimeout() {
+  try {
+    const response = await fetch('/api/ui-session-status');
+    const data = await response.json();
+    if (data.inactivityTimeoutMs > 0) {
+      inactivityTimeoutMs = data.inactivityTimeoutMs;
+      log(`[SESSION] Inactivity timeout set to ${inactivityTimeoutMs / 1000} seconds\n`);
+    }
+  } catch (error) {
+    console.error('Failed to load inactivity timeout:', error);
+  }
+}
+
 /**
  * Save session to local storage
  */
@@ -237,6 +315,10 @@ export async function login() {
 
     setSessionToken(data.token);
 
+    // Stop polling for job status (we're now logged in)
+    const { stopLoginPageJobPolling } = await import('./queueService.js');
+    stopLoginPageJobPolling();
+
     // Clear any previous job results on new login
     toggleDisplay('processResults', false);
     setHTML('processResultContent', '');
@@ -262,6 +344,10 @@ export async function login() {
     // Save config (no password - backend will keep existing password from secure config)
     await saveConfig({ serverUrl, username, database: databaseName });
     log('[CONFIG] Database name saved securely\n');
+
+    // Load inactivity timeout and start tracking
+    await loadInactivityTimeout();
+    startActivityTracking();
 
     await initializeQueueTable(databaseName);
 
@@ -592,6 +678,9 @@ export async function logout(preserveResults = false) {
   } finally {
     clearSession();
 
+    // Stop activity tracking
+    stopActivityTracking();
+
     // Clear session from storage
     clearSessionFromStorage();
 
@@ -604,6 +693,10 @@ export async function logout(preserveResults = false) {
     // Reset entire page to initial state (optionally preserving results)
     const { resetPage } = await import('../ui/stepManager.js');
     resetPage(preserveResults);
+
+    // Restart polling for job status (now logged out)
+    const { startLoginPageJobPolling } = await import('./queueService.js');
+    startLoginPageJobPolling();
   }
 }
 
